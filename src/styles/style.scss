@@ -1,0 +1,24 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins/breakpoints";
+
+@import "./variables";
+@import "./controls";
+@import "./grid";
+
+
+html, body {
+  height: 100%;
+  background-color: map-get($colors, background);
+  overflow-x: hidden;  // button shaking @ phones shall not cause trouble
+}
+
+input {
+  &[type="text"] {
+    text-align: center;
+  }
+}
+
+label, button {
+  font-weight: bold !important; // overwrite bootstrap
+}

@@ -1,0 +1,39 @@
+#game-controls {
+  input {
+    &#player-name {
+      width: 65%;
+
+      @include media-breakpoint-up(sm) {
+        width: 38%;
+      }
+      @include media-breakpoint-up(md) {
+        width: 65%;
+      }
+      @include media-breakpoint-up(lg) {
+        width: 60%;
+      }
+    }
+  }
+
+  button {
+    margin: 0.25rem auto 0;
+
+    @include media-breakpoint-up(xl) {
+      margin: 0 1rem 0 0;
+    }
+
+    &[name="ready"] {
+      display: none;
+    }
+    &[name="abort"] {
+      display: none;
+    }
+    &[name="slide"] {
+      display: none;
+
+      @include media-breakpoint-up(md) {
+        display: none !important; // show via script only has effect on phones
+      }
+    }
+  }
+}
