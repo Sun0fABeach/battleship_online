@@ -1,8 +1,6 @@
 import * as ship_placement from './ship_placement';
 import Button from './button';
 
-let btn_host, btn_join, btn_ready, btn_abort, btn_slide;
-
 
 $(document).ready(function() {
     init_buttons();
@@ -10,11 +8,27 @@ $(document).ready(function() {
 });
 
 
+let btn_host, btn_join, btn_ready, btn_abort, btn_leave, btn_slide;
+let ships;
+
+
 function init_buttons() {
     btn_host = new Button(
         $('button[name="host"]'),
         () => player_name(),
-        () => switch_to_dual_view(),
+        () => {
+            $('#game-controls .form-group').fadeOut(function() {
+                // need to remove bootstrap class in order to be able to hide
+                $(this).removeClass('d-flex');
+            });
+
+            btn_host.hide();
+            btn_join.hide(() => {
+                btn_abort.show();
+                btn_ready.show(); // TODO: don't show until opponent joined
+                $('#opponent-side, #player-side').addClass('dual-view');
+            });
+        },
         'Waiting for an opponent to join ...',
         'Please enter your <strong>name</strong>.'
     );
@@ -27,26 +41,52 @@ function init_buttons() {
         'Please enter your <strong>name</strong>.'
     );
 
+    btn_abort = new Button(
+        $('button[name="abort"]'),
+        () => true,
+        () => {
+            btn_abort.hide();
+            btn_ready.hide(() => {
+                btn_host.show();
+                btn_join.show();
+            });
+        },
+        'Choose <strong>Host</strong> to host a game, ' +
+        'or <strong>Join</strong> to join a hosted game.',
+        undefined
+    );
+
     btn_ready = new Button(
         $('button[name="ready"]'),
         () => valid_ship_placement(),
         () => {
+            ship_placement.deinit();
+
             btn_abort.hide();
             btn_ready.hide(() => {
-                // TODO: delay this until game start:
                 btn_slide.show();
-                btn_abort.show();
+                btn_leave.show();
                 set_crosshair(true);
             });
         },
-        'Waiting for opponent to finish ship placement ...',
+        'Commencing battle!',
         'You have <strong>invalid</strong> ship placements.'
     );
 
-    btn_abort = new Button(
-        $('button[name="abort"]'),
+    btn_leave = new Button(
+        $('button[name="leave"]'),
         () => true,
-        () => switch_to_game_left_view(),
+        () => {
+            btn_slide.hide();
+            btn_leave.hide(() => {
+                ship_placement.reinit();
+
+                btn_host.show();
+                btn_join.show();
+                $('#opponent-side, #player-side').removeClass('dual-view');
+                set_crosshair(false);
+            });
+        },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
         undefined
@@ -64,31 +104,6 @@ function init_buttons() {
 
 function player_name() {
     return $('#player-name').val();
-}
-
-function switch_to_dual_view() {
-    $('#game-controls .form-group').fadeOut(function() {
-        // need to remove bootstrap class in order to be able to hide
-        $(this).removeClass('d-flex');
-    });
-
-    btn_host.hide();
-    btn_join.hide(() => {
-        btn_abort.show();
-        btn_ready.show();
-        $('#opponent-side, #player-side').addClass('dual-view');
-    });
-}
-
-function switch_to_game_left_view() {
-    btn_ready.hide();
-    btn_slide.hide();
-    btn_abort.hide(() => {
-        btn_host.show();
-        btn_join.show();
-        $('#opponent-side, #player-side').removeClass('dual-view');
-        set_crosshair(false);
-    });
 }
 
 function valid_ship_placement() {

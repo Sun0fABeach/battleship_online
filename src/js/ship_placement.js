@@ -14,6 +14,16 @@ export function init() {
     draw_grid();
 }
 
+export function deinit() {
+    $('#player-side .draggable').remove();
+}
+
+export function reinit() {
+    z_index_val = 0;
+
+    init_draggables();
+    draw_grid();
+}
 
 const ships = [
     [[3, 5], [4, 5], [5, 5], [6, 5]],
@@ -90,7 +100,7 @@ function draggable_mousedown_handler() {
             sort_coords(
                 $draggable.data('ship'), $draggable.data('ship_alignment')
             );
-            // dropped ship needs to be above others
+            // dropped ship needs to be on top of others
             $draggable.css('z-index', ++z_index_val);
             draw_grid();
             set_dragging_cursor(false);
