@@ -59,7 +59,7 @@ function init_buttons() {
 
     btn_ready = new Button(
         $('button[name="ready"]'),
-        () => valid_ship_placement(),
+        () => ship_placement.is_valid(),
         () => {
             ship_placement.deinit();
 
@@ -107,10 +107,6 @@ function init_buttons() {
 
 function player_name() {
     return $('#player-name').val();
-}
-
-function valid_ship_placement() {
-    return $('#player-side').find('.over, .forbidden').length === 0;
 }
 
 function set_crosshair(active) {
