@@ -49,6 +49,7 @@ function init_buttons() {
             btn_ready.hide(() => {
                 btn_host.show();
                 btn_join.show();
+                $('#opponent-side, #player-side').removeClass('dual-view');
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -77,10 +78,12 @@ function init_buttons() {
         $('button[name="leave"]'),
         () => true,
         () => {
+            $('#player-side .game-grid').slideDown(() => {
+                ship_placement.reinit();
+            });
+
             btn_slide.hide();
             btn_leave.hide(() => {
-                ship_placement.reinit();
-
                 btn_host.show();
                 btn_join.show();
                 $('#opponent-side, #player-side').removeClass('dual-view');
