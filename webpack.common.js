@@ -13,7 +13,7 @@ module.exports = {
             'webpack-jquery-ui/shake-effect',
             './src/vendor/jquery.ui.touch-punch.js',
             './node_modules/bootstrap/scss/bootstrap.scss',
-            // 'bootstrap',  // bootstrap js files - TODO: used?
+            'bootstrap',
         ],
     },
     output: {

@@ -35,9 +35,14 @@ function init_buttons() {
 
     btn_join = new Button(
         $('button[name="join"]'),
-        () => true,
-        () => {},
-        'Implement me.',
+        () => player_name(),
+        () => {
+            hide_player_name_input();
+
+            btn_host.hide();
+            btn_join.hide();
+        },
+        'Choose a host.',
         'Please enter your <strong>name</strong>.'
     );
 
@@ -100,6 +105,18 @@ function init_buttons() {
         () => true,
         () => $player_side.find('.game-grid').slideToggle(),
         undefined,
+        undefined
+    );
+
+    btn_close_hosts = new Button(
+        $('button[name="close-hosts"]'),
+        () => true,
+        () => {
+            btn_host.show();
+            btn_join.show();
+        },
+        'Choose <strong>Host</strong> to host a game, ' +
+        'or <strong>Join</strong> to join a hosted game.',
         undefined
     );
 }
