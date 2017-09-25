@@ -3,13 +3,16 @@ import Button from './button';
 
 
 $(document).ready(function() {
+    $player_side = $('#player-side');
+    $opponent_side = $('#opponent-side');
     init_buttons();
     ship_placement.init();
 });
 
 
-let btn_host, btn_join, btn_ready, btn_abort, btn_leave, btn_slide;
-let ships;
+let btn_host, btn_join, btn_ready, btn_abort,
+    btn_leave, btn_slide, btn_close_hosts;
+let $player_side, $opponent_side;
 
 
 function init_buttons() {
@@ -17,16 +20,13 @@ function init_buttons() {
         $('button[name="host"]'),
         () => player_name(),
         () => {
-            $('#game-controls .form-group').fadeOut(function() {
-                // need to remove bootstrap class in order to be able to hide
-                $(this).removeClass('d-flex');
-            });
+            hide_player_name_input();
 
             btn_host.hide();
             btn_join.hide(() => {
                 btn_abort.show();
                 btn_ready.show(); // TODO: don't show until opponent joined
-                $('#opponent-side, #player-side').addClass('dual-view');
+                $player_side.add($opponent_side).addClass('dual-view');
             });
         },
         'Waiting for an opponent to join ...',
@@ -49,7 +49,7 @@ function init_buttons() {
             btn_ready.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                $('#opponent-side, #player-side').removeClass('dual-view');
+                $player_side.add($opponent_side).removeClass('dual-view');
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -78,7 +78,7 @@ function init_buttons() {
         $('button[name="leave"]'),
         () => true,
         () => {
-            $('#player-side .game-grid').slideDown(() => {
+            $player_side.find('.game-grid').slideDown(() => {
                 ship_placement.reinit();
             });
 
@@ -86,7 +86,7 @@ function init_buttons() {
             btn_leave.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                $('#opponent-side, #player-side').removeClass('dual-view');
+                $player_side.add($opponent_side).removeClass('dual-view');
                 set_crosshair(false);
             });
         },
@@ -98,7 +98,7 @@ function init_buttons() {
     btn_slide = new Button(
         $('button[name="slide"]'),
         () => true,
-        () => $('#player-side .game-grid').slideToggle(),
+        () => $player_side.find('.game-grid').slideToggle(),
         undefined,
         undefined
     );
@@ -109,6 +109,13 @@ function player_name() {
     return $('#player-name').val();
 }
 
+function hide_player_name_input() {
+    $('#game-controls .form-group').fadeOut(function() {
+        // need to remove bootstrap class in order to be able to hide
+        $(this).removeClass('d-flex');
+    });
+}
+
 function set_crosshair(active) {
-    $('#opponent-side table').css('cursor', active ? 'crosshair' : '');
+    $opponent_side.find('table').css('cursor', active ? 'crosshair' : '');
 }

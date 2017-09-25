@@ -3,8 +3,9 @@
 */
 
 export function init() {
-    $tiles = $('#player-side td');
-    $rows = $('#player-side tr');
+    $player_side = $('#player-side');
+    $tiles = $player_side.find('td');
+    $rows = $player_side.find('tr');
     coords_to_tile = {};
     drag_init_tile_count = 0;
     z_index_val = 0;
@@ -15,7 +16,7 @@ export function init() {
 }
 
 export function deinit() {
-    $('#player-side .draggable').remove();
+    $player_side.find('.draggable').remove();
 }
 
 export function reinit() {
@@ -42,6 +43,7 @@ const ships = [
     [[0, 0]],
 ];
 
+let $player_side;
 let $tiles;
 let $rows;
 let coords_to_tile;
@@ -74,7 +76,7 @@ function init_draggables() {
         .data('ship_length', ship_coords.length)
         .data('ship_alignment', calc_ship_alignment(ship_coords))
         .css('position', 'absolute')
-        .insertAfter('#player-side table');
+        .insertAfter($player_side.find('table'));
 
         span_draggable_movable($draggable);
     }
@@ -194,7 +196,7 @@ function span_draggable_displayable($draggable) {
 
 function set_dragging_cursor(drag_happening) {
     // set on multiple elements for consistent (uninterrupted) cursor change
-    const $elements = $('#player-side').find('.game-grid, .draggable');
+    const $elements = $player_side.find('.game-grid, .draggable');
     const drag_class = 'dragging';
     if(drag_happening)
         $elements.addClass(drag_class);
