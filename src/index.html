@@ -169,14 +169,24 @@
     <div class="modal fade" id="host-modal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
+
           <div class="modal-header">
-            <h5 class="modal-title">Hosts</h5>
-            <!-- <input type="text" id="host-search" maxlength=12 autofocus placeholder="search host"
-              class="form-control font-weight-bold mx-5"> -->
-            <button type="button" class="close" name="close-hosts">
-              &times;
-            </button>
+            <div class="container-fluid">
+              <div class="row align-items-center justify-content-between">
+                <h5 class="modal-title col-4 pl-0 pl-sm-2">Hosts</h5>
+
+                <input type="text" id="host-search" maxlength=12 autofocus placeholder="search host"
+                  class="form-control font-weight-bold col-6">
+
+                <div class="col-2 text-right pr-0 pr-sm-1">
+                  <button type="button" class="close" name="close-hosts">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+
           <div class="modal-body">
             <ul class="list-group">
               <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -202,6 +212,7 @@
               </li>
             </ul>
           </div>
+
           <div class="modal-footer">
             <button type="button"
                 class="btn btn-primary">
