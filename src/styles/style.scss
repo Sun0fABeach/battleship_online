@@ -17,6 +17,9 @@ input {
   &[type="text"] {
     text-align: center;
   }
+  &:focus::placeholder {
+    color: transparent;
+  }
 }
 
 label, button {
