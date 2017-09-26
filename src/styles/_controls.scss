@@ -18,8 +18,8 @@
   button {
     margin: 0.25rem auto 0;
 
-    @include media-breakpoint-up(xl) {
-      margin: 0 1rem 0 0;
+    @include media-breakpoint-up(md) {
+      margin: 0 0.5rem 0;
     }
 
     &[name="ready"] {
