@@ -19,6 +19,10 @@
 .grid-wrapper {
   width: 100%;
 
+  /* width for breakpoint sm is handled via bootstrap via class of
+     .grids-container in html (col-sm-*)
+  */
+
   @include media-breakpoint-up(md) {
     width: 45%;
   }
@@ -64,10 +68,6 @@
 }
 
 .game-grid {
-  border: 1px solid map-get($colors, table-border);
-
-  // width for breakpoint sm is handled via bootstrap class in html (col-sm-*)
-
   @include make-square-box;
 
   table {
@@ -78,6 +78,10 @@
     border-spacing: 1px;
     background-color: map-get($colors, table-border);
     table-layout: fixed;
+
+    @include media-breakpoint-up(sm) {
+      outline: 1px solid map-get($colors, table-border);
+    }
   }
 
   table td {
