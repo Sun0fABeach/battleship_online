@@ -21,7 +21,6 @@ function init_buttons() {
         () => player_name(),
         () => {
             hide_player_name_input();
-
             btn_host.hide();
             btn_join.hide(() => {
                 btn_abort.show();
@@ -38,9 +37,10 @@ function init_buttons() {
         () => player_name(),
         () => {
             hide_player_name_input();
-
             btn_host.hide();
             btn_join.hide();
+
+            open_host_list();
         },
         'Choose a host.',
         'Please enter your <strong>name</strong>.'
@@ -112,6 +112,7 @@ function init_buttons() {
         $('button[name="close-hosts"]'),
         () => true,
         () => {
+            close_host_list();
             btn_host.show();
             btn_join.show();
         },
@@ -131,6 +132,17 @@ function hide_player_name_input() {
         // need to remove bootstrap class in order to be able to hide
         $(this).removeClass('d-flex');
     });
+}
+
+function open_host_list() {
+    $('#host-modal').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+
+function close_host_list() {
+    $('#host-modal').modal('hide');
 }
 
 function set_crosshair(active) {
