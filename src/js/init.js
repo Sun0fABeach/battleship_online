@@ -5,6 +5,7 @@ import Button from './button';
 $(document).ready(function() {
     $player_side = $('#player-side');
     $opponent_side = $('#opponent-side');
+    $both_sides = $('.grid-wrapper');
     init_buttons();
     ship_placement.init();
 });
@@ -12,7 +13,7 @@ $(document).ready(function() {
 
 let btn_enter, btn_host, btn_join, btn_ready, btn_abort,
     btn_leave, btn_slide, btn_close_hosts;
-let $player_side, $opponent_side;
+let $player_side, $opponent_side, $both_sides;
 
 
 function init_buttons() {
@@ -39,7 +40,7 @@ function init_buttons() {
             btn_join.hide(() => {
                 btn_abort.show();
                 btn_ready.show(); // TODO: don't show until opponent joined
-                $player_side.add($opponent_side).addClass('dual-view');
+                toggle_dual_grid(true);
             });
         },
         'Waiting for an opponent to join ...',
@@ -68,7 +69,7 @@ function init_buttons() {
             btn_ready.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                $player_side.add($opponent_side).removeClass('dual-view');
+                toggle_dual_grid(false);
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -105,7 +106,7 @@ function init_buttons() {
             btn_leave.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                $player_side.add($opponent_side).removeClass('dual-view');
+                toggle_dual_grid(false);
                 set_crosshair(false);
             });
         },
@@ -154,6 +155,13 @@ function open_host_list() {
 
 function close_host_list() {
     $('#host-modal').modal('hide');
+}
+
+function toggle_dual_grid(active) {
+    if(active)
+        $both_sides.addClass('dual-view');
+    else
+        $both_sides.removeClass('dual-view');
 }
 
 function set_crosshair(active) {
