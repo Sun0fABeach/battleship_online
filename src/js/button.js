@@ -5,7 +5,7 @@ export default class Button {
         this.$btn = $button;
 
         if(!$game_msg)
-            $game_msg = $('#game-message');
+            $game_msg = $('#game-message > span');
 
         $button
         .focusout(() => {  // using lambda so 'this' is not bound by jQuery
