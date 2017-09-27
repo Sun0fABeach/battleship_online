@@ -1,16 +1,19 @@
 #game-controls {
   input {
     &#player-name {
-      width: 65%;
+      width: 66%;
 
       @include media-breakpoint-up(sm) {
-        width: 38%;
+        width: 36%;
       }
       @include media-breakpoint-up(md) {
-        width: 65%;
+        width: 28%;
       }
       @include media-breakpoint-up(lg) {
-        width: 60%;
+        width: 21%;
+      }
+      @include media-breakpoint-up(xl) {
+        width: 17%;
       }
     }
   }
@@ -22,18 +25,13 @@
       margin: 0 0.5rem 0;
     }
 
-    &[name="ready"] {
-      display: none;
-    }
-    &[name="leave"] {
-      display: none;
-    }
-    &[name="abort"] {
-      display: none;
-    }
-    &[name="slide"] {
-      display: none;
+    display: none;
 
+    &[name="enter"] {
+      display: block;
+    }
+
+    &[name="slide"] {
       @include media-breakpoint-up(md) {
         display: none !important; // show via script only has effect on phones
       }

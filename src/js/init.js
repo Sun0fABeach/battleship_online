@@ -10,17 +10,31 @@ $(document).ready(function() {
 });
 
 
-let btn_host, btn_join, btn_ready, btn_abort,
+let btn_enter, btn_host, btn_join, btn_ready, btn_abort,
     btn_leave, btn_slide, btn_close_hosts;
 let $player_side, $opponent_side;
 
 
 function init_buttons() {
-    btn_host = new Button(
-        $('button[name="host"]'),
+    btn_enter = new Button(
+        $('button[name="enter"]'),
         () => player_name(),
         () => {
             hide_player_name_input();
+            btn_enter.hide(() => {
+                btn_host.show();
+                btn_join.show();
+            });
+        },
+        'Choose <strong>Host</strong> to host a game, ' +
+        'or <strong>Join</strong> to join a hosted game.',
+        'Please enter your <strong>name</strong>.'
+    );
+
+    btn_host = new Button(
+        $('button[name="host"]'),
+        () => true,
+        () => {
             btn_host.hide();
             btn_join.hide(() => {
                 btn_abort.show();
@@ -29,12 +43,12 @@ function init_buttons() {
             });
         },
         'Waiting for an opponent to join ...',
-        'Please enter your <strong>name</strong>.'
+        undefined
     );
 
     btn_join = new Button(
         $('button[name="join"]'),
-        () => player_name(),
+        () => true,
         () => {
             hide_player_name_input();
             btn_host.hide();
@@ -43,7 +57,7 @@ function init_buttons() {
             open_host_list();
         },
         'Choose a host.',
-        'Please enter your <strong>name</strong>.'
+        undefined
     );
 
     btn_abort = new Button(
@@ -128,10 +142,7 @@ function player_name() {
 }
 
 function hide_player_name_input() {
-    $('#game-controls .form-group').fadeOut(function() {
-        // need to remove bootstrap class in order to be able to hide
-        $(this).removeClass('d-flex');
-    });
+    $('#player-name').fadeOut();
 }
 
 function open_host_list() {

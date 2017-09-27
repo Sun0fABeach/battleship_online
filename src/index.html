@@ -120,22 +120,17 @@
         <div id="game-controls" class="col-12">
 
           <p id="game-message" class="text-center mt-3 mt-sm-4 mt-xl-5">
-            Please enter your name. Choose <strong>Host</strong> to host a game,
-            or <strong>Join</strong> to join a hosted game.
+            Please enter your name.
           </p>
 
+          <input type="text" id="player-name" maxlength="12" autofocus
+            class="form-control font-weight-bold mx-auto">
+
           <div class="row justify-content-center mx-auto mx-md-5 mt-3 mt-sm-4 mt-xl-5">
-
-            <div class="form-group d-flex justify-content-center p-0
-                        col-12 col-md-5 justify-content-md-start mb-md-0 col-lg-5 col-xl-4">
-              <label for="player-name"
-                  class="col-form-label mr-2 mr-lg-3">
-                Your name
-              </label>
-              <input type="text" id="player-name" maxlength="12" autofocus
-                class="form-control font-weight-bold">
-            </div>
-
+            <button type="button" name="enter"
+                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+              Enter
+            </button>
             <button type="button" name="host"
                 class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
               Host
