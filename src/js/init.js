@@ -6,6 +6,7 @@ $(document).ready(function() {
     $player_side = $('#player-side');
     $opponent_side = $('#opponent-side');
     $both_sides = $('.grid-wrapper');
+    $grids_container = $('#grids-container')
     init_buttons();
     ship_placement.init();
 });
@@ -13,7 +14,7 @@ $(document).ready(function() {
 
 let btn_enter, btn_host, btn_join, btn_ready, btn_abort,
     btn_leave, btn_slide, btn_close_hosts;
-let $player_side, $opponent_side, $both_sides;
+let $player_side, $opponent_side, $both_sides, $grids_container;
 
 
 function init_buttons() {
@@ -36,11 +37,11 @@ function init_buttons() {
         $('button[name="host"]'),
         () => true,
         () => {
+            toggle_dual_grid(true);
             btn_host.hide();
             btn_join.hide(() => {
                 btn_abort.show();
                 btn_ready.show(); // TODO: don't show until opponent joined
-                toggle_dual_grid(true);
             });
         },
         'Waiting for an opponent to join ...',
@@ -54,7 +55,6 @@ function init_buttons() {
             hide_player_name_input();
             btn_host.hide();
             btn_join.hide();
-
             open_host_list();
         },
         'Choose a host.',
@@ -65,11 +65,11 @@ function init_buttons() {
         $('button[name="abort"]'),
         () => true,
         () => {
+            toggle_dual_grid(false);
             btn_abort.hide();
             btn_ready.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                toggle_dual_grid(false);
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -100,13 +100,13 @@ function init_buttons() {
         () => {
             $player_side.find('.game-grid').slideDown(() => {
                 ship_placement.reinit();
+                toggle_dual_grid(false);
             });
 
             btn_slide.hide();
             btn_leave.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                toggle_dual_grid(false);
                 set_crosshair(false);
             });
         },
@@ -158,6 +158,17 @@ function close_host_list() {
 }
 
 function toggle_dual_grid(active) {
+    if($(window).width() >= 768) { // hard-coded bootstrap md-breakpoint
+        $grids_container.fadeOut(() => {
+            set_grid_split(active);
+            $grids_container.fadeIn();
+        });
+    } else {
+        set_grid_split(active);
+    }
+}
+
+function set_grid_split(active) {
     if(active)
         $both_sides.addClass('dual-view');
     else
