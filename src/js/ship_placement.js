@@ -174,8 +174,8 @@ function span_draggable_movable($draggable) {
 function span_draggable_displayable($draggable) {
     const [ship_coords, ship_len, ship_alignment] = get_ship_data($draggable);
 
-    const tiles = ship_coords.map((pair) => coords_to_tile[pair]);
-    const tile_sizes = tiles.map(($tile) => {
+    const tiles = ship_coords.map(pair => coords_to_tile[pair]);
+    const tile_sizes = tiles.map($tile => {
         return [$tile.outerWidth(), $tile.outerHeight()];
     });
     const accumulate = ship_alignment === 'x' ? 0 : 1;
@@ -288,7 +288,7 @@ function clear_grid() {
 
 function draw_ships(highlighted_ship) {
     for(const ship_coords of ships) {
-        for(const $tile of ship_coords.map((coord) => coords_to_tile[coord])) {
+        for(const $tile of ship_coords.map(coord => coords_to_tile[coord])) {
             $tile.addClass($tile.hasClass('ship') ? 'overlap' : 'ship');
             if(ship_coords === highlighted_ship)
                 $tile.addClass('highlighted');
@@ -308,7 +308,7 @@ function mark_forbidden() {
                 ([x_off, y_off]) => [ship_x + x_off, ship_y + y_off]
             );
             for(const adjacent of surrounding_coords) {
-                if(ship.some((coords) => equal_coords(coords, adjacent)))
+                if(ship.some(coords => equal_coords(coords, adjacent)))
                     continue; // is part of this ship
                 const $tile = coords_to_tile[adjacent];
                 if(!$tile)
@@ -356,10 +356,10 @@ function ship_in_valid_state(ship_coords, ship_len, ship_alignment) {
     const [same, different] = ship_alignment === 'x' ? [1, 0] : [0 , 1];
 
     const constant = ship_coords[0][same];
-    if(ship_coords.some((pair) => pair[same] !== constant))
+    if(ship_coords.some(pair => pair[same] !== constant))
         return false;
 
-    const diff_axis = ship_coords.map((pair) => pair[different]).sort();
+    const diff_axis = ship_coords.map(pair => pair[different]).sort();
     let prev_diff = diff_axis[0];
     for(let i = 1; i < ship_len; ++i)
         if(diff_axis[i] !== ++prev_diff)
