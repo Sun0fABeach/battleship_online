@@ -14,6 +14,7 @@ module.exports = {
             './src/vendor/jquery.ui.touch-punch.js',
             './node_modules/bootstrap/scss/bootstrap.scss',
             'bootstrap',
+            'font-awesome-webpack'
         ],
     },
     output: {
@@ -43,13 +44,20 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        outputPath: 'assets/'
-                    }
-                },
+                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000,
+                    mimetype: 'application/font-woff',
+                    outputPath: 'assets/'
+                }
+            },
+            {
+                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: 'file-loader',
+                options: {
+                    outputPath: 'assets/'
+                }
             }
         ]
     },
