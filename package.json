@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Browser based multiplayer battleships game",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:Sun0fABeach/battleships_pvp.git"
+  },
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "serve": "webpack-dev-server --open --config webpack.dev.js"
