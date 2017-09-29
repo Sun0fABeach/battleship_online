@@ -42,6 +42,56 @@
     }
   }
 
+
+  .game-grid {
+    @include make-square-box;
+
+    table {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-collapse: separate;
+      border-spacing: 1px;
+      background-color: map-get($colors, table-border);
+      table-layout: fixed;
+
+      @include media-breakpoint-up(sm) {
+        outline: 1px solid map-get($colors, table-border);
+      }
+    }
+
+    table td {
+      background-color: map-get($colors, table-cell);
+    }
+
+    .ship {
+      // outline: 1px solid grey;
+      background-color: map-get($colors, ship);
+    }
+
+    .overlap {
+      background-color: map-get($colors, ship-overlap);
+    }
+
+    .forbidden {
+      background-color: map-get($colors, ship-forbidden);
+    }
+
+    .highlighted {
+      box-shadow: 0 0 0.5em 0.5em map-get($colors, ship-highlight-shadow) inset;
+    }
+
+    .draggable {
+      // border: 1px solid black;
+      cursor: grab;
+    }
+    /* set cursor on both dragged element and parent to keep it
+    consistent when dragging */
+    &.dragging, .dragging {
+      cursor: grabbing;
+    }
+  }
+
   &#player-side {
     /* when opposite grid is revealed, player grid is moved on top, but only
        on small screens */
@@ -64,54 +114,38 @@
     &.dual-view {
       display: block;
     }
-  }
-}
 
-.game-grid {
-  @include make-square-box;
+    td {
+      position: relative;
 
-  table {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-collapse: separate;
-    border-spacing: 1px;
-    background-color: map-get($colors, table-border);
-    table-layout: fixed;
+      & .fa {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: default;
 
-    @include media-breakpoint-up(sm) {
-      outline: 1px solid map-get($colors, table-border);
+        &.fa-times {
+          color: map-get($colors, shot-hit);
+          font-size: 1.5em;
+
+          @include media-breakpoint-up(sm) {
+            font-size: 2.5em;
+          }
+        }
+        &.fa-bullseye {
+          color: map-get($colors, shot-miss);
+          font-size: 1.3em;
+
+          @include media-breakpoint-up(sm) {
+            font-size: 1.5em;
+          }
+        }
+      }
     }
-  }
-
-  table td {
-    background-color: map-get($colors, table-cell);
-  }
-
-  .ship {
-    // outline: 1px solid grey;
-    background-color: map-get($colors, ship);
-  }
-
-  .overlap {
-    background-color: map-get($colors, ship-overlap);
-  }
-
-  .forbidden {
-    background-color: map-get($colors, ship-forbidden);
-  }
-
-  .highlighted {
-    box-shadow: 0 0 0.5em 0.5em map-get($colors, ship-highlight-shadow) inset;
-  }
-
-  .draggable {
-    // border: 1px solid black;
-    cursor: grab;
-  }
-  /* set cursor on both dragged element and parent to keep it
-  consistent when dragging */
-  &.dragging, .dragging {
-    cursor: grabbing;
   }
 }

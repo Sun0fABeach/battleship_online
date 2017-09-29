@@ -1,12 +1,13 @@
 import * as ship_placement from './ship_placement';
 import Button from './button';
+import * as battle from './battle';
 
 
 $(document).ready(function() {
     $player_side = $('#player-side');
     $opponent_side = $('#opponent-side');
     $both_sides = $('.grid-wrapper');
-    $grids_container = $('#grids-container')
+    $grids_container = $('#grids-container');
     init_buttons();
     ship_placement.init();
 });
@@ -81,13 +82,13 @@ function init_buttons() {
         $('button[name="ready"]'),
         () => ship_placement.is_valid(),
         () => {
-            ship_placement.deinit();
+            const ships = ship_placement.deinit();
 
             btn_abort.hide();
             btn_ready.hide(() => {
                 btn_slide.show();
                 btn_leave.show();
-                set_crosshair(true);
+                battle.init($opponent_side.find('table'), ships);
             });
         },
         'Commencing battle!',
@@ -107,7 +108,7 @@ function init_buttons() {
             btn_leave.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                set_crosshair(false);
+                battle.deinit();
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -173,8 +174,4 @@ function set_grid_split(active) {
         $both_sides.addClass('dual-view');
     else
         $both_sides.removeClass('dual-view');
-}
-
-function set_crosshair(active) {
-    $opponent_side.find('table').css('cursor', active ? 'crosshair' : '');
 }

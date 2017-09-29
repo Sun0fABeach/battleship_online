@@ -17,6 +17,7 @@ export function init() {
 
 export function deinit() {
     $player_side.find('.draggable').remove();
+    return ships;
 }
 
 export function reinit() {
