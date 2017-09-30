@@ -9,7 +9,7 @@ $(document).ready(function() {
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');
     init_buttons();
-    ship_placement.init($player_side);
+    ship_placement.init($player_side.find('table')); //TODO ... u know
     ship_placement.activate();
     battle.init($opponent_side.find('table'));
 });

@@ -1,32 +1,8 @@
+import Grid from './grid';
+
 /* TODO:
 *   exact calculation of draggable size for styling?
 */
-
-export function init($plyr_side) {
-    $player_side = $plyr_side;
-    $tiles = $player_side.find('td');
-    $rows = $player_side.find('tr');
-    coords_to_tile = {};
-    drag_init_tile_count = 0;
-
-    init_droppables();
-}
-
-export function activate() {
-    z_index_val = 0;
-
-    init_draggables();
-    draw_grid();
-}
-
-export function deactivate() { //TODO: call activate/deactivate
-    $player_side.find('.draggable').remove();
-    return ships;
-}
-
-export function is_valid() {
-    return $tiles.filter('.over, .forbidden').length === 0;
-}
 
 const ships = [
     [[3, 5], [4, 5], [5, 5], [6, 5]],
@@ -41,12 +17,31 @@ const ships = [
     [[0, 0]],
 ];
 
-let $player_side;
-let $tiles;
-let $rows;
-let coords_to_tile;
+let player_grid;
 let drag_init_tile_count;
 let z_index_val;
+
+export function init($player_table) {
+    player_grid = new Grid($player_table);
+    player_grid.tiles.droppable(drop_config);
+}
+
+export function activate() {
+    drag_init_tile_count = 0;
+    z_index_val = 0;
+
+    init_draggables();
+    draw_grid();
+}
+
+export function deactivate() {
+    player_grid.table.siblings('.draggable').remove();
+    return ships;
+}
+
+export function is_valid() {
+    return player_grid.tiles.filter('.over, .forbidden').length === 0;
+}
 
 
 const drag_config = {
@@ -64,7 +59,9 @@ const drag_config = {
 };
 
 function init_draggables() {
-    drag_config.snapTolerance = Math.round($tiles.outerWidth() / 2) + 1;
+    drag_config.snapTolerance = Math.round(
+        player_grid.tiles.outerWidth() / 2
+    ) + 1;
 
     for(const ship_coords of ships) {
         const $draggable = $('<div></div>')
@@ -74,7 +71,7 @@ function init_draggables() {
         .data('ship_length', ship_coords.length)
         .data('ship_alignment', calc_ship_alignment(ship_coords))
         .css('position', 'absolute')
-        .insertAfter($player_side.find('table'));
+        .insertAfter(player_grid.table);
 
         span_draggable_movable($draggable);
     }
@@ -143,7 +140,7 @@ function rotate_ship($draggable) {
             break;
         }
         // side: bottom or right
-        adjustment = ship_coords[ship_len-1][dimension] - $rows.length + 1;
+        adjustment = ship_coords[ship_len-1][dimension] - player_grid.height + 1;
         if(adjustment > 0)
             for(const pair of ship_coords)
                 pair[dimension] -= adjustment;
@@ -156,7 +153,7 @@ function rotate_ship($draggable) {
 function span_draggable_movable($draggable) {
     const [ship_coords, ship_len, ship_alignment] = get_ship_data($draggable);
     const [cells_x, cells_y] = ship_dimensions(ship_len, ship_alignment);
-    const $starting_tile = coords_to_tile[ship_coords[0]];
+    const $starting_tile = player_grid.coords_to_tile(ship_coords[0]);
 
     $draggable.css({
         top: $starting_tile.position().top,
@@ -172,7 +169,7 @@ function span_draggable_movable($draggable) {
 function span_draggable_displayable($draggable) {
     const [ship_coords, ship_len, ship_alignment] = get_ship_data($draggable);
 
-    const tiles = ship_coords.map(pair => coords_to_tile[pair]);
+    const tiles = ship_coords.map(pair => player_grid.coords_to_tile(pair));
     const tile_sizes = tiles.map($tile => {
         return [$tile.outerWidth(), $tile.outerHeight()];
     });
@@ -194,7 +191,9 @@ function span_draggable_displayable($draggable) {
 
 function set_dragging_cursor(drag_happening) {
     // set on multiple elements for consistent (uninterrupted) cursor change
-    const $elements = $player_side.find('.game-grid, .draggable');
+    const $elements = player_grid.table.add(
+        player_grid.table.siblings('.draggable')
+    );
     const drag_class = 'dragging';
     if(drag_happening)
         $elements.addClass(drag_class);
@@ -203,7 +202,7 @@ function set_dragging_cursor(drag_happening) {
 }
 
 function adjust_draggables() {
-    $('.draggable').each(function(index, draggable) {
+    player_grid.table.siblings('.draggable').each(function(i, draggable) {
         span_draggable_movable($(draggable));
     });
 }
@@ -262,17 +261,6 @@ const drop_config = {
     }
 };
 
-function init_droppables() {
-    $rows.each(function(y, row) {
-        $(row).find('td').each(function(x, tile) {
-            const $tile = $(tile);
-            $tile.droppable(drop_config);
-            $tile.data('coords', [x, y]);
-            coords_to_tile[[x, y]] = $tile;
-        });
-    });
-}
-
 
 function draw_grid(highlighted_ship) {
     clear_grid();
@@ -281,12 +269,15 @@ function draw_grid(highlighted_ship) {
 }
 
 function clear_grid() {
-    $tiles.removeClass('ship forbidden overlap highlighted');
+    player_grid.tiles.removeClass('ship forbidden overlap highlighted');
 }
 
 function draw_ships(highlighted_ship) {
     for(const ship_coords of ships) {
-        for(const $tile of ship_coords.map(coord => coords_to_tile[coord])) {
+        const tiles = ship_coords.map(
+            coords => player_grid.coords_to_tile(coords)
+        );
+        for(const $tile of tiles) {
             $tile.addClass($tile.hasClass('ship') ? 'overlap' : 'ship');
             if(ship_coords === highlighted_ship)
                 $tile.addClass('highlighted');
@@ -308,7 +299,7 @@ function mark_forbidden() {
             for(const adjacent of surrounding_coords) {
                 if(ship.some(coords => equal_coords(coords, adjacent)))
                     continue; // is part of this ship
-                const $tile = coords_to_tile[adjacent];
+                const $tile = player_grid.coords_to_tile(adjacent);
                 if(!$tile)
                     continue; // is outside grid
                 if($tile.hasClass('ship') && !$tile.hasClass('overlap'))

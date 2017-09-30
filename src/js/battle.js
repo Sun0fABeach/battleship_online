@@ -1,37 +1,29 @@
 import Ship from './ship';
+import Grid from './grid';
 
-let coords_to_tile = {};
 let player_ships;
-let $target_grid;
+let opponent_grid;
 
 
-export function init($opponent_grid) {
-    $target_grid = $opponent_grid;
-    init_tiles();
+export function init($opponent_table) {
+    opponent_grid = new Grid($opponent_table);
 }
 
 export function activate(placed_ships) {
     player_ships = init_ships(placed_ships);
-    $target_grid.find('td').one('click', handle_player_shot);
+    opponent_grid.tiles.one('click', handle_player_shot);
     set_crosshair(true);
 }
 
 export function deactivate() {
     set_crosshair(false);
-    $target_grid.find('td')
+
+    opponent_grid
+    .clear_ships()
+    .tiles
     .off()
     .removeClass('ship')
     .children().remove();
-}
-
-function init_tiles() {
-    $target_grid.find('tr').each(function(y, row) {
-        $(row).find('td').each(function(x, tile) {
-            const $tile = $(tile);
-            $tile.data('coords', [x, y]);
-            coords_to_tile[[x, y]] = $tile;
-        });
-    });
 }
 
 function init_ships(placed_ships) {
@@ -40,14 +32,14 @@ function init_ships(placed_ships) {
         const ship = new Ship(ship_coords);
         ships.push(ship);
         for(const coord_pair of ship_coords)
-            coords_to_tile[coord_pair].data('ship', ship);
+            opponent_grid.set_ship(ship, coord_pair);
     }
     return ships;
 }
 
 function handle_player_shot() {
     const $tile = $(this);
-    const shot_result = send_shot($tile.data('coords'));
+    const shot_result = send_shot(opponent_grid.tile_to_coords($tile));
 
     if(shot_result) {
         mark_hit($tile);
@@ -64,7 +56,7 @@ function send_shot(coords) {
 }
 
 function receive_shot(coord_pair) {
-    const ship = coords_to_tile[coord_pair].data('ship');
+    const ship = opponent_grid.get_ship(coord_pair);
     if(!ship)
         return false;
     return ship.take_shot(coord_pair);
@@ -80,9 +72,9 @@ function mark_miss($tile) {
 
 function reveal_ship(ship_coords) {
     for(const coord_pair of ship_coords)
-        coords_to_tile[coord_pair].addClass('ship');
+        opponent_grid.coords_to_tile(coord_pair).addClass('ship');
 }
 
 function set_crosshair(active) {
-    $target_grid.css('cursor', active ? 'crosshair' : '');
+    opponent_grid.table.css('cursor', active ? 'crosshair' : '');
 }
