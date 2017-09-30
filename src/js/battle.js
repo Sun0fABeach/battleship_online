@@ -1,5 +1,5 @@
-import Grid from './grid';
-import Ship from './ship';
+import Grid from './classes/grid';
+import Ship from './classes/ship';
 
 let player_ships;
 let player_grid, opponent_grid;

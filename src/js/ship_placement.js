@@ -1,5 +1,5 @@
-import Grid from './grid';
-import Ship from './ship';
+import Grid from './classes/grid';
+import Ship from './classes/ship';
 
 /* TODO:
 *   exact calculation of draggable size for styling?

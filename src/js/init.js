@@ -1,7 +1,7 @@
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
-import Button from './button';
-import Text from './text';
+import Button from './classes/button';
+import Text from './classes/text';
 
 
 $(document).ready(function() {
