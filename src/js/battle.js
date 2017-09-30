@@ -1,16 +1,23 @@
-import Ship from './ship';
 import Grid from './grid';
+import Ship from './ship';
 
 let player_ships;
-let opponent_grid;
+let player_grid, opponent_grid;
 
 
-export function init($opponent_table) {
+export function init($player_table, $opponent_table) {
+    player_grid = new Grid($player_table);
     opponent_grid = new Grid($opponent_table);
 }
 
-export function activate(placed_ships) {
-    player_ships = init_ships(placed_ships);
+export function activate(ships) {
+    player_ships = ships;
+
+    for(const ship of player_ships) {
+        ship.prepare_for_battle();
+        player_grid.set_ship(ship);
+        opponent_grid.set_ship(ship); // TODO: remove me later
+    }
     opponent_grid.tiles.one('click', handle_player_shot);
     set_crosshair(true);
 }
@@ -18,23 +25,17 @@ export function activate(placed_ships) {
 export function deactivate() {
     set_crosshair(false);
 
+    player_grid
+    .clear_ships()
+    .tiles
+    .children().remove();
+
     opponent_grid
     .clear_ships()
     .tiles
     .off()
     .removeClass('ship')
     .children().remove();
-}
-
-function init_ships(placed_ships) {
-    const ships = [];
-    for(const ship_coords of placed_ships) {
-        const ship = new Ship(ship_coords);
-        ships.push(ship);
-        for(const coord_pair of ship_coords)
-            opponent_grid.set_ship(ship, coord_pair);
-    }
-    return ships;
 }
 
 function handle_player_shot() {

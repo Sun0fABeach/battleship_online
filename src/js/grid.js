@@ -24,11 +24,9 @@ export default class Grid {
         return this._$table;
     }
 
-    set_ship(ship, target) {
-        if(target instanceof Array)
-            this.coords_to_tile(target).data('ship', ship);
-        else
-            target.data('ship', ship);
+    set_ship(ship) {
+        for(const coord_pair of ship.coords)
+            this.coords_to_tile(coord_pair).data('ship', ship);
     }
 
     get_ship(target) {

@@ -8,10 +8,13 @@ $(document).ready(function() {
     $opponent_side = $('#opponent-side');
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');
+    const $player_table = $player_side.find('table');
+    const $opponent_table = $opponent_side.find('table');
+
     init_buttons();
-    ship_placement.init($player_side.find('table')); //TODO ... u know
+    ship_placement.init($player_table);
     ship_placement.activate();
-    battle.init($opponent_side.find('table'));
+    battle.init($player_table, $opponent_table);
 });
 
 
