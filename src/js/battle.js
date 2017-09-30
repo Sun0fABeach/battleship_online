@@ -4,16 +4,19 @@ let coords_to_tile = {};
 let player_ships;
 let $target_grid;
 
-// TODO: one init @ document ready, another for each game start
-export function init($opponent_grid, placed_ships) {
-    // order is important here !
+
+export function init($opponent_grid) {
     $target_grid = $opponent_grid;
     init_tiles();
+}
+
+export function activate(placed_ships) {
     player_ships = init_ships(placed_ships);
+    $target_grid.find('td').one('click', handle_player_shot);
     set_crosshair(true);
 }
 
-export function deinit() {
+export function deactivate() {
     set_crosshair(false);
     $target_grid.find('td')
     .off()
@@ -27,7 +30,6 @@ function init_tiles() {
             const $tile = $(tile);
             $tile.data('coords', [x, y]);
             coords_to_tile[[x, y]] = $tile;
-            $tile.one('click', handle_player_shot);
         });
     });
 }

@@ -9,7 +9,9 @@ $(document).ready(function() {
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');
     init_buttons();
-    ship_placement.init();
+    ship_placement.init($player_side);
+    ship_placement.activate();
+    battle.init($opponent_side.find('table'));
 });
 
 
@@ -82,13 +84,13 @@ function init_buttons() {
         $('button[name="ready"]'),
         () => ship_placement.is_valid(),
         () => {
-            const ships = ship_placement.deinit();
+            const ships = ship_placement.deactivate();
 
             btn_abort.hide();
             btn_ready.hide(() => {
                 btn_slide.show();
                 btn_leave.show();
-                battle.init($opponent_side.find('table'), ships);
+                battle.activate(ships);
             });
         },
         'Commencing battle!',
@@ -100,7 +102,7 @@ function init_buttons() {
         () => true,
         () => {
             $player_side.find('.game-grid').slideDown(() => {
-                ship_placement.reinit();
+                ship_placement.activate();
                 toggle_dual_grid(false);
             });
 
@@ -108,7 +110,7 @@ function init_buttons() {
             btn_leave.hide(() => {
                 btn_host.show();
                 btn_join.show();
-                battle.deinit();
+                battle.deactivate();
             });
         },
         'Choose <strong>Host</strong> to host a game, ' +

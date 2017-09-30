@@ -2,29 +2,26 @@
 *   exact calculation of draggable size for styling?
 */
 
-export function init() {
-    $player_side = $('#player-side');
+export function init($plyr_side) {
+    $player_side = $plyr_side;
     $tiles = $player_side.find('td');
     $rows = $player_side.find('tr');
     coords_to_tile = {};
     drag_init_tile_count = 0;
+
+    init_droppables();
+}
+
+export function activate() {
     z_index_val = 0;
 
-    init_droppables();  // must come first
     init_draggables();
     draw_grid();
 }
 
-export function deinit() { //TODO: call activate/deactivate
+export function deactivate() { //TODO: call activate/deactivate
     $player_side.find('.draggable').remove();
     return ships;
-}
-
-export function reinit() {
-    z_index_val = 0;
-
-    init_draggables();
-    draw_grid();
 }
 
 export function is_valid() {
