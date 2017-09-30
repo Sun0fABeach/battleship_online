@@ -15,7 +15,7 @@ export function init() {
     draw_grid();
 }
 
-export function deinit() {
+export function deinit() { //TODO: call activate/deactivate
     $player_side.find('.draggable').remove();
     return ships;
 }

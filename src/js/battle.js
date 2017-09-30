@@ -1,14 +1,16 @@
-let i = 0;
+import Ship from './ship';
+
 let coords_to_tile = {};
 let player_ships;
 let $target_grid;
 
+// TODO: one init @ document ready, another for each game start
 export function init($opponent_grid, placed_ships) {
-    player_ships = placed_ships;
+    // order is important here !
     $target_grid = $opponent_grid;
-
-    set_crosshair(true);
     init_tiles();
+    player_ships = init_ships(placed_ships);
+    set_crosshair(true);
 }
 
 export function deinit() {
@@ -25,24 +27,45 @@ function init_tiles() {
             const $tile = $(tile);
             $tile.data('coords', [x, y]);
             coords_to_tile[[x, y]] = $tile;
-
-            $tile.one('click', function(event) {
-                event.preventDefault();
-                if(i % 3 == 0) {
-                    mark_hit($(this));
-                } else if(i % 3 == 1) {
-                    mark_miss($(this));
-                } else {
-                    reveal_ship($(this));
-                }
-                ++i;
-            });
+            $tile.one('click', handle_player_shot);
         });
     });
 }
 
-function set_crosshair(active) {
-    $target_grid.css('cursor', active ? 'crosshair' : '');
+function init_ships(placed_ships) {
+    const ships = [];
+    for(const ship_coords of placed_ships) {
+        const ship = new Ship(ship_coords);
+        ships.push(ship);
+        for(const coord_pair of ship_coords)
+            coords_to_tile[coord_pair].data('ship', ship);
+    }
+    return ships;
+}
+
+function handle_player_shot() {
+    const $tile = $(this);
+    const shot_result = send_shot($tile.data('coords'));
+
+    if(shot_result) {
+        mark_hit($tile);
+        if(shot_result instanceof Ship)
+            reveal_ship(shot_result.coords);
+    } else {
+        mark_miss($tile);
+    }
+}
+
+// fires at own ships atm, needs to fire at opponent via AJAX later ...
+function send_shot(coords) {
+    return receive_shot(coords);
+}
+
+function receive_shot(coord_pair) {
+    const ship = coords_to_tile[coord_pair].data('ship');
+    if(!ship)
+        return false;
+    return ship.take_shot(coord_pair);
 }
 
 function mark_hit($tile) {
@@ -53,6 +76,11 @@ function mark_miss($tile) {
     $('<i class="fa fa-bullseye"></i>').appendTo($tile);
 }
 
-function reveal_ship($tile) {
-    $tile.addClass('ship');
+function reveal_ship(ship_coords) {
+    for(const coord_pair of ship_coords)
+        coords_to_tile[coord_pair].addClass('ship');
+}
+
+function set_crosshair(active) {
+    $target_grid.css('cursor', active ? 'crosshair' : '');
 }
