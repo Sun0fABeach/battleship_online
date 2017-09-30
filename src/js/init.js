@@ -1,6 +1,7 @@
 import * as ship_placement from './ship_placement';
-import Button from './button';
 import * as battle from './battle';
+import Button from './button';
+import Text from './text';
 
 
 $(document).ready(function() {
@@ -24,6 +25,8 @@ let $player_side, $opponent_side, $both_sides, $grids_container;
 
 
 function init_buttons() {
+    Button.msg_handler = new Text($('#game-message > span'));
+
     btn_enter = new Button(
         $('button[name="enter"]'),
         () => player_name(),
