@@ -1,9 +1,12 @@
+import * as communications from './communications';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import Button from './classes/button';
+import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
+const text_handlers = {};
 const buttons = {};
 
 
@@ -12,18 +15,23 @@ export function init() {
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');
 
+    text_handlers.player_name = new Text($('#player-side > p:first-child'));
+    text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
+    text_handlers.game_msg = new Text($('#game-message > span'));
+
     init_buttons();
 }
 
 
 function init_buttons() {
-    Button.init();
+    Button.init(text_handlers.game_msg);
 
     buttons.enter = new Button(
         $('button[name="enter"]'),
         () => player_name(),
         () => {
             hide_player_name_input();
+            text_handlers.player_name.change(player_name());
             buttons.enter.hide(() => {
                 buttons.host.show();
                 buttons.join.show();
@@ -38,11 +46,29 @@ function init_buttons() {
         $('button[name="host"]'),
         () => true,
         () => {
+            communications.host(
+                (opponent_name) => {
+                    text_handlers.opponent_name.change(opponent_name);
+                    text_handlers.game_msg.change(
+                        'Player <strong>'+opponent_name+'</strong> joined. ' +
+                        'Finish ship placement and press <strong>Ready</strong>.'
+                    );
+                    buttons.abort.hide(() => {
+                        buttons.abort.show();
+                        buttons.ready.show();
+                    });
+                },
+                () => {
+                    alert('Could not host!');
+                    buttons.abort.click();
+                }
+            );
+
+
             toggle_dual_grid(true);
             buttons.host.hide();
             buttons.join.hide(() => {
                 buttons.abort.show();
-                buttons.ready.show(); // TODO: don't show until opponent joined
             });
         },
         'Waiting for an opponent to join ...',
@@ -67,8 +93,9 @@ function init_buttons() {
         () => true,
         () => {
             toggle_dual_grid(false);
-            buttons.abort.hide();
-            buttons.ready.hide(() => {
+            text_handlers.opponent_name.change('Opponent');
+            buttons.ready.hide();
+            buttons.abort.hide(() => {
                 buttons.host.show();
                 buttons.join.show();
             });
@@ -104,6 +131,7 @@ function init_buttons() {
                 toggle_dual_grid(false);
             });
 
+            text_handlers.opponent_name.change('Opponent');
             buttons.slide.hide();
             buttons.leave.hide(() => {
                 buttons.host.show();

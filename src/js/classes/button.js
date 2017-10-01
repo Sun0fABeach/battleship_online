@@ -1,10 +1,7 @@
-import Text from './text';
-
-
 export default class Button {
     // must be called before using a button object!
-    static init() {
-        this.msg_handler = new Text($('#game-message > span'));
+    static init(msg_box) {
+        this.msg_handler = msg_box;
     }
 
     constructor($button, valid_test, action, valid_msg, invalid_msg) {
@@ -16,7 +13,7 @@ export default class Button {
         })
         .click(() => {
             if(valid_test()) {
-                this._button_valid();
+                // this._button_valid();
                 action();
                 if(valid_msg)
                     Button.msg_handler.change(valid_msg);
@@ -34,6 +31,10 @@ export default class Button {
 
     hide(completion_cb) {
         this._$btn.fadeOut(completion_cb);
+    }
+
+    click() {
+        this._$btn.click();
     }
 
     _button_valid() {
