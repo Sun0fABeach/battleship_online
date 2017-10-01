@@ -6,12 +6,7 @@ export default class Button {
 
     constructor($button, valid_test, action, valid_msg, invalid_msg) {
         this._$btn = $button;
-
-        $button
-        .focusout(() => {  // using lambda so 'this' is not bound by jQuery
-            this._button_normal();
-        })
-        .click(() => {
+        this._click_cb = () => {
             if(valid_test()) {
                 // this._button_valid();
                 action();
@@ -22,7 +17,11 @@ export default class Button {
                 if(invalid_msg)
                     Button.msg_handler.change(invalid_msg);
             }
-        });
+        }
+
+        $button
+        .focusout(() => this._button_normal())
+        .click(this._click_cb);
     }
 
     is_visible() {
@@ -30,11 +29,16 @@ export default class Button {
     }
 
     show(completion_cb) {
-        this._$btn.fadeIn(completion_cb);
+        this._$btn
+        .off() // do this to avoid difficult duplicate event handler situations
+        .click(this._click_cb)
+        .fadeIn(completion_cb);
     }
 
     hide(completion_cb) {
-        this._$btn.fadeOut(completion_cb);
+        this._$btn
+        .off() // prohibit clicks on fadeout
+        .fadeOut(completion_cb);
     }
 
     click() {

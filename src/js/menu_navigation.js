@@ -35,7 +35,7 @@ function init_buttons() {
         () => {
             hide_name_input();
             text_handlers.player_name.change(player_name());
-            show_buttons(['host', 'join']);
+            show_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
@@ -68,8 +68,8 @@ function init_buttons() {
         undefined
     );
 
-    buttons.ctrl_panel.join = new Button(
-        $('button[name="join"]'),
+    buttons.ctrl_panel.open_hosts = new Button(
+        $('button[name="open-hosts"]'),
         () => true,
         () => {
             hide_name_input();
@@ -87,7 +87,7 @@ function init_buttons() {
             communications.cancel_host();
             toggle_dual_grid(false);
             text_handlers.opponent_name.change('Opponent');
-            show_buttons(['host', 'join']);
+            show_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
@@ -114,7 +114,7 @@ function init_buttons() {
                 toggle_dual_grid(false);
             });
             text_handlers.opponent_name.change('Opponent');
-            show_buttons(['host', 'join'], battle.deactivate);
+            show_buttons(['host', 'open_hosts'], battle.deactivate);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
@@ -134,7 +134,7 @@ function init_buttons() {
         () => true,
         () => {
             close_host_list();
-            show_buttons(['host', 'join']);
+            show_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
