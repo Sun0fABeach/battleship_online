@@ -34,11 +34,12 @@
   }
 
   > p {
-    display: none;
+    display: block;
     text-align: center;
 
-    @include media-breakpoint-up(md) {
-      display: block;
+    // non-mobile first here, so js manipulation is hindered only on mobile
+    @include media-breakpoint-down(sm) {
+      display: none !important;
     }
   }
 

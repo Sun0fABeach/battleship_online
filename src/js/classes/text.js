@@ -5,7 +5,7 @@ export default class Text {
 
     change(new_text) {
         this._$container
-        .fadeOut(
+        .fadeOut( // these fades are prevented on mobile via css
             () => this._$container.html(new_text)
         )
         .fadeIn();
