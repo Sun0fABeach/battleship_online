@@ -1,4 +1,12 @@
+import Text from './text';
+
+
 export default class Button {
+    // must be called before using a button object!
+    static init() {
+        this.msg_handler = new Text($('#game-message > span'));
+    }
+
     constructor($button, valid_test, action, valid_msg, invalid_msg) {
         this._$btn = $button;
 
@@ -41,6 +49,3 @@ export default class Button {
         this._$btn.removeClass('btn-success btn-danger');
     }
 }
-
- // must be initialized before using a Button object!
-Button.msg_handler = undefined;

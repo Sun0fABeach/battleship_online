@@ -1,7 +1,6 @@
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import Button from './classes/button';
-import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
@@ -18,7 +17,7 @@ export function init() {
 
 
 function init_buttons() {
-    Button.msg_handler = new Text($('#game-message > span'));
+    Button.init();
 
     buttons.enter = new Button(
         $('button[name="enter"]'),
