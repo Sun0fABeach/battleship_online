@@ -25,6 +25,10 @@ export default class Button {
         });
     }
 
+    is_visible() {
+        return this._$btn.css('display') !== 'none';
+    }
+
     show(completion_cb) {
         this._$btn.fadeIn(completion_cb);
     }
