@@ -84,6 +84,7 @@ function init_buttons() {
         $('button[name="abort"]'),
         () => true,
         () => {
+            communications.cancel_host();
             toggle_dual_grid(false);
             text_handlers.opponent_name.change('Opponent');
             show_buttons(['host', 'join']);
