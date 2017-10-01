@@ -6,8 +6,8 @@ let player_grid, opponent_grid;
 
 
 export function init($player_table, $opponent_table) {
-    player_grid = new Grid($player_table);
-    opponent_grid = new Grid($opponent_table);
+    player_grid = new Grid($('#player-side table'));
+    opponent_grid = new Grid($('#opponent-side table'));
 }
 
 export function activate(ships) {

@@ -24,8 +24,8 @@ let drag_init_tile_count;
 let z_index_val;
 
 
-export function init($player_table) {
-    player_grid = new Grid($player_table);
+export function init() {
+    player_grid = new Grid($('#player-side table'));
     player_grid.tiles.droppable(drop_config);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
 }
