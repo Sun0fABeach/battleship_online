@@ -56,7 +56,7 @@ function init_buttons() {
                     show_buttons(['abort', 'ready']);
                 },
                 () => {
-                    alert('Could not host!');
+                    show_error('Server rejected hosting request.');
                     buttons.ctrl_panel.abort.click();
                 }
             );
@@ -188,6 +188,14 @@ function open_host_list() {
 
 function close_host_list() {
     $('#host-modal').modal('hide');
+}
+
+function show_error(error_msg) {
+    const $error_modal = $('#error-modal');
+    $error_modal.find('p').html('<strong>'+error_msg+'</strong>');
+    $error_modal.modal({
+        backdrop: 'static'
+    });
 }
 
 function toggle_dual_grid(active) {

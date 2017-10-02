@@ -17,7 +17,7 @@ export default class Button {
                 if(invalid_msg)
                     Button.msg_handler.change(invalid_msg);
             }
-        }
+        };
 
         $button
         .focusout(() => this._button_normal())
