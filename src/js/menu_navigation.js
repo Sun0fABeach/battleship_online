@@ -47,13 +47,21 @@ function init_buttons() {
         () => true,
         () => {
             communications.host(
-                (opponent_name) => {
-                    text_handlers.opponent_name.change(opponent_name);
-                    text_handlers.game_msg.change(
-                        'Player <strong>'+opponent_name+'</strong> joined. ' +
-                        'Finish ship placement and press <strong>Ready</strong>.'
+                () => {
+                    communications.request_opponent(
+                        (opponent_name) => {
+                            text_handlers.opponent_name.change(opponent_name);
+                            text_handlers.game_msg.change(
+                                'Player <strong>'+opponent_name+'</strong> joined. ' +
+                                'Finish ship placement and press <strong>Ready</strong>.'
+                            );
+                            show_buttons(['abort', 'ready']);
+                        },
+                        () => {
+                            show_error('Server aborted hosting (timeout).');
+                            buttons.ctrl_panel.abort.click();
+                        }
                     );
-                    show_buttons(['abort', 'ready']);
                 },
                 () => {
                     show_error('Server rejected hosting request.');
@@ -84,7 +92,7 @@ function init_buttons() {
         $('button[name="abort"]'),
         () => true,
         () => {
-            communications.cancel_host();
+            communications.cancel_request();
             toggle_dual_grid(false);
             text_handlers.opponent_name.change('Opponent');
             show_buttons(['host', 'open_hosts']);
