@@ -1,0 +1,12 @@
+#host-modal {
+  input {
+    &[name="host-search"] {
+      display: none;
+    }
+  }
+  button {
+    &[name="join-random"] {
+      display: none;
+    }
+  }
+}

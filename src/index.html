@@ -171,7 +171,8 @@
               <div class="row align-items-center justify-content-between">
                 <h5 class="modal-title col-4 pl-0 pl-sm-2">Hosts</h5>
 
-                <input type="text" id="host-search" maxlength=12 autofocus placeholder="search host"
+                <input type="text" name="host-search"
+                  maxlength=12 placeholder="search host" autofocus
                   class="form-control font-weight-bold col-6">
 
                 <div class="col-2 text-right pr-0 pr-sm-1">
@@ -185,32 +186,12 @@
 
           <div class="modal-body">
             <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Bitchfresse
-                <button type="button" name="join"
-                    class="btn btn-sm btn-info float-right">
-                  Join
-                </button>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Masafaka
-                <button type="button" name="join"
-                    class="btn btn-sm btn-info float-right">
-                  Join
-                </button>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Nigguh
-                <button type="button" name="join"
-                    class="btn btn-sm btn-info float-right">
-                  Join
-                </button>
-              </li>
+              <li class="list-group-item text-center">Loading ...</li>
             </ul>
           </div>
 
           <div class="modal-footer">
-            <button type="button"
+            <button type="button" name="join-random"
                 class="btn btn-primary">
               Join Random Host
             </button>

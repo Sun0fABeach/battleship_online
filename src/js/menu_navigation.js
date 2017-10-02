@@ -22,6 +22,17 @@ export function init() {
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
     text_handlers.game_msg = new Text($('#game-message > span'));
 
+    $('#host-modal').on('hidden.bs.modal', function() {
+        const $modal = $(this);
+
+        $modal.find('li').remove();
+        $modal.find('ul')
+        .append($('<li class="list-group-item text-center">Loading ...</li>'));
+
+        $modal.find('input[name="host-search"]').hide();
+        $modal.find('button[name="join-random"]').hide();
+    });
+
     init_buttons();
 }
 
@@ -141,6 +152,7 @@ function init_buttons() {
         $('button[name="close-hosts"]'),
         () => true,
         () => {
+            communications.cancel_request();
             close_host_list();
             show_buttons(['host', 'open_hosts']);
         },
@@ -188,10 +200,39 @@ function hide_name_input() {
 }
 
 function open_host_list() {
-    $('#host-modal').modal({
+    const $modal = $('#host-modal');
+
+    $modal.modal({
         backdrop: 'static',
         keyboard: false
     });
+
+    communications.request_hosts(
+        (hosts) => {
+            $modal.find('li').remove();
+
+            $modal.find('input[name="host-search"]').show();
+            $modal.find('button[name="join-random"]').show();
+
+            for(const host of hosts) {
+                $('<li class="list-group-item d-flex ' +
+                    'justify-content-between align-items-center">' +
+                    host.name + '</li>')
+                .data('id', host.id)
+                .append('<button type="button" name="join"' +
+                        'class="btn btn-sm btn-info float-right">Join</button>')
+                .appendTo($modal.find('ul'));
+            }
+        },
+        () => {
+            $modal.find('li').remove();
+            $modal.find('ul')
+            .append(
+                $('<li class="list-group-item text-center">' +
+                'Currently no hosted games.</li>')
+            );
+        }
+    );
 }
 
 function close_host_list() {
