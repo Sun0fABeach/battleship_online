@@ -1,12 +1,14 @@
 import * as communications from './communications';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
+import { HostModal, ErrorModal } from './classes/modal';
 import Button from './classes/button';
 import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
 const text_handlers = {};
+const modals = {};
 const buttons = {
     ctrl_panel: {},
     modal: {}
@@ -22,15 +24,12 @@ export function init() {
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
     text_handlers.game_msg = new Text($('#game-message > span'));
 
-    $('#host-modal').on('hidden.bs.modal', function() {
-        const $modal = $(this);
-
-        $modal.find('li').remove();
-        $modal.find('ul')
-        .append($('<li class="list-group-item text-center">Loading ...</li>'));
-
-        $modal.find('input[name="host-search"]').hide();
-        $modal.find('button[name="join-random"]').hide();
+    modals.host_list = new HostModal($('#host-modal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modals.error = new ErrorModal($('#error-modal'), {
+        backdrop: 'static'
     });
 
     init_buttons();
@@ -69,13 +68,13 @@ function init_buttons() {
                             show_buttons(['abort', 'ready']);
                         },
                         () => {
-                            show_error('Server aborted hosting (timeout).');
+                            modals.error.open('Server aborted hosting (timeout).');
                             buttons.ctrl_panel.abort.click();
                         }
                     );
                 },
                 () => {
-                    show_error('Server rejected hosting request.');
+                    modals.error.open('Server rejected hosting request.');
                     buttons.ctrl_panel.abort.click();
                 }
             );
@@ -91,8 +90,7 @@ function init_buttons() {
         $('button[name="open-hosts"]'),
         () => true,
         () => {
-            hide_name_input();
-            open_host_list();
+            modals.host_list.open();
             show_buttons(null);
         },
         'Choose a host.',
@@ -153,7 +151,7 @@ function init_buttons() {
         () => true,
         () => {
             communications.cancel_request();
-            close_host_list();
+            modals.host_list.close();
             show_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -197,54 +195,6 @@ function player_name() {
 
 function hide_name_input() {
     $('#player-name').fadeOut();
-}
-
-function open_host_list() {
-    const $modal = $('#host-modal');
-
-    $modal.modal({
-        backdrop: 'static',
-        keyboard: false
-    });
-
-    communications.request_hosts(
-        (hosts) => {
-            $modal.find('li').remove();
-
-            $modal.find('input[name="host-search"]').show();
-            $modal.find('button[name="join-random"]').show();
-
-            for(const host of hosts) {
-                $('<li class="list-group-item d-flex ' +
-                    'justify-content-between align-items-center">' +
-                    host.name + '</li>')
-                .data('id', host.id)
-                .append('<button type="button" name="join"' +
-                        'class="btn btn-sm btn-info float-right">Join</button>')
-                .appendTo($modal.find('ul'));
-            }
-        },
-        () => {
-            $modal.find('li').remove();
-            $modal.find('ul')
-            .append(
-                $('<li class="list-group-item text-center">' +
-                'Currently no hosted games.</li>')
-            );
-        }
-    );
-}
-
-function close_host_list() {
-    $('#host-modal').modal('hide');
-}
-
-function show_error(error_msg) {
-    const $error_modal = $('#error-modal');
-    $error_modal.find('p').html('<strong>'+error_msg+'</strong>');
-    $error_modal.modal({
-        backdrop: 'static'
-    });
 }
 
 function toggle_dual_grid(active) {
