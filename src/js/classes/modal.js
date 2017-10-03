@@ -4,9 +4,6 @@ class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
         this._cfg = config;
-        this._$list_container = $modal.find('ul');
-        this._$host_search = $modal.find('input[name="host-search"]');
-        this._$random_join = $modal.find('button[name="join-random"]');
     }
 
     _open() {
@@ -35,6 +32,10 @@ export class ErrorModal extends Modal {
 export class HostModal extends Modal {
     constructor($modal, config) {
         super($modal, config);
+        this._$list_container = $modal.find('ul');
+        this._$loading_text = this._$list_container.find('li');
+        this._$host_search = $modal.find('input[name="host-search"]');
+        this._$random_join = $modal.find('button[name="join-random"]');
 
         this._li_class = 'list-group-item d-flex ' +
                             'justify-content-between align-items-center';
@@ -44,14 +45,11 @@ export class HostModal extends Modal {
                                 'Currently no hosted games.</li>');
         this._$join_btn = $('<button type="button" name="join"' +
                             'class="'+this._join_btn_class+'">Join</button>');
-        this._$loading_text = this._$list_container.find('li');
 
-        $modal.on('hidden.bs.modal', () => {
-            this._clear_list();
-            this._$list_container.append(this._$loading_text);
-            this._$host_search.hide();
-            this._$random_join.hide();
-        });
+        this._$host_search.on('input',
+            () => this._handle_search(this._$host_search.val())
+        );
+        $modal.on('hidden.bs.modal', () => this._set_default_state());
     }
 
     open() {
@@ -78,7 +76,46 @@ export class HostModal extends Modal {
         );
     }
 
+    _set_default_state() {
+        this._clear_list();
+        this._$list_container.append(this._$loading_text);
+        this._$host_search.hide().val('');
+        this._$random_join.hide();
+    }
+
     _clear_list() {
         this._$list_container.empty();
+    }
+
+    _handle_search(query) {
+        const $entries = this._$list_container.find('li');
+        query = query.trim().toUpperCase();
+
+        if(query.length === 0) {
+            this._show_entry($entries); // will show all
+            return;
+        }
+
+        $entries.each((index, entry) => {
+            const $entry = $(entry);
+            if(this._extract_hostname($entry).toUpperCase().startsWith(query))
+                this._show_entry($entry);
+            else
+                this._hide_entry($entry);
+        });
+    }
+
+    _extract_hostname($entry) {
+        return $entry.contents().filter((index, element) =>
+            element.nodeType === Node.TEXT_NODE
+        ).text();
+    }
+
+    _show_entry($entry) {
+        $entry.removeClass('d-none').addClass('d-flex');
+    }
+
+    _hide_entry($entry) {
+        $entry.removeClass('d-flex').addClass('d-none');
     }
 }
