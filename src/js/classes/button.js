@@ -20,7 +20,7 @@ export default class Button {
         };
 
         $button
-        .focusout(() => this._button_normal())
+        .blur(() => this._button_normal())
         .click(this._click_cb);
     }
 
@@ -30,14 +30,14 @@ export default class Button {
 
     show(completion_cb) {
         this._$btn
-        .off() // do this to avoid difficult duplicate event handler situations
+        .off('click') // avoid difficult duplicate event handler situations
         .click(this._click_cb)
         .fadeIn(completion_cb);
     }
 
     hide(completion_cb) {
         this._$btn
-        .off() // prohibit clicks on fadeout
+        .off('click') // prohibit clicks on fadeout
         .fadeOut(completion_cb);
     }
 
