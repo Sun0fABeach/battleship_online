@@ -1,5 +1,6 @@
 import * as communications from '../communications';
 
+
 class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
@@ -10,7 +11,7 @@ class Modal {
         this._$modal.modal(this._cfg);
     }
 
-    close() {
+    _close() {
         this._$modal.modal('hide');
     }
 }
@@ -30,12 +31,15 @@ export class ErrorModal extends Modal {
 
 
 export class HostModal extends Modal {
-    constructor($modal, config) {
+    constructor($modal, config, close_cb) {
         super($modal, config);
+        this._close_cb = close_cb;
+
         this._$list_container = $modal.find('ul');
         this._$loading_text = this._$list_container.find('li');
         this._$host_search = $modal.find('input[name="host-search"]');
         this._$random_join = $modal.find('button[name="join-random"]');
+        this._$close = $modal.find('button[name="close-hosts"]');
 
         this._li_class = 'list-group-item d-flex ' +
                             'justify-content-between align-items-center';
@@ -49,6 +53,13 @@ export class HostModal extends Modal {
         this._$host_search.on('input',
             () => this._handle_search(this._$host_search.val())
         );
+
+        this._$close.click(() => {
+            communications.cancel_request();
+            this._close();
+            this._close_cb();
+        });
+
         $modal.on('hidden.bs.modal', () => this._set_default_state());
     }
 

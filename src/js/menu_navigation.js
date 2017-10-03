@@ -9,10 +9,7 @@ import Text from './classes/text';
 let $player_side, $both_sides, $grids_container;
 const text_handlers = {};
 const modals = {};
-const buttons = {
-    ctrl_panel: {},
-    modal: {}
-};
+const buttons = {};
 
 
 export function init() {
@@ -24,10 +21,20 @@ export function init() {
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
     text_handlers.game_msg = new Text($('#game-message > span'));
 
-    modals.host_list = new HostModal($('#host-modal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
+    modals.host_list = new HostModal(
+        $('#host-modal'),
+        {
+            backdrop: 'static',
+            keyboard: false
+        },
+        () => {
+            show_buttons(['host', 'open_hosts']);
+            text_handlers.game_msg.change(
+                'Choose <strong>Host</strong> to host a game, ' +
+                'or <strong>Join</strong> to join a hosted game.'
+            );
+        }
+    );
     modals.error = new ErrorModal($('#error-modal'), {
         backdrop: 'static'
     });
@@ -39,7 +46,7 @@ export function init() {
 function init_buttons() {
     Button.init(text_handlers.game_msg);
 
-    buttons.ctrl_panel.enter = new Button(
+    buttons.enter = new Button(
         $('button[name="enter"]'),
         () => player_name(),
         () => {
@@ -52,7 +59,7 @@ function init_buttons() {
         'Please enter your <strong>name</strong>.'
     );
 
-    buttons.ctrl_panel.host = new Button(
+    buttons.host = new Button(
         $('button[name="host"]'),
         () => true,
         () => {
@@ -69,13 +76,13 @@ function init_buttons() {
                         },
                         () => {
                             modals.error.open('Server aborted hosting (timeout).');
-                            buttons.ctrl_panel.abort.click();
+                            buttons.abort.click();
                         }
                     );
                 },
                 () => {
                     modals.error.open('Server rejected hosting request.');
-                    buttons.ctrl_panel.abort.click();
+                    buttons.abort.click();
                 }
             );
 
@@ -86,7 +93,7 @@ function init_buttons() {
         undefined
     );
 
-    buttons.ctrl_panel.open_hosts = new Button(
+    buttons.open_hosts = new Button(
         $('button[name="open-hosts"]'),
         () => true,
         () => {
@@ -97,7 +104,7 @@ function init_buttons() {
         undefined
     );
 
-    buttons.ctrl_panel.abort = new Button(
+    buttons.abort = new Button(
         $('button[name="abort"]'),
         () => true,
         () => {
@@ -111,7 +118,7 @@ function init_buttons() {
         undefined
     );
 
-    buttons.ctrl_panel.ready = new Button(
+    buttons.ready = new Button(
         $('button[name="ready"]'),
         () => ship_placement.is_valid(),
         () => {
@@ -122,7 +129,7 @@ function init_buttons() {
         'You have <strong>invalid</strong> ship placements.'
     );
 
-    buttons.ctrl_panel.leave = new Button(
+    buttons.leave = new Button(
         $('button[name="leave"]'),
         () => true,
         () => {
@@ -138,24 +145,11 @@ function init_buttons() {
         undefined
     );
 
-    buttons.ctrl_panel.slide = new Button(
+    buttons.slide = new Button(
         $('button[name="slide"]'),
         () => true,
         () => $player_side.find('.game-grid').slideToggle(),
         undefined,
-        undefined
-    );
-
-    buttons.modal.close_hosts = new Button(
-        $('button[name="close-hosts"]'),
-        () => true,
-        () => {
-            communications.cancel_request();
-            modals.host_list.close();
-            show_buttons(['host', 'open_hosts']);
-        },
-        'Choose <strong>Host</strong> to host a game, ' +
-        'or <strong>Join</strong> to join a hosted game.',
         undefined
     );
 }
@@ -164,7 +158,7 @@ function init_buttons() {
 function show_buttons(to_show, callback) {
     let cb_registered = false;
 
-    for(const button of Object.values(buttons.ctrl_panel)) {
+    for(const button of Object.values(buttons)) {
         if(button.is_visible()) {
             if(!cb_registered) {
                 button.hide(() => {
@@ -184,7 +178,7 @@ function show_buttons(to_show, callback) {
 
 function show_buttons_do_action(buttons_to_show, action) {
     if(buttons_to_show)
-        buttons_to_show.forEach(name => buttons.ctrl_panel[name].show());
+        buttons_to_show.forEach(name => buttons[name].show());
     if(action)
         action();
 }
