@@ -2,14 +2,14 @@ import * as communications from './communications';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import { HostModal, ErrorModal } from './classes/modal';
-import Button from './classes/button';
+import MenuButton from './classes/menu_button';
 import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
 const text_handlers = {};
 const modals = {};
-const buttons = {};
+const menu_buttons = {};
 
 
 export function init() {
@@ -19,8 +19,14 @@ export function init() {
 
     text_handlers.player_name = new Text($('#player-side > p:first-child'));
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
-    text_handlers.game_msg = new Text($('#game-message > span'));
+    text_handlers.game_msg = new Text($('#main-menu > p:first-child > span'));
 
+    init_modals();
+    init_menu_buttons();
+}
+
+
+function init_modals() {
     modals.host_list = new HostModal(
         $('#host-modal'),
         {
@@ -28,39 +34,41 @@ export function init() {
             keyboard: false
         },
         () => {
-            show_buttons(['host', 'open_hosts']);
+            show_menu_buttons(['host', 'open_hosts']);
             text_handlers.game_msg.change(
                 'Choose <strong>Host</strong> to host a game, ' +
                 'or <strong>Join</strong> to join a hosted game.'
             );
         }
     );
-    modals.error = new ErrorModal($('#error-modal'), {
-        backdrop: 'static'
-    });
 
-    init_buttons();
+    modals.error = new ErrorModal(
+        $('#error-modal'),
+        {
+            backdrop: 'static'
+        }
+    );
 }
 
 
-function init_buttons() {
-    Button.init(text_handlers.game_msg);
+function init_menu_buttons() {
+    MenuButton.init(text_handlers.game_msg);
 
-    buttons.enter = new Button(
-        $('button[name="enter"]'),
+    menu_buttons.enter = new MenuButton(
+        'enter',
         () => player_name(),
         () => {
             hide_name_input();
             text_handlers.player_name.change(player_name());
-            show_buttons(['host', 'open_hosts']);
+            show_menu_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
         'Please enter your <strong>name</strong>.'
     );
 
-    buttons.host = new Button(
-        $('button[name="host"]'),
+    menu_buttons.host = new MenuButton(
+        'host',
         () => true,
         () => {
             communications.host(
@@ -72,65 +80,65 @@ function init_buttons() {
                                 'Player <strong>'+opponent_name+'</strong> joined. ' +
                                 'Finish ship placement and press <strong>Ready</strong>.'
                             );
-                            show_buttons(['abort', 'ready']);
+                            show_menu_buttons(['abort', 'ready']);
                         },
                         () => {
                             modals.error.open('Server aborted hosting (timeout).');
-                            buttons.abort.click();
+                            menu_buttons.abort.click();
                         }
                     );
                 },
                 () => {
                     modals.error.open('Server rejected hosting request.');
-                    buttons.abort.click();
+                    menu_buttons.abort.click();
                 }
             );
 
             toggle_dual_grid(true);
-            show_buttons(['abort']);
+            show_menu_buttons(['abort']);
         },
         'Waiting for an opponent to join ...',
         undefined
     );
 
-    buttons.open_hosts = new Button(
-        $('button[name="open-hosts"]'),
+    menu_buttons.open_hosts = new MenuButton(
+        'open-hosts',
         () => true,
         () => {
             modals.host_list.open();
-            show_buttons(null);
+            show_menu_buttons(null);
         },
         'Choose a host.',
         undefined
     );
 
-    buttons.abort = new Button(
-        $('button[name="abort"]'),
+    menu_buttons.abort = new MenuButton(
+        'abort',
         () => true,
         () => {
             communications.cancel_request();
             toggle_dual_grid(false);
             text_handlers.opponent_name.change('Opponent');
-            show_buttons(['host', 'open_hosts']);
+            show_menu_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
         undefined
     );
 
-    buttons.ready = new Button(
-        $('button[name="ready"]'),
+    menu_buttons.ready = new MenuButton(
+        'ready',
         () => ship_placement.is_valid(),
         () => {
             const ships = ship_placement.deactivate();
-            show_buttons(['slide', 'leave'], () => battle.activate(ships));
+            show_menu_buttons(['slide', 'leave'], () => battle.activate(ships));
         },
         'Commencing battle!',
         'You have <strong>invalid</strong> ship placements.'
     );
 
-    buttons.leave = new Button(
-        $('button[name="leave"]'),
+    menu_buttons.leave = new MenuButton(
+        'leave',
         () => true,
         () => {
             $player_side.find('.game-grid').slideDown(() => {
@@ -138,15 +146,15 @@ function init_buttons() {
                 toggle_dual_grid(false);
             });
             text_handlers.opponent_name.change('Opponent');
-            show_buttons(['host', 'open_hosts'], battle.deactivate);
+            show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
         },
         'Choose <strong>Host</strong> to host a game, ' +
         'or <strong>Join</strong> to join a hosted game.',
         undefined
     );
 
-    buttons.slide = new Button(
-        $('button[name="slide"]'),
+    menu_buttons.slide = new MenuButton(
+        'slide',
         () => true,
         () => $player_side.find('.game-grid').slideToggle(),
         undefined,
@@ -155,14 +163,14 @@ function init_buttons() {
 }
 
 
-function show_buttons(to_show, callback) {
+function show_menu_buttons(to_show, callback) {
     let cb_registered = false;
 
-    for(const button of Object.values(buttons)) {
+    for(const button of Object.values(menu_buttons)) {
         if(button.is_visible()) {
             if(!cb_registered) {
                 button.hide(() => {
-                    show_buttons_do_action(to_show, callback);
+                    show_menu_buttons_do_action(to_show, callback);
                 });
                 cb_registered = true;
             } else {
@@ -173,12 +181,12 @@ function show_buttons(to_show, callback) {
 
     // if no button was there to hide, we still need to trigger this
     if(!cb_registered)
-        show_buttons_do_action(to_show, callback);
+        show_menu_buttons_do_action(to_show, callback);
 }
 
-function show_buttons_do_action(buttons_to_show, action) {
-    if(buttons_to_show)
-        buttons_to_show.forEach(name => buttons[name].show());
+function show_menu_buttons_do_action(menu_buttons_to_show, action) {
+    if(menu_buttons_to_show)
+        menu_buttons_to_show.forEach(name => menu_buttons[name].show());
     if(action)
         action();
 }

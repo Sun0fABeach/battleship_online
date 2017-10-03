@@ -1,25 +1,25 @@
-export default class Button {
+export default class MenuButton {
     // must be called before using a button object!
     static init(msg_box) {
         this.msg_handler = msg_box;
     }
 
-    constructor($button, valid_test, action, valid_msg, invalid_msg) {
-        this._$btn = $button;
+    constructor(btn_name, valid_test, action, valid_msg, invalid_msg) {
+        this._$btn = $('#main-menu button[name="'+btn_name+'"]');
         this._click_cb = () => {
             if(valid_test()) {
                 // this._button_valid();
                 action();
                 if(valid_msg)
-                    Button.msg_handler.change(valid_msg);
+                    MenuButton.msg_handler.change(valid_msg);
             } else {
                 this._button_invalid();
                 if(invalid_msg)
-                    Button.msg_handler.change(invalid_msg);
+                    MenuButton.msg_handler.change(invalid_msg);
             }
         };
 
-        $button
+        this._$btn
         .blur(() => this._button_normal())
         .click(this._click_cb);
     }
