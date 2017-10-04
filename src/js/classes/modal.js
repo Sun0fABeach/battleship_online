@@ -39,6 +39,7 @@ export class HostModal extends Modal {
         this._$loading_text = this._$list_container.find('li');
         this._$host_search = $modal.find('input[name="host-search"]');
         this._$random_join = $modal.find('button[name="join-random"]');
+        this._$refresh = $modal.find('button[name="refresh-hosts"]');
         this._$close = $modal.find('button[name="close-hosts"]');
 
         this._li_class = 'list-group-item d-flex ' +
@@ -50,57 +51,85 @@ export class HostModal extends Modal {
         this._$join_btn = $('<button type="button" name="join"' +
                             'class="'+this._join_btn_class+'">Join</button>');
 
-        this._$host_search.on('input',
-            () => this._handle_search(this._$host_search.val())
-        );
-
-        this._$close.click(() => {
-            communications.cancel_request();
-            this._close();
-            this._close_cb();
-        });
+        this._$host_search.on('input', () => this._handle_search());
+        this._$refresh.click(() => this._refresh());
+        this._$close.click(() => this._close());
 
         $modal.on('hidden.bs.modal', () => this._set_default_state());
     }
 
     open() {
         super._open();
+        communications.request_hosts(
+            (hosts) => {
+                this._set_hosts(hosts);
+                this._set_join_helpers(true);
+            },
+            () => this._set_text(this._$list_empty_text)
+        );
+    }
+
+    _close() {
+        communications.cancel_request();
+        super._close();
+        this._close_cb();
+    }
+
+    _refresh() {
+        communications.cancel_request();
+        this._set_text(this._$loading_text);
 
         communications.request_hosts(
             (hosts) => {
-                this._$loading_text.remove();
-                this._$host_search.show();
-                this._$random_join.show();
-
-                for(const host of hosts) {
-                    $('<li class="'+this._li_class+'">' + host.name + '</li>')
-                    .append(
-                        this._$join_btn.clone().data('host', host)
-                    )
-                    .appendTo(this._$list_container);
-                }
+                this._set_hosts(hosts);
+                this._set_join_helpers(true);
             },
             () => {
-                this._$loading_text.remove();
-                this._$list_container.append(this._$list_empty_text);
+                this._set_text(this._$list_empty_text);
+                this._set_join_helpers(false);
             }
         );
     }
 
-    _set_default_state() {
+    _set_hosts(hosts) {
         this._clear_list();
-        this._$list_container.append(this._$loading_text);
-        this._$host_search.hide().val('');
-        this._$random_join.hide();
+
+        for(const host of hosts) {
+            $('<li class="'+this._li_class+'">' + host.name + '</li>')
+            .append(
+                this._$join_btn.clone().data('host', host)
+            )
+            .appendTo(this._$list_container);
+        }
+    }
+
+    _set_default_state() {
+        this._set_text(this._$loading_text);
+        this._set_join_helpers(false);
+    }
+
+    _set_text($text_as_li) {
+        this._clear_list();
+        this._$list_container.append($text_as_li);
+    }
+
+    _set_join_helpers(visible) {
+        if(visible) {
+            this._$host_search.show();
+            this._$random_join.show();
+        } else {
+            this._$host_search.hide().val('');
+            this._$random_join.hide();
+        }
     }
 
     _clear_list() {
         this._$list_container.empty();
     }
 
-    _handle_search(query) {
+    _handle_search() {
+        const query = this._$host_search.val().trim().toUpperCase();
         const $entries = this._$list_container.find('li');
-        query = query.trim().toUpperCase();
 
         if(query.length === 0) {
             this._show_entry($entries); // will show all

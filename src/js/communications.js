@@ -28,29 +28,53 @@ export function request_opponent(success_cb, failure_cb) {
     }
 }
 
+let request_count = 0;
 export function request_hosts(success_cb, failure_cb) {
-    if(k++ % 2 == 0) {
+    if(k !== 1) {
         to = setTimeout(() => {
-            success_cb([
-                {
-                    name: 'Bitchfresse',
-                    id: 0,
-                },
-                {
-                    name: 'Masafaka',
-                    id: 1,
-                },
-                {
-                    name: 'Nigguh',
-                    id: 2,
-                }
-            ]);
+            if(request_count === 0) {
+                success_cb([
+                    {
+                        name: 'Bitchfresse',
+                        id: 0,
+                    },
+                    {
+                        name: 'Masafaka',
+                        id: 1,
+                    }
+                ]);
+            } else if(request_count === 1) {
+                success_cb([
+                    {
+                        name: 'Nigguh',
+                        id: 2,
+                    }
+                ]);
+            } else {
+                success_cb([
+                    {
+                        name: 'Bitchfresse',
+                        id: 0,
+                    },
+                    {
+                        name: 'Masafaka',
+                        id: 1,
+                    },
+                    {
+                        name: 'Nigguh',
+                        id: 2,
+                    }
+                ]);
+            }
+            ++request_count;
         }, 1200);
     } else {
         to = setTimeout(() => {
             failure_cb();
         }, 1200);
     }
+
+    ++k;
 }
 
 export function cancel_request() {
