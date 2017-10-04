@@ -36,18 +36,22 @@ export class HostModal extends Modal {
         this._close_cb = close_cb;
 
         this._$list_container = $modal.find('ul');
-        this._$loading_text = this._$list_container.find('li');
         this._$host_search = $modal.find('input[name="host-search"]');
         this._$random_join = $modal.find('button[name="join-random"]');
         this._$refresh = $modal.find('button[name="refresh-hosts"]');
         this._$close = $modal.find('button[name="close-hosts"]');
 
-        this._li_class = 'list-group-item d-flex ' +
-                            'justify-content-between align-items-center';
+        this._text_li_class = 'list-group-item text-center';
+        this._host_li_class = 'list-group-item d-flex ' +
+                                'justify-content-between align-items-center';
         this._join_btn_class = 'btn btn-sm btn-info float-right';
 
-        this._$list_empty_text = $('<li class="list-group-item text-center">' +
+        this._$loading_text = $('<li class="'+this._text_li_class+'">' +
+                                'Loading ...</li>');
+        this._$list_empty_text = $('<li class="'+this._text_li_class+'">' +
                                 'Currently no hosted games.</li>');
+        this._$host_entry = $('<li class="'+this._host_li_class+'"></li>');
+
         this._$join_btn = $('<button type="button" name="join"' +
                             'class="'+this._join_btn_class+'">Join</button>');
 
@@ -56,6 +60,8 @@ export class HostModal extends Modal {
         this._$close.click(() => this._close());
 
         $modal.on('hidden.bs.modal', () => this._set_default_state());
+
+        this._set_default_state();
     }
 
     open() {
@@ -95,9 +101,13 @@ export class HostModal extends Modal {
         this._clear_list();
 
         for(const host of hosts) {
-            $('<li class="'+this._li_class+'">' + host.name + '</li>')
+            this._$host_entry
+            .clone()
+            .text(host.name)
             .append(
-                this._$join_btn.clone().data('host', host)
+                this._$join_btn
+                .clone()
+                .data('host', host)
             )
             .appendTo(this._$list_container);
         }
