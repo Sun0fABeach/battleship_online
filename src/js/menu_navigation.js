@@ -12,6 +12,22 @@ const text_handlers = {};
 const modals = {};
 const menu_buttons = {};
 
+const messages = {
+    name_enter:
+    'Please enter your <strong>name</strong>.',
+    host_or_join:
+    'Choose <strong>Host</strong> to host a game, ' +
+    'or <strong>Join</strong> to join a hosted game.',
+    wait_for_join:
+    'Waiting for an opponent to join ...',
+    finish_placement:
+    'Finish ship placement and press <strong>Ready</strong>.',
+    invalid_placement:
+    'You have <strong>invalid</strong> ship placements.',
+    battle_start:
+    'Commencing battle!',
+}
+
 
 export function init() {
     $player_side = $('#player-side');
@@ -44,25 +60,19 @@ function init_modals() {
                     text_handlers.opponent_name.change(host.name);
                     text_handlers.game_msg.change(
                         'Connected to <strong>'+host.name+'</strong>. ' +
-                        'Finish ship placement and press <strong>Ready</strong>.'
+                        messages.finish_placement
                     );
                     show_menu_buttons(['abort', 'ready']);
                 },
                 () => {
                     modals.error.open('Failed to join '+host.name+'.');
-                    text_handlers.game_msg.change(
-                        'Choose <strong>Host</strong> to host a game, ' +
-                        'or <strong>Join</strong> to join a hosted game.'
-                    );
+                    text_handlers.game_msg.change(messages.host_or_join)
                     show_menu_buttons(['host', 'open_hosts']);
                 }
             )
         },
         () => {
-            text_handlers.game_msg.change(
-                'Choose <strong>Host</strong> to host a game, ' +
-                'or <strong>Join</strong> to join a hosted game.'
-            );
+            text_handlers.game_msg.change(messages.host_or_join);
             show_menu_buttons(['host', 'open_hosts']);
         }
     );
@@ -88,9 +98,8 @@ function init_menu_buttons() {
             text_handlers.player_name.change(player_name);
             show_menu_buttons(['host', 'open_hosts']);
         },
-        'Choose <strong>Host</strong> to host a game, ' +
-        'or <strong>Join</strong> to join a hosted game.',
-        'Please enter your <strong>name</strong>.'
+        messages.host_or_join,
+        messages.name_enter
     );
 
     menu_buttons.host = new MenuButton(
@@ -104,7 +113,7 @@ function init_menu_buttons() {
                             text_handlers.opponent_name.change(opponent_name);
                             text_handlers.game_msg.change(
                                 'Player <strong>'+opponent_name+'</strong> joined. ' +
-                                'Finish ship placement and press <strong>Ready</strong>.'
+                                messages.finish_placement
                             );
                             show_menu_buttons(['abort', 'ready']);
                         },
@@ -123,7 +132,7 @@ function init_menu_buttons() {
             toggle_dual_grid(true);
             show_menu_buttons(['abort']);
         },
-        'Waiting for an opponent to join ...',
+        messages.wait_for_join,
         undefined
     );
 
@@ -147,8 +156,7 @@ function init_menu_buttons() {
             text_handlers.opponent_name.change('Opponent');
             show_menu_buttons(['host', 'open_hosts']);
         },
-        'Choose <strong>Host</strong> to host a game, ' +
-        'or <strong>Join</strong> to join a hosted game.',
+        messages.host_or_join,
         undefined
     );
 
@@ -159,8 +167,8 @@ function init_menu_buttons() {
             const ships = ship_placement.deactivate();
             show_menu_buttons(['slide', 'leave'], () => battle.activate(ships));
         },
-        'Commencing battle!',
-        'You have <strong>invalid</strong> ship placements.'
+        messages.battle_start,
+        messages.invalid_placement
     );
 
     menu_buttons.leave = new MenuButton(
@@ -174,8 +182,7 @@ function init_menu_buttons() {
             text_handlers.opponent_name.change('Opponent');
             show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
         },
-        'Choose <strong>Host</strong> to host a game, ' +
-        'or <strong>Join</strong> to join a hosted game.',
+        messages.host_or_join,
         undefined
     );
 

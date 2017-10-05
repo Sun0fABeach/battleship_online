@@ -18,7 +18,7 @@ module.exports = merge(common, {
                 use: {
                     loader: 'jshint-loader',
                     options: {
-                        'esversion': 6
+                        esversion: 6,
                     }
                 }
             },
