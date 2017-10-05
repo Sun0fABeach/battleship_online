@@ -31,8 +31,9 @@ export class ErrorModal extends Modal {
 
 
 export class HostModal extends Modal {
-    constructor($modal, config, close_cb) {
+    constructor($modal, config, join_cb, close_cb) {
         super($modal, config);
+        this._join_cb = join_cb;
         this._close_cb = close_cb;
 
         this._$list_container = $modal.find('ul');
@@ -101,16 +102,22 @@ export class HostModal extends Modal {
         this._clear_list();
 
         for(const host of hosts) {
+            const $join_btn = this._$join_btn
+            .clone()
+            .data('host', host)
+            .click(() => this._join_host($join_btn));
+
             this._$host_entry
             .clone()
-            .text(host.name)
-            .append(
-                this._$join_btn
-                .clone()
-                .data('host', host)
-            )
+            .append('<span>'+host.name+'</span>')
+            .append($join_btn)
             .appendTo(this._$list_container);
         }
+    }
+
+    _join_host($clicked_btn) {
+        super._close();
+        this._join_cb($clicked_btn.data('host'));
     }
 
     _set_default_state() {
@@ -156,9 +163,7 @@ export class HostModal extends Modal {
     }
 
     _extract_hostname($entry) {
-        return $entry.contents().filter((index, element) =>
-            element.nodeType === Node.TEXT_NODE
-        ).text();
+        return $entry.find('span').text();
     }
 
     _show_entry($entry) {

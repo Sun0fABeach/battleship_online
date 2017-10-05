@@ -7,6 +7,7 @@ import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
+let player_name;
 const text_handlers = {};
 const modals = {};
 const menu_buttons = {};
@@ -33,12 +34,36 @@ function init_modals() {
             backdrop: 'static',
             keyboard: false
         },
+        (host) => {
+            text_handlers.game_msg.change(
+                'Connecting to player <strong>'+host.name+'</strong> ...'
+            );
+            communications.join_host(host.id, player_name,
+                () => {
+                    toggle_dual_grid(true);
+                    text_handlers.opponent_name.change(host.name);
+                    text_handlers.game_msg.change(
+                        'Connected to <strong>'+host.name+'</strong>. ' +
+                        'Finish ship placement and press <strong>Ready</strong>.'
+                    );
+                    show_menu_buttons(['abort', 'ready']);
+                },
+                () => {
+                    modals.error.open('Failed to join '+host.name+'.');
+                    text_handlers.game_msg.change(
+                        'Choose <strong>Host</strong> to host a game, ' +
+                        'or <strong>Join</strong> to join a hosted game.'
+                    );
+                    show_menu_buttons(['host', 'open_hosts']);
+                }
+            )
+        },
         () => {
-            show_menu_buttons(['host', 'open_hosts']);
             text_handlers.game_msg.change(
                 'Choose <strong>Host</strong> to host a game, ' +
                 'or <strong>Join</strong> to join a hosted game.'
             );
+            show_menu_buttons(['host', 'open_hosts']);
         }
     );
 
@@ -56,10 +81,11 @@ function init_menu_buttons() {
 
     menu_buttons.enter = new MenuButton(
         'enter',
-        () => player_name(),
+        () => get_player_name(),
         () => {
+            player_name = get_player_name();
             hide_name_input();
-            text_handlers.player_name.change(player_name());
+            text_handlers.player_name.change(player_name);
             show_menu_buttons(['host', 'open_hosts']);
         },
         'Choose <strong>Host</strong> to host a game, ' +
@@ -191,7 +217,7 @@ function show_menu_buttons_do_action(menu_buttons_to_show, action) {
         action();
 }
 
-function player_name() {
+function get_player_name() {
     return $('#player-name').val();
 }
 
