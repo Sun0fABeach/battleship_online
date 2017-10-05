@@ -57,6 +57,7 @@ export class HostModal extends Modal {
                             'class="'+this._join_btn_class+'">Join</button>');
 
         this._$host_search.on('input', () => this._handle_search());
+        this._$random_join.click(() => this._join_random_host());
         this._$refresh.click(() => this._refresh());
         this._$close.click(() => this._close());
 
@@ -118,6 +119,17 @@ export class HostModal extends Modal {
     _join_host($clicked_btn) {
         super._close();
         this._join_cb($clicked_btn.data('host'));
+    }
+
+    _join_random_host() {
+        const $join_buttons = this._$list_container.find('button');
+        this._join_host(
+            $(
+                $join_buttons.get(
+                    Math.floor(Math.random() * $join_buttons.length)
+                )
+            )
+        );
     }
 
     _set_default_state() {

@@ -26,7 +26,7 @@ const messages = {
     'You have <strong>invalid</strong> ship placements.',
     battle_start:
     'Commencing battle!',
-}
+};
 
 
 export function init() {
@@ -66,10 +66,10 @@ function init_modals() {
                 },
                 () => {
                     modals.error.open('Failed to join '+host.name+'.');
-                    text_handlers.game_msg.change(messages.host_or_join)
+                    text_handlers.game_msg.change(messages.host_or_join);
                     show_menu_buttons(['host', 'open_hosts']);
                 }
-            )
+            );
         },
         () => {
             text_handlers.game_msg.change(messages.host_or_join);
