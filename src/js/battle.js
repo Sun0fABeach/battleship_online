@@ -64,11 +64,11 @@ function receive_shot(coord_pair) {
 }
 
 function mark_hit($tile) {
-    $('<i class="fa fa-times"></i>').appendTo($tile);
+    $('<i>').addClass('fa fa-times').appendTo($tile);
 }
 
 function mark_miss($tile) {
-    $('<i class="fa fa-bullseye"></i>').appendTo($tile);
+    $('<i>').addClass('fa fa-bullseye').appendTo($tile);
 }
 
 function reveal_ship(ship_coords) {

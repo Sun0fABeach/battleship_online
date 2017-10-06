@@ -68,7 +68,7 @@ function init_draggables() {
     ) + 1;
 
     for(const ship of ships) {
-        const $draggable = $('<div></div>')
+        const $draggable = $('<div>')
         .draggable(drag_config)
         .on('mousedown', draggable_mousedown_handler)
         .data('ship', ship)

@@ -47,14 +47,18 @@ export class HostModal extends Modal {
                                 'justify-content-between align-items-center';
         this._join_btn_class = 'btn btn-sm btn-info float-right';
 
-        this._$loading_text = $('<li class="'+this._text_li_class+'">' +
-                                'Loading ...</li>');
-        this._$list_empty_text = $('<li class="'+this._text_li_class+'">' +
-                                'Currently no hosted games.</li>');
-        this._$host_entry = $('<li class="'+this._host_li_class+'"></li>');
-
-        this._$join_btn = $('<button type="button" name="join"' +
-                            'class="'+this._join_btn_class+'">Join</button>');
+        this._$loading_text = $('<li>')
+                                .addClass(this._text_li_class)
+                                .text('Loading ...');
+        this._$list_empty_text = $('<li>')
+                                .addClass(this._text_li_class)
+                                .text('Currently no hosted games.');
+        this._$host_entry = $('<li>')
+                            .addClass(this._host_li_class);
+        this._$join_btn = $('<button>')
+                            .attr({type: 'button', name: 'join'})
+                            .addClass(this._join_btn_class)
+                            .text('Join');
 
         this._$host_search.on('input', () => this._handle_search());
         this._$random_join.click(() => this._join_random_host());
