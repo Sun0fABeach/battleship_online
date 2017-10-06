@@ -5,8 +5,8 @@ import * as battle from './battle';
 
 
 $(document).ready(function() {
-    menu_navigation.init();
     communications.init();
+    menu_navigation.init();
     ship_placement.init();
     ship_placement.activate();
     battle.init();

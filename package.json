@@ -37,6 +37,8 @@
     "bootstrap": "^4.0.0-beta",
     "font-awesome": "^4.7.0",
     "popper.js": "^1.12.5",
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.0.3",
     "webpack-jquery-ui": "^1.0.0"
   }
 }

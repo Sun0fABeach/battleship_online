@@ -1,6 +1,25 @@
-export function init() {
+import io from 'socket.io-client';
+let socket;
 
+export function init() {
+    socket = io('http://localhost:3000');
+    socket.on('connect', () => {
+        console.log('connected');
+    });
+
+    socket.send('hello from client');
+
+    socket.on('hello', (msg) => {
+        console.log(msg);
+    });
+
+    socket.on('error', (error) => {
+        console.log('error: ' + error);
+    });
+
+    $(window).on('unload', socket.close);
 }
+
 
 let to;
 let i = 0, j = 0, k = 0;

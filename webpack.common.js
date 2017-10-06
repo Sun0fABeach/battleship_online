@@ -14,7 +14,8 @@ module.exports = {
             './src/vendor/jquery.ui.touch-punch.js',
             './node_modules/bootstrap/scss/bootstrap.scss',
             'bootstrap',
-            'font-awesome-webpack'
+            'font-awesome-webpack',
+            'socket.io-client'
         ],
     },
     output: {
