@@ -43,6 +43,7 @@ export function init(sock) {
 
     init_modals();
     init_menu_buttons();
+    init_communication();
 }
 
 
@@ -94,7 +95,7 @@ function init_menu_buttons() {
 
     menu_buttons.enter = new MenuButton(
         'enter',
-        () => get_player_name(),
+        get_player_name,
         () => {
             player_name = get_player_name();
             hide_name_input();
@@ -109,33 +110,27 @@ function init_menu_buttons() {
         'host',
         () => true,
         () => {
-            communications.host(
-                () => {
-                    communications.request_opponent(
-                        (opponent_name) => {
-                            text_handlers.opponent_name.change(opponent_name);
-                            text_handlers.game_msg.change(
-                                'Player <strong>'+opponent_name+'</strong> joined. ' +
-                                messages.finish_placement
-                            );
-                            show_menu_buttons(['abort', 'ready']);
-                        },
-                        () => {
-                            modals.error.open('Server aborted hosting (timeout).');
-                            menu_buttons.abort.click();
-                        }
-                    );
-                },
-                () => {
-                    modals.error.open('Server rejected hosting request.');
-                    menu_buttons.abort.click();
-                }
-            );
-
-            toggle_dual_grid(true);
-            show_menu_buttons(['abort']);
+            set_cursor('wait');
+            socket.emit('host', player_name);
+            // communications.host(
+            //     () => {
+            //         communications.request_opponent(
+            //             (opponent_name) => {
+            //                 text_handlers.opponent_name.change(opponent_name);
+            //                 text_handlers.game_msg.change(
+            //                     'Player <strong>'+opponent_name+'</strong> joined. ' +
+            //                     messages.finish_placement
+            //                 );
+            //                 show_menu_buttons(['abort', 'ready']);
+            //             },
+            //             () => {
+            //                 modals.error.open('Server aborted hosting (timeout).');
+            //                 menu_buttons.abort.click();
+            //             }
+            //         );
+            //     }
         },
-        messages.wait_for_join,
+        undefined,
         undefined
     );
 
@@ -154,7 +149,7 @@ function init_menu_buttons() {
         'abort',
         () => true,
         () => {
-            communications.cancel_request();
+            socket.emit('abort');
             toggle_dual_grid(false);
             text_handlers.opponent_name.change('Opponent');
             show_menu_buttons(['host', 'open_hosts']);
@@ -253,6 +248,24 @@ function set_grid_split(active) {
         $both_sides.removeClass('dual-view');
 }
 
+function set_cursor(state) {
+    $('*').css('cursor', state);
+}
+
 function adjacent_grids() {
     return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
+}
+
+function init_communication() {
+    socket.on('host failed', (reason) => {
+        set_cursor('default');
+        modals.error.open('Failed to host: ' + reason);
+    });
+
+    socket.on('host success', () => {
+        set_cursor('default');
+        toggle_dual_grid(true);
+        show_menu_buttons(['abort']);
+        text_handlers.game_msg.change(messages.wait_for_join);
+    });
 }

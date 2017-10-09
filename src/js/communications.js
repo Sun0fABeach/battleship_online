@@ -1,28 +1,6 @@
 let to;
-let i = 0, j = 0, k = 0;
-export function host(success_cb, failure_cb) {
-    if(i++ % 2 == 0) {
-        to = setTimeout(() => {
-            success_cb();
-        }, 1200);
-    } else {
-        to = setTimeout(() => {
-            failure_cb();
-        }, 1200);
-    }
-}
+let k = 0;
 
-export function request_opponent(success_cb, failure_cb) {
-    if(j++ % 2 == 0) {
-        to = setTimeout(() => {
-            success_cb('Dummy');
-        }, 1200);
-    } else {
-        to = setTimeout(() => {
-            failure_cb();
-        }, 1200);
-    }
-}
 
 let request_count = 0;
 export function request_hosts(success_cb, failure_cb) {

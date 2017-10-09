@@ -1,12 +1,20 @@
 var io = require('socket.io')(3000);
 
+const hosts = {};
+let h = 0;
+
 io.on('connection', (socket) => {
-    console.log('user connected');
+    socket.on('host', (player_name) => {
+        if(h++ % 2 === 0) {
+            socket.emit('host failed', 'id duplicate')
+        } else {
+            socket.emit('host success')
+            hosts[socket.id] = player_name;
+        }
+    });
 
-    socket.emit('hello', 'hello from server');
-
-    socket.on('message', function(msg) {
-        console.log(msg);
+    socket.on('abort', () => {
+        delete hosts[socket.id];
     });
 
     socket.on('disconnect', () => {
