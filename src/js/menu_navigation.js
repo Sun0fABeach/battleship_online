@@ -111,6 +111,7 @@ function init_menu_buttons() {
         () => true,
         () => {
             set_cursor('wait');
+            menu_buttons.open_hosts.clickable(false);
             socket.emit('host', player_name);
             // communications.host(
             //     () => {
@@ -259,6 +260,7 @@ function adjacent_grids() {
 function init_communication() {
     socket.on('host failed', (reason) => {
         set_cursor('default');
+        menu_buttons.open_hosts.clickable(true);
         modals.error.open('Failed to host: ' + reason);
     });
 

@@ -45,6 +45,10 @@ export default class MenuButton {
         this._$btn.click();
     }
 
+    clickable(active) {
+        active ? this._$btn.click(this._click_cb) : this._$btn.off('click');
+    }
+
     _button_valid() {
         this._$btn.addClass('btn-success');
     }

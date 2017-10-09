@@ -5,12 +5,14 @@ let h = 0;
 
 io.on('connection', (socket) => {
     socket.on('host', (player_name) => {
-        if(h++ % 2 === 0) {
-            socket.emit('host failed', 'id duplicate')
-        } else {
-            socket.emit('host success')
-            hosts[socket.id] = player_name;
-        }
+        setTimeout(() => {
+            if(h++ % 2 === 0) {
+                socket.emit('host failed', 'id duplicate')
+            } else {
+                socket.emit('host success')
+                hosts[socket.id] = player_name;
+            }
+        }, 1000);
     });
 
     socket.on('abort', () => {
