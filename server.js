@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('abort', () => {
-        delete players[socket.id];
+        players[socket.id].is_host = false;
     });
 
     socket.on('disconnect', () => {
