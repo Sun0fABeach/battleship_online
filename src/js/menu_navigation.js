@@ -16,6 +16,8 @@ const menu_buttons = {};
 const messages = {
     name_enter:
     'Please enter your <strong>name</strong>.',
+    name_taken:
+    'The name you entered is already in use.',
     host_or_join:
     'Choose <strong>Host</strong> to host a game, ' +
     'or <strong>Join</strong> to join a hosted game.',
@@ -98,11 +100,11 @@ function init_menu_buttons() {
         get_player_name,
         () => {
             player_name = get_player_name();
-            hide_name_input();
-            text_handlers.player_name.change(player_name);
-            show_menu_buttons(['host', 'open_hosts']);
+            socket.emit('name register', player_name);
+            menu_buttons.enter.clickable(false);
+            set_cursor('wait');
         },
-        messages.host_or_join,
+        undefined,
         messages.name_enter
     );
 
@@ -110,9 +112,9 @@ function init_menu_buttons() {
         'host',
         () => true,
         () => {
-            set_cursor('wait');
             menu_buttons.open_hosts.clickable(false);
-            socket.emit('host', player_name);
+            socket.emit('host');
+            set_cursor('wait');
             // communications.host(
             //     () => {
             //         communications.request_opponent(
@@ -123,10 +125,6 @@ function init_menu_buttons() {
             //                     messages.finish_placement
             //                 );
             //                 show_menu_buttons(['abort', 'ready']);
-            //             },
-            //             () => {
-            //                 modals.error.open('Server aborted hosting (timeout).');
-            //                 menu_buttons.abort.click();
             //             }
             //         );
             //     }
@@ -258,6 +256,21 @@ function adjacent_grids() {
 }
 
 function init_communication() {
+    socket.on('name taken', () => {
+        set_cursor('default');
+        menu_buttons.enter.invalid();
+        menu_buttons.enter.clickable(true);
+        text_handlers.game_msg.change(messages.name_taken);
+    });
+
+    socket.on('name accepted', () => {
+        set_cursor('default');
+        hide_name_input();
+        show_menu_buttons(['host', 'open_hosts']);
+        text_handlers.player_name.change(player_name);
+        text_handlers.game_msg.change(messages.host_or_join);
+    });
+
     socket.on('host failed', (reason) => {
         set_cursor('default');
         menu_buttons.open_hosts.clickable(true);

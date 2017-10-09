@@ -13,7 +13,7 @@ export default class MenuButton {
                 if(valid_msg)
                     MenuButton.msg_handler.change(valid_msg);
             } else {
-                this._button_invalid();
+                this.invalid();
                 if(invalid_msg)
                     MenuButton.msg_handler.change(invalid_msg);
             }
@@ -46,16 +46,19 @@ export default class MenuButton {
     }
 
     clickable(active) {
-        active ? this._$btn.click(this._click_cb) : this._$btn.off('click');
+        if(active)
+            this._$btn.click(this._click_cb);
+        else
+            this._$btn.off('click');
+    }
+
+    invalid() {
+        this._$btn.effect('shake');
+        this._$btn.addClass('btn-danger');
     }
 
     _button_valid() {
         this._$btn.addClass('btn-success');
-    }
-
-    _button_invalid() {
-        this._$btn.effect('shake');
-        this._$btn.addClass('btn-danger');
     }
 
     _button_normal() {

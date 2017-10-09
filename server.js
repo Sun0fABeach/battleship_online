@@ -1,29 +1,55 @@
 var io = require('socket.io')(3000);
 
-const hosts = {};
-let h = 0;
+const players = {};
 
 io.on('connection', (socket) => {
-    socket.on('host', (player_name) => {
+    socket.on('name register', (player_name) => {
         setTimeout(() => {
-            if(h++ % 2 === 0) {
-                socket.emit('host failed', 'id duplicate')
-            } else {
-                socket.emit('host success')
-                hosts[socket.id] = player_name;
+            if(players[socket.id])
+                return;
+
+            if(name_registered(player_name)) {
+                socket.emit('name taken');
+                return;
             }
-        }, 1000);
+
+            players[socket.id] = {name: player_name};
+            socket.emit('name accepted')
+        }, 800);
+    });
+
+    socket.on('host', () => {
+        setTimeout(() => {
+            const player_data = players[socket.id];
+            if(!player_data)
+                return;
+            if(player_data.is_host) {
+                socket.emit('host failed', 'id duplicate');
+                return;
+            }
+            player_data.is_host = true;
+            socket.emit('host success');
+        }, 800);
     });
 
     socket.on('abort', () => {
-        delete hosts[socket.id];
+        delete players[socket.id];
     });
 
     socket.on('disconnect', () => {
-        console.log('user disconnected');
+        delete players[socket.id];
     });
 
     socket.on('error', (error) => {
-        console.log('error: ' + error);
+        delete players[socket.id];
     });
 });
+
+function name_registered(player_name) {
+    for(const id in players)
+        if(players.hasOwnProperty(id))
+            if(players[id] === player_name)
+                return true;
+
+    return false;
+}
