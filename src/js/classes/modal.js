@@ -89,6 +89,7 @@ export class HostModal extends Modal {
     }
 
     _close() {
+        this._socket.emit('host unwatch');
         super._close();
         this._close_cb();
     }
@@ -127,6 +128,7 @@ export class HostModal extends Modal {
     }
 
     _join_host($clicked_btn) {
+        this._socket.emit('host unwatch');
         super._close();
         this._join_cb($clicked_btn.data('host'));
     }

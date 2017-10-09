@@ -37,13 +37,15 @@ io.on('connection', (socket) => {
 
     socket.on('abort', () => {
         const player_data = players[socket.id];
+        if(!player_data || !player_data.is_host)
+            return;
         player_data.is_host = false;
         socket.to('host watchers').emit('remove host', socket.id);
     });
 
     socket.on('host watch', (callback) => {
         setTimeout(() => {
-            if(players[socket.id].is_host)
+            if(!players[socket.id] || players[socket.id].is_host)
                 return;
 
             const hosts = [];
@@ -58,13 +60,19 @@ io.on('connection', (socket) => {
         }, 1200);
     });
 
+    socket.on('host unwatch', () => {
+        if(!players[socket.id])
+            return;
+        socket.leave('host watchers');
+    });
+
     socket.on('disconnecting', () => {
         const player_data = players[socket.id];
 
         if(player_data) {
             if(player_data.is_host) {
                 socket.to('host watchers').emit(
-                    'add host', {name: player_data.name, id: socket.id}
+                    'remove host', {name: player_data.name, id: socket.id}
                 );
             }
             delete players[socket.id];
@@ -73,12 +81,15 @@ io.on('connection', (socket) => {
 
     socket.on('error', (error) => {
         const player_data = players[socket.id];
-        if(player_data.is_host) {
-            socket.to('host watchers').emit(
-                'add host', {name: player_data.name, id: socket.id}
-            );
+
+        if(player_data) {
+            if(player_data.is_host) {
+                socket.to('host watchers').emit(
+                    'remove host', {name: player_data.name, id: socket.id}
+                );
+            }
+            delete players[socket.id];
         }
-        delete players[socket.id];
     });
 });
 
