@@ -6,6 +6,7 @@ import MenuButton from './classes/menu_button';
 import Text from './classes/text';
 
 
+let socket;
 let $player_side, $both_sides, $grids_container;
 let player_name;
 const text_handlers = {};
@@ -29,7 +30,9 @@ const messages = {
 };
 
 
-export function init() {
+export function init(sock) {
+    socket = sock;
+
     $player_side = $('#player-side');
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');

@@ -1,11 +1,13 @@
 import Grid from './classes/grid';
 import Ship from './classes/ship';
 
+let socket;
 let player_ships;
 let player_grid, opponent_grid;
 
 
-export function init($player_table, $opponent_table) {
+export function init(sock) {
+    socket = sock;
     player_grid = new Grid($('#player-side table'));
     opponent_grid = new Grid($('#opponent-side table'));
 }
