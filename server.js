@@ -29,26 +29,64 @@ io.on('connection', (socket) => {
             }
             player_data.is_host = true;
             socket.emit('host success');
+            socket.to('host watchers').emit(
+                'add host', {name: player_data.name, id: socket.id}
+            );
         }, 800);
     });
 
     socket.on('abort', () => {
-        players[socket.id].is_host = false;
+        const player_data = players[socket.id];
+        player_data.is_host = false;
+        socket.to('host watchers').emit('remove host', socket.id);
     });
 
-    socket.on('disconnect', () => {
-        delete players[socket.id];
+    socket.on('host watch', (callback) => {
+        setTimeout(() => {
+            if(players[socket.id].is_host)
+                return;
+
+            const hosts = [];
+
+            for(const id in players)
+                if(players.hasOwnProperty(id))
+                    if(players[id].is_host)
+                        hosts.push({name: players[id].name, id});
+
+            callback(hosts.length > 0 ? hosts : null);
+            socket.join('host watchers');
+        }, 1200);
+    });
+
+    socket.on('disconnecting', () => {
+        const player_data = players[socket.id];
+
+        if(player_data) {
+            if(player_data.is_host) {
+                socket.to('host watchers').emit(
+                    'add host', {name: player_data.name, id: socket.id}
+                );
+            }
+            delete players[socket.id];
+        }
     });
 
     socket.on('error', (error) => {
+        const player_data = players[socket.id];
+        if(player_data.is_host) {
+            socket.to('host watchers').emit(
+                'add host', {name: player_data.name, id: socket.id}
+            );
+        }
         delete players[socket.id];
     });
 });
 
+
 function name_registered(player_name) {
     for(const id in players)
         if(players.hasOwnProperty(id))
-            if(players[id] === player_name)
+            if(players[id].name === player_name)
                 return true;
 
     return false;

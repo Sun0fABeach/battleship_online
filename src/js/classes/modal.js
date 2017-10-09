@@ -31,15 +31,15 @@ export class ErrorModal extends Modal {
 
 
 export class HostModal extends Modal {
-    constructor($modal, config, join_cb, close_cb) {
+    constructor($modal, config, socket, join_cb, close_cb) {
         super($modal, config);
+        this._socket = socket;
         this._join_cb = join_cb;
         this._close_cb = close_cb;
 
         this._$list_container = $modal.find('ul');
         this._$host_search = $modal.find('input[name="host-search"]');
         this._$random_join = $modal.find('button[name="join-random"]');
-        this._$refresh = $modal.find('button[name="refresh-hosts"]');
         this._$close = $modal.find('button[name="close-hosts"]');
 
         this._text_li_class = 'list-group-item text-center';
@@ -62,62 +62,68 @@ export class HostModal extends Modal {
 
         this._$host_search.on('input', () => this._handle_search());
         this._$random_join.click(() => this._join_random_host());
-        this._$refresh.click(() => this._refresh());
         this._$close.click(() => this._close());
 
-        $modal.on('hidden.bs.modal', () => this._set_default_state());
+        socket.on('add host', (host) => {
+            this._add_item(host);
+        });
+        socket.on('remove host', (id) => {
+            this._remove_item(id);
+        });
 
         this._set_default_state();
     }
 
     open() {
+        this._set_default_state();
         super._open();
-        communications.request_hosts(
-            (hosts) => {
-                this._set_hosts(hosts);
-                this._set_join_helpers(true);
-            },
-            () => this._set_text(this._$list_empty_text)
-        );
+        this._socket.emit('host watch', (hosts) => {
+            this._$loading_text.remove();
+            if(hosts) {
+                for(const host of hosts)
+                    this._add_item(host);
+            } else {
+                this._$list_container.append(this._$list_empty_text);
+            }
+        });
     }
 
     _close() {
-        communications.cancel_request();
         super._close();
         this._close_cb();
     }
 
-    _refresh() {
-        communications.cancel_request();
-        this._set_text(this._$loading_text);
+    _add_item(host) {
+        this._$list_empty_text.remove(); // present if adding first item
 
-        communications.request_hosts(
-            (hosts) => {
-                this._set_hosts(hosts);
-                this._set_join_helpers(true);
-            },
-            () => {
-                this._set_text(this._$list_empty_text);
-                this._set_join_helpers(false);
-            }
-        );
+        if(this._$list_container.find('li').length === 0)
+            this._set_join_helpers(true); // list was empty until now
+
+        const $join_btn = this._$join_btn
+        .clone()
+        .data('host', host)
+        .click(() => this._join_host($join_btn));
+
+        this._$host_entry
+        .clone()
+        .append('<span>'+host.name+'</span>')
+        .append($join_btn)
+        .appendTo(this._$list_container);
     }
 
-    _set_hosts(hosts) {
-        this._clear_list();
+    _remove_item(id) {
+        const $items = this._$list_container.find('li');
 
-        for(const host of hosts) {
-            const $join_btn = this._$join_btn
-            .clone()
-            .data('host', host)
-            .click(() => this._join_host($join_btn));
-
-            this._$host_entry
-            .clone()
-            .append('<span>'+host.name+'</span>')
-            .append($join_btn)
-            .appendTo(this._$list_container);
-        }
+        $items.each((index, item) => {
+            if($(item).find('button').data('host').id === id) {
+                $(item).remove();
+                if($items.length === 1) { // was 1 before, is now empty
+                    this._$list_container.append(this._$list_empty_text);
+                    this._set_join_helpers(false);
+                }
+                return false;
+            }
+        });
     }
 
     _join_host($clicked_btn) {
@@ -137,13 +143,9 @@ export class HostModal extends Modal {
     }
 
     _set_default_state() {
-        this._set_text(this._$loading_text);
+        this._$list_container.empty();
+        this._$list_container.append(this._$loading_text);
         this._set_join_helpers(false);
-    }
-
-    _set_text($text_as_li) {
-        this._clear_list();
-        this._$list_container.append($text_as_li);
     }
 
     _set_join_helpers(visible) {
@@ -154,10 +156,6 @@ export class HostModal extends Modal {
             this._$host_search.hide().val('');
             this._$random_join.hide();
         }
-    }
-
-    _clear_list() {
-        this._$list_container.empty();
     }
 
     _handle_search() {

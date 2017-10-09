@@ -40,18 +40,19 @@ export function init(socket) {
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
     text_handlers.game_msg = new Text($('#main-menu > p:first-child > span'));
 
-    init_modals();
+    init_modals(socket);
     init_menu_buttons(socket);
 }
 
 
-function init_modals() {
+function init_modals(socket) {
     modals.host_list = new HostModal(
         $('#host-modal'),
         {
             backdrop: 'static',
             keyboard: false
         },
+        socket,
         (host) => {
             text_handlers.game_msg.change(
                 'Connecting to player <strong>'+host.name+'</strong> ...'
