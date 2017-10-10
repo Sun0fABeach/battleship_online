@@ -153,7 +153,7 @@ class Player {
         host._game_open = false;
 
         host.send('opponent entered', this.name);
-        host.to_host_watchers('remove host', host.id);
+        this.to_host_watchers('remove host', host.id);
     }
 
     unpair() {
