@@ -177,6 +177,12 @@ function init_menu_buttons(socket) {
     );
 
     socket.on('opponent left', () => {
+        /* rare corner case: player clicked abort, grid is made single and
+           shortly afterwards, this event arrives b/c opponent aborted or
+           disconnected at the same time. */
+        if(!is_dual_grid())
+            return;
+
         modals.error.open('Your opponent has left the game.');
 
         $player_side.find('.game-grid').slideDown(() => {
@@ -255,6 +261,10 @@ function toggle_dual_grid(active) {
     } else {
         set_grid_split(active);
     }
+}
+
+function is_dual_grid() {
+    return $both_sides.hasClass('dual-view');
 }
 
 function set_grid_split(active) {
