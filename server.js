@@ -91,7 +91,9 @@ io.on('connection', (socket) => {
 
         if(player) {
             if(player.game_open())
-                player.to_host_watchers('remove host', player.name_id);
+                player.close_open_game();
+            else if(player.is_paired())
+                player.unpair();
             delete players[socket.id];
         }
     });
@@ -101,7 +103,9 @@ io.on('connection', (socket) => {
 
         if(player) {
             if(player.game_open())
-                player.to_host_watchers('remove host', player.name_id);
+                player.close_open_game();
+            else if(player.is_paired())
+                player.unpair();
             delete players[socket.id];
         }
     });
