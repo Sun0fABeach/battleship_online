@@ -40,7 +40,7 @@ export class HostModal extends Modal {
         this._$close = $modal.find('button[name="close-hosts"]');
 
         this._text_li_class = 'list-group-item text-center';
-        this._host_li_class = 'list-group-item d-flex ' +
+        this._host_li_class = 'list-group-item list-group-item-action d-flex ' +
                                 'justify-content-between align-items-center';
         this._join_btn_class = 'btn btn-sm btn-info float-right';
 
@@ -57,13 +57,9 @@ export class HostModal extends Modal {
                             .addClass(this._join_btn_class)
                             .text('Join');
 
-        const modal = this;
-        this._$list_container.on('click', 'button', function() {
-            modal._join_host($(this));
-        });
         this._$host_search.on('input', () => this._handle_search());
-        this._$random_join.click(() => this._join_random_host());
         this._$close.click(() => this._close());
+        this._join_buttons_enable(true);
 
         socket.on('add host', (host) => {
             this._add_item(host);
@@ -128,18 +124,12 @@ export class HostModal extends Modal {
     }
 
     _join_host($clicked_btn) {
-        this._$random_join.off(); // prevent double clicking ...
-        this._$close.off();
-        this._$list_container.off();
-
         const host = $clicked_btn.data('host');
+        this._join_buttons_enable(false);
+        this._$close.off('click');
 
         this._socket.emit('join', host.id, this._player_name, (success) => {
-            const modal = this;
-            this._$list_container.on('click', 'button', function() {
-                modal._join_host($(this));
-            });
-            this._$random_join.click(() => this._join_random_host());
+            this._join_buttons_enable(true);
             this._$close.click(() => this._close());
 
             if(success) {
@@ -159,6 +149,19 @@ export class HostModal extends Modal {
                 )
             )
         );
+    }
+
+    _join_buttons_enable(active) {
+        if(active) {
+            const modal = this;
+            this._$list_container.on('click', 'li:has(button)', function() {
+                modal._join_host($(this).find('button'));
+            });
+            this._$random_join.click(() => this._join_random_host());
+        } else {
+            this._$list_container.off('click');
+            this._$random_join.off('click');
+        }
     }
 
     _set_default_state() {
