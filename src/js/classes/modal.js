@@ -59,7 +59,7 @@ export class HostModal extends Modal {
 
         this._$host_search.on('input', () => this._handle_search());
         this._$close.click(() => this._close());
-        this._join_buttons_enable(true);
+        this._join_inputs_enable(true);
 
         socket.on('add host', (host) => {
             this._add_item(host);
@@ -97,22 +97,19 @@ export class HostModal extends Modal {
         if(this._$list_container.find('li').length === 0)
             this._set_join_helpers(true); // list was empty until now
 
-        const $join_btn = this._$join_btn
-        .clone()
-        .data('host', host);
-
         this._$host_entry
         .clone()
         .append('<span>'+host.name+'</span>')
-        .append($join_btn)
-        .appendTo(this._$list_container);
+        .append(this._$join_btn.clone())
+        .appendTo(this._$list_container)
+        .data('host', host);
     }
 
     _remove_item(id) {
         const $items = this._$list_container.find('li');
 
         $items.each((index, item) => {
-            if($(item).find('button').data('host').id === id) {
+            if($(item).data('host').id === id) {
                 $(item).remove();
                 if($items.length === 1) { // was 1 before, is now empty
                     this._$list_container.append(this._$list_empty_text);
@@ -123,13 +120,12 @@ export class HostModal extends Modal {
         });
     }
 
-    _join_host($clicked_btn) {
-        const host = $clicked_btn.data('host');
-        this._join_buttons_enable(false);
+    _join_host(host) {
+        this._join_inputs_enable(false);
         this._$close.off('click');
 
         this._socket.emit('join', host.id, this._player_name, (success) => {
-            this._join_buttons_enable(true);
+            this._join_inputs_enable(true);
             this._$close.click(() => this._close());
 
             if(success) {
@@ -141,21 +137,21 @@ export class HostModal extends Modal {
     }
 
     _join_random_host() {
-        const $join_buttons = this._$list_container.find('button');
+        const $host_entries = this._$list_container.find('li');
         this._join_host(
             $(
-                $join_buttons.get(
-                    Math.floor(Math.random() * $join_buttons.length)
+                $host_entries.get(
+                    Math.floor(Math.random() * $host_entries.length)
                 )
-            )
+            ).data('host')
         );
     }
 
-    _join_buttons_enable(active) {
+    _join_inputs_enable(active) {
         if(active) {
             const modal = this;
             this._$list_container.on('click', 'li:has(button)', function() {
-                modal._join_host($(this).find('button'));
+                modal._join_host($(this).data('host'));
             });
             this._$random_join.click(() => this._join_random_host());
         } else {
