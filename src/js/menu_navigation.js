@@ -99,21 +99,18 @@ function init_menu_buttons(socket) {
             player_name = get_player_name();
             socket.emit('name register', player_name);
             menu_buttons.enter.clickable(false);
-            set_cursor('wait');
         },
         undefined,
         messages.name_enter
     );
 
     socket.on('name taken', () => {
-        set_cursor('default');
         menu_buttons.enter.invalid();
         menu_buttons.enter.clickable(true);
         text_handlers.game_msg.change(messages.name_taken);
     });
 
     socket.on('name accepted', () => {
-        set_cursor('default');
         hide_name_input();
         show_menu_buttons(['host', 'open_hosts']);
         text_handlers.player_name.change(player_name);
@@ -127,7 +124,6 @@ function init_menu_buttons(socket) {
         () => {
             menu_buttons.open_hosts.clickable(false);
             socket.emit('host');
-            set_cursor('wait');
             // communications.host(
             //     () => {
             //         communications.request_opponent(
@@ -147,13 +143,11 @@ function init_menu_buttons(socket) {
     );
 
     socket.on('host failed', (reason) => {
-        set_cursor('default');
         menu_buttons.open_hosts.clickable(true);
         modals.error.open('Failed to host: ' + reason);
     });
 
     socket.on('host success', () => {
-        set_cursor('default');
         toggle_dual_grid(true);
         show_menu_buttons(['abort']);
         text_handlers.game_msg.change(messages.wait_for_join);
@@ -272,10 +266,6 @@ function set_grid_split(active) {
         $both_sides.addClass('dual-view');
     else
         $both_sides.removeClass('dual-view');
-}
-
-function set_cursor(state) {
-    $('*').css('cursor', state);
 }
 
 function adjacent_grids() {
