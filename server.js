@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
             if(!player)
                 return;
             if(player.game_open()) {
-                player.to_self('host failed', 'id duplicate');
+                player.send('host failed', 'id duplicate');
                 return;
             }
             player.open_game();
@@ -35,11 +35,7 @@ io.on('connection', (socket) => {
         const player = players[socket.id];
         if(!player)
             return;
-
-        if(player.game_open())
-            player.close_open_game();
-        else if(player.is_paired())
-            player.unpair();
+        player.handle_goodbye();
     });
 
     socket.on('host watch', (callback) => {
@@ -90,10 +86,7 @@ io.on('connection', (socket) => {
         const player = players[socket.id];
 
         if(player) {
-            if(player.game_open())
-                player.close_open_game();
-            else if(player.is_paired())
-                player.unpair();
+            player.handle_goodbye();
             delete players[socket.id];
         }
     });
@@ -102,10 +95,7 @@ io.on('connection', (socket) => {
         const player = players[socket.id];
 
         if(player) {
-            if(player.game_open())
-                player.close_open_game();
-            else if(player.is_paired())
-                player.unpair();
+            player.handle_goodbye();
             delete players[socket.id];
         }
     });
@@ -147,7 +137,7 @@ class Player {
     }
 
     open_game() {
-        this.to_self('host success');
+        this.send('host success');
         this.to_host_watchers('add host', {name: this.name, id: this.id});
         this._game_open = true;
     }
@@ -162,12 +152,12 @@ class Player {
         host._opponent = this;
         host._game_open = false;
 
-        host.to_self('opponent entered', this.name);
+        host.send('opponent entered', this.name);
         host.to_host_watchers('remove host', host.id);
     }
 
     unpair() {
-        this._opponent.to_self('opponent left');
+        this._opponent.send('opponent left');
         this._opponent._opponent = null;
         this._opponent = null;
     }
@@ -176,7 +166,14 @@ class Player {
         return !!this._opponent;
     }
 
-    to_self(...args) {
+    handle_goodbye() {
+        if(this.game_open())
+            this.close_open_game();
+        else if(this.is_paired())
+            this.unpair();
+    }
+
+    send(...args) {
         this._socket.emit(...args);
     }
 
