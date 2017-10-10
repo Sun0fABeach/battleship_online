@@ -57,6 +57,10 @@ export class HostModal extends Modal {
                             .addClass(this._join_btn_class)
                             .text('Join');
 
+        const modal = this;
+        this._$list_container.on('click', 'button', function() {
+            modal._join_host($(this));
+        });
         this._$host_search.on('input', () => this._handle_search());
         this._$random_join.click(() => this._join_random_host());
         this._$close.click(() => this._close());
@@ -99,8 +103,7 @@ export class HostModal extends Modal {
 
         const $join_btn = this._$join_btn
         .clone()
-        .data('host', host)
-        .click(() => this._join_host($join_btn));
+        .data('host', host);
 
         this._$host_entry
         .clone()
@@ -127,11 +130,15 @@ export class HostModal extends Modal {
     _join_host($clicked_btn) {
         this._$random_join.off(); // prevent double clicking ...
         this._$close.off();
-        this._$list_container.find('button').off();
+        this._$list_container.off();
 
         const host = $clicked_btn.data('host');
 
         this._socket.emit('join', host.id, this._player_name, (success) => {
+            const modal = this;
+            this._$list_container.on('click', 'button', function() {
+                modal._join_host($(this));
+            });
             this._$random_join.click(() => this._join_random_host());
             this._$close.click(() => this._close());
 
@@ -140,12 +147,6 @@ export class HostModal extends Modal {
                 this._join_cb(host.name);
                 return;
             }
-
-            // these will already be set in case of success by opening modal
-            const modal = this;
-            this._$list_container.find('button').click(function() {
-                modal._join_host($(this));
-            });
         });
     }
 
