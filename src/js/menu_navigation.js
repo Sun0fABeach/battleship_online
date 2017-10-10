@@ -1,4 +1,3 @@
-import * as communications from './communications';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import { HostModal, ErrorModal } from './classes/modal';
@@ -53,26 +52,14 @@ function init_modals(socket) {
             keyboard: false
         },
         socket,
-        (host) => {
+        (host_name) => {
+            toggle_dual_grid(true);
+            text_handlers.opponent_name.change(host_name);
             text_handlers.game_msg.change(
-                'Connecting to player <strong>'+host.name+'</strong> ...'
+                'Connected to <strong>'+host_name+'</strong>. ' +
+                messages.finish_placement
             );
-            communications.join_host(host.id, player_name,
-                () => {
-                    toggle_dual_grid(true);
-                    text_handlers.opponent_name.change(host.name);
-                    text_handlers.game_msg.change(
-                        'Connected to <strong>'+host.name+'</strong>. ' +
-                        messages.finish_placement
-                    );
-                    show_menu_buttons(['abort', 'ready']);
-                },
-                () => {
-                    modals.error.open('Failed to join '+host.name+'.');
-                    text_handlers.game_msg.change(messages.host_or_join);
-                    show_menu_buttons(['host', 'open_hosts']);
-                }
-            );
+            show_menu_buttons(['abort', 'ready']);
         },
         () => {
             text_handlers.game_msg.change(messages.host_or_join);
@@ -124,19 +111,6 @@ function init_menu_buttons(socket) {
         () => {
             menu_buttons.open_hosts.clickable(false);
             socket.emit('host');
-            // communications.host(
-            //     () => {
-            //         communications.request_opponent(
-            //             (opponent_name) => {
-            //                 text_handlers.opponent_name.change(opponent_name);
-            //                 text_handlers.game_msg.change(
-            //                     'Player <strong>'+opponent_name+'</strong> joined. ' +
-            //                     messages.finish_placement
-            //                 );
-            //                 show_menu_buttons(['abort', 'ready']);
-            //             }
-            //         );
-            //     }
         },
         undefined,
         undefined
@@ -153,12 +127,21 @@ function init_menu_buttons(socket) {
         text_handlers.game_msg.change(messages.wait_for_join);
     });
 
+    socket.on('opponent entered', (opponent_name) => {
+        show_menu_buttons(['abort', 'ready']);
+        text_handlers.opponent_name.change(opponent_name);
+        text_handlers.game_msg.change(
+            'Player <strong>'+opponent_name+'</strong> joined. ' +
+            messages.finish_placement
+        );
+    });
+
 
     menu_buttons.open_hosts = new MenuButton(
         'open-hosts',
         () => true,
         () => {
-            modals.host_list.open();
+            modals.host_list.open(player_name);
             show_menu_buttons(null);
         },
         'Choose a host.',
@@ -178,17 +161,6 @@ function init_menu_buttons(socket) {
         undefined
     );
 
-    menu_buttons.ready = new MenuButton(
-        'ready',
-        () => ship_placement.is_valid(),
-        () => {
-            const ships = ship_placement.deactivate();
-            show_menu_buttons(['slide', 'leave'], () => battle.activate(ships));
-        },
-        messages.battle_start,
-        messages.invalid_placement
-    );
-
     menu_buttons.leave = new MenuButton(
         'leave',
         () => true,
@@ -202,6 +174,30 @@ function init_menu_buttons(socket) {
         },
         messages.host_or_join,
         undefined
+    );
+
+    socket.on('opponent left', () => {
+        modals.error.open('Your opponent has left the game.');
+
+        $player_side.find('.game-grid').slideDown(() => {
+            ship_placement.activate();
+            toggle_dual_grid(false);
+        });
+        text_handlers.opponent_name.change('Opponent');
+        text_handlers.game_msg.change(messages.host_or_join);
+        show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
+    });
+
+
+    menu_buttons.ready = new MenuButton(
+        'ready',
+        () => ship_placement.is_valid(),
+        () => {
+            const ships = ship_placement.deactivate();
+            show_menu_buttons(['slide', 'leave'], () => battle.activate(ships));
+        },
+        messages.battle_start,
+        messages.invalid_placement
     );
 
     menu_buttons.slide = new MenuButton(

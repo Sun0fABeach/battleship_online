@@ -1,5 +1,4 @@
 import * as menu_navigation from './menu_navigation';
-import * as communications from './communications';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import io from 'socket.io-client';

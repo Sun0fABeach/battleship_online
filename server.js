@@ -13,81 +13,95 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            players[socket.id] = {name: player_name};
+            players[socket.id] = new Player(player_name, socket);
             socket.emit('name accepted')
         }, 800);
     });
 
     socket.on('host', () => {
         setTimeout(() => {
-            const player_data = players[socket.id];
-            if(!player_data)
+            const player = players[socket.id];
+            if(!player)
                 return;
-            if(player_data.is_host) {
-                socket.emit('host failed', 'id duplicate');
+            if(player.game_open()) {
+                player.to_self('host failed', 'id duplicate');
                 return;
             }
-            player_data.is_host = true;
-            socket.emit('host success');
-            socket.to('host watchers').emit(
-                'add host', {name: player_data.name, id: socket.id}
-            );
+            player.open_game();
         }, 800);
     });
 
     socket.on('abort', () => {
-        const player_data = players[socket.id];
-        if(!player_data || !player_data.is_host)
+        const player = players[socket.id];
+        if(!player)
             return;
-        player_data.is_host = false;
-        socket.to('host watchers').emit('remove host', socket.id);
+
+        if(player.game_open())
+            player.close_open_game();
+        else if(player.is_paired())
+            player.unpair();
     });
 
     socket.on('host watch', (callback) => {
         setTimeout(() => {
-            if(!players[socket.id] || players[socket.id].is_host)
+            const player = players[socket.id];
+            if(!player || player.game_open())
                 return;
 
             const hosts = [];
 
             for(const id in players)
                 if(players.hasOwnProperty(id))
-                    if(players[id].is_host)
-                        hosts.push({name: players[id].name, id});
+                    if(players[id].game_open())
+                        hosts.push(players[id].name_id);
 
             callback(hosts.length > 0 ? hosts : null);
-            socket.join('host watchers');
+
+            player.become_host_watcher();
         }, 1200);
     });
 
     socket.on('host unwatch', () => {
-        if(!players[socket.id])
+        const player = players[socket.id];
+        if(!player)
             return;
-        socket.leave('host watchers');
+        player.stop_host_watching();
+    });
+
+    socket.on('join', (host_id, joiner_name, callback) => {
+        setTimeout(() => {
+            const player = players[socket.id];
+            const host = players[host_id];
+
+            if(!player || player.game_open() || player.is_paired())
+                return;
+            if(!host || !host.game_open()) {
+                callback(false);
+                return;
+            }
+
+            player.pair_with(host);
+
+            callback(true);
+        }, 1200);
     });
 
     socket.on('disconnecting', () => {
-        const player_data = players[socket.id];
+        const player = players[socket.id];
 
-        if(player_data) {
-            if(player_data.is_host) {
-                socket.to('host watchers').emit(
-                    'remove host', {name: player_data.name, id: socket.id}
-                );
-            }
+        if(player) {
+            if(player.game_open())
+                player.to_host_watchers('remove host', player.name_id);
             delete players[socket.id];
         }
     });
 
     socket.on('error', (error) => {
-        const player_data = players[socket.id];
+        const player = players[socket.id];
 
-        if(player_data) {
-            if(player_data.is_host) {
-                socket.to('host watchers').emit(
-                    'remove host', {name: player_data.name, id: socket.id}
-                );
-            }
+        if(player) {
+            if(player.game_open())
+                player.to_host_watchers('remove host', player.name_id);
             delete players[socket.id];
         }
     });
@@ -101,4 +115,76 @@ function name_registered(player_name) {
                 return true;
 
     return false;
+}
+
+
+class Player {
+    constructor(name, socket) {
+        this._name = name;
+        this._socket = socket;
+        this._game_open = false;
+        this._opponent = null;
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    get id() {
+        return this._socket.id;
+    }
+
+    get name_id() {
+        return {name: this.name, id: this.id};
+    }
+
+    game_open() {
+        return this._game_open && !this.is_paired();
+    }
+
+    open_game() {
+        this.to_self('host success');
+        this.to_host_watchers('add host', {name: this.name, id: this.id});
+        this._game_open = true;
+    }
+
+    close_open_game() {
+        this.to_host_watchers('remove host', this.id);
+        this._game_open = false;
+    }
+
+    pair_with(host) {
+        this._opponent = host;
+        host._opponent = this;
+        host._game_open = false;
+
+        host.to_self('opponent entered', this.name);
+        host.to_host_watchers('remove host', host.id);
+    }
+
+    unpair() {
+        this._opponent.to_self('opponent left');
+        this._opponent._opponent = null;
+        this._opponent = null;
+    }
+
+    is_paired() {
+        return !!this._opponent;
+    }
+
+    to_self(...args) {
+        this._socket.emit(...args);
+    }
+
+    become_host_watcher() {
+        this._socket.join('host watchers');
+    }
+
+    stop_host_watching() {
+        this._socket.leave('host watchers');
+    }
+
+    to_host_watchers(...args) {
+        this._socket.to('host watchers').emit(...args);
+    }
 }

@@ -1,6 +1,3 @@
-import * as communications from '../communications';
-
-
 class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
@@ -70,12 +67,12 @@ export class HostModal extends Modal {
         socket.on('remove host', (id) => {
             this._remove_item(id);
         });
-
-        this._set_default_state();
     }
 
-    open() {
+    open(player_name) {
+        this._player_name = player_name; // needed for networking
         this._set_default_state();
+
         super._open();
         this._socket.emit('host watch', (hosts) => {
             this._$loading_text.remove();
@@ -128,9 +125,28 @@ export class HostModal extends Modal {
     }
 
     _join_host($clicked_btn) {
-        this._socket.emit('host unwatch');
-        super._close();
-        this._join_cb($clicked_btn.data('host'));
+        this._$random_join.off(); // prevent double clicking ...
+        this._$close.off();
+        this._$list_container.find('button').off();
+
+        const host = $clicked_btn.data('host');
+
+        this._socket.emit('join', host.id, this._player_name, (success) => {
+            this._$random_join.click(() => this._join_random_host());
+            this._$close.click(() => this._close());
+
+            if(success) {
+                super._close();
+                this._join_cb(host.name);
+                return;
+            }
+
+            // these will already be set in case of success by opening modal
+            const modal = this;
+            this._$list_container.find('button').click(function() {
+                modal._join_host($(this));
+            });
+        });
     }
 
     _join_random_host() {
