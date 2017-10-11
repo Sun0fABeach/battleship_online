@@ -122,39 +122,41 @@
             <span class="text-center">Please enter your name.</span>
           </p>
 
-          <input type="text" id="player-name" maxlength="12" autofocus
-            class="form-control font-weight-bold mx-auto">
+          <form>
+            <input type="text" id="player-name" maxlength="12" autofocus
+              class="form-control font-weight-bold mx-auto">
 
-          <div class="row justify-content-center mx-auto mx-md-5 mt-3 mt-sm-4 mt-xl-5">
-            <button type="button" name="enter"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Enter
-            </button>
-            <button type="button" name="host"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Host
-            </button>
-            <button type="button" name="open-hosts"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Join
-            </button>
-            <button type="button" name="ready"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Ready
-            </button>
-            <button type="button" name="slide"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Toggle Grid
-            </button>
-            <button type="button" name="abort"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Abort
-            </button>
-            <button type="button" name="leave"
-                class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
-              Give up
-            </button>
-          </div>
+            <div class="row justify-content-center mx-auto mx-md-5 mt-3 mt-sm-4 mt-xl-5">
+              <button type="submit" name="enter"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Enter
+              </button>
+              <button type="button" name="host"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Host
+              </button>
+              <button type="button" name="open-hosts"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Join
+              </button>
+              <button type="button" name="ready"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Ready
+              </button>
+              <button type="button" name="slide"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Toggle Grid
+              </button>
+              <button type="button" name="abort"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Abort
+              </button>
+              <button type="button" name="leave"
+                  class="btn btn-primary btn-block col-12 col-sm-5 col-md-3 col-xl-2">
+                Give up
+              </button>
+            </div>
+          </form>
         </div>
 
       </div>
@@ -170,7 +172,7 @@
                 <h5 class="modal-title col-4 pl-0 pl-sm-2">Hosts</h5>
 
                 <input type="text" name="host-search"
-                  maxlength=12 placeholder="search host" autofocus
+                  maxlength=12 placeholder="search host"
                   class="form-control font-weight-bold col-6">
 
                 <div class="col-2 text-right pr-0 pr-sm-1">

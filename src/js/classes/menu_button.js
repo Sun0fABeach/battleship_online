@@ -6,7 +6,10 @@ export default class MenuButton {
 
     constructor(btn_name, valid_test, action, valid_msg, invalid_msg) {
         this._$btn = $('#main-menu button[name="'+btn_name+'"]');
-        this._click_cb = () => {
+        this._click_cb = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
             if(valid_test()) {
                 // this._button_valid();
                 action();

@@ -41,6 +41,8 @@ export function init(socket) {
 
     init_modals(socket);
     init_menu_buttons(socket);
+
+    $('#main-menu form').on('submit', menu_buttons.enter.click);
 }
 
 
