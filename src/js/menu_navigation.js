@@ -6,7 +6,7 @@ import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
-let player_name;
+let $name_input, player_name;
 const text_handlers = {};
 const modals = {};
 const menu_buttons = {};
@@ -34,6 +34,7 @@ export function init(socket) {
     $player_side = $('#player-side');
     $both_sides = $('.grid-wrapper');
     $grids_container = $('#grids-container');
+    $name_input = $('#player-name');
 
     text_handlers.player_name = new Text($('#player-side > p:first-child'));
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
@@ -83,7 +84,7 @@ function init_menu_buttons(socket) {
 
     menu_buttons.enter = new MenuButton(
         'enter',
-        get_player_name,
+        validate_player_name,
         () => {
             player_name = get_player_name();
             socket.emit('name register', player_name);
@@ -246,12 +247,20 @@ function show_menu_buttons_do_action(menu_buttons_to_show, action) {
         action();
 }
 
+function validate_player_name() {
+    if(get_player_name() === '') {
+        $name_input.focus();
+        return false;
+    }
+    return true;
+}
+
 function get_player_name() {
-    return $('#player-name').val();
+    return $name_input.val().trim();
 }
 
 function hide_name_input() {
-    $('#player-name').fadeOut();
+    $name_input.fadeOut();
 }
 
 function toggle_dual_grid(active) {
