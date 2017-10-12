@@ -4,31 +4,27 @@ const players = {};
 
 io.on('connection', (socket) => {
     socket.on('name register', (player_name) => {
-        setTimeout(() => {
-            if(players[socket.id])
-                return;
+        if(players[socket.id])
+            return;
 
-            if(name_registered(player_name)) {
-                socket.emit('name taken');
-                return;
-            }
+        if(name_registered(player_name)) {
+            socket.emit('name taken');
+            return;
+        }
 
-            players[socket.id] = new Player(player_name, socket);
-            socket.emit('name accepted')
-        }, 800);
+        players[socket.id] = new Player(player_name, socket);
+        socket.emit('name accepted')
     });
 
     socket.on('host', () => {
-        setTimeout(() => {
-            const player = players[socket.id];
-            if(!player)
-                return;
-            if(player.game_open()) {
-                player.send('host failed', 'id duplicate');
-                return;
-            }
-            player.open_game();
-        }, 800);
+        const player = players[socket.id];
+        if(!player)
+            return;
+        if(player.game_open()) {
+            player.send('host failed', 'id duplicate');
+            return;
+        }
+        player.open_game();
     });
 
     socket.on('abort', () => {
@@ -39,22 +35,20 @@ io.on('connection', (socket) => {
     });
 
     socket.on('host watch', (callback) => {
-        setTimeout(() => {
-            const player = players[socket.id];
-            if(!player || player.game_open())
-                return;
+        const player = players[socket.id];
+        if(!player || player.game_open())
+            return;
 
-            const hosts = [];
+        const hosts = [];
 
-            for(const id in players)
-                if(players.hasOwnProperty(id))
-                    if(players[id].game_open())
-                        hosts.push(players[id].name_id);
+        for(const id in players)
+            if(players.hasOwnProperty(id))
+                if(players[id].game_open())
+                    hosts.push(players[id].name_id);
 
-            callback(hosts.length > 0 ? hosts : null);
+        callback(hosts.length > 0 ? hosts : null);
 
-            player.become_host_watcher();
-        }, 1200);
+        player.become_host_watcher();
     });
 
     socket.on('host unwatch', () => {
@@ -65,21 +59,19 @@ io.on('connection', (socket) => {
     });
 
     socket.on('join', (host_id, joiner_name, callback) => {
-        setTimeout(() => {
-            const player = players[socket.id];
-            const host = players[host_id];
+        const player = players[socket.id];
+        const host = players[host_id];
 
-            if(!player || player.game_open() || player.is_paired())
-                return;
-            if(!host || !host.game_open()) {
-                callback(false);
-                return;
-            }
+        if(!player || player.game_open() || player.is_paired())
+            return;
+        if(!host || !host.game_open()) {
+            callback(false);
+            return;
+        }
 
-            player.pair_with(host);
+        player.pair_with(host);
 
-            callback(true);
-        }, 1200);
+        callback(true);
     });
 
     socket.on('disconnecting', () => {
