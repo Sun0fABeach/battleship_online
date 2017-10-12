@@ -74,9 +74,7 @@ function init_modals(socket) {
 
     modals.error = new ErrorModal(
         $('#error-modal'),
-        {
-            backdrop: 'static'
-        }
+        'show'
     );
 }
 
