@@ -12,9 +12,11 @@ export function init(sock) {
     opponent_grid = new Grid($('#opponent-side table'));
 }
 
-export function activate(ships) {
+export function set_player_ships(ships) {
     player_ships = ships;
+}
 
+export function activate() {
     for(const ship of player_ships) {
         ship.prepare_for_battle();
         player_grid.set_ship(ship);

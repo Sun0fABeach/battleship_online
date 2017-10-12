@@ -6,7 +6,8 @@ import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
-let $name_input, player_name;
+let $name_input
+let player_name, opponent_name;
 const text_handlers = {};
 const modals = {};
 const menu_buttons = {};
@@ -56,6 +57,7 @@ function init_modals(socket) {
         },
         socket,
         (host_name) => {
+            opponent_name = host_name;
             toggle_dual_grid(true);
             text_handlers.opponent_name.change(host_name);
             text_handlers.game_msg.change(
@@ -130,7 +132,8 @@ function init_menu_buttons(socket) {
         text_handlers.game_msg.change(messages.wait_for_join);
     });
 
-    socket.on('opponent entered', (opponent_name) => {
+    socket.on('opponent entered', (opponent) => {
+        opponent_name = opponent;
         show_menu_buttons(['abort', 'ready']);
         text_handlers.opponent_name.change(opponent_name);
         text_handlers.game_msg.change(
@@ -186,7 +189,7 @@ function init_menu_buttons(socket) {
         if(!is_dual_grid())
             return;
 
-        modals.error.open('Your opponent has left the game.');
+        modals.error.open(opponent_name + ' has left the game.');
 
         $player_side.find('.game-grid').slideDown(() => {
             ship_placement.activate();
@@ -202,12 +205,27 @@ function init_menu_buttons(socket) {
         'ready',
         () => ship_placement.is_valid(),
         () => {
-            const ships = ship_placement.deactivate();
-            show_menu_buttons(['slide', 'leave'], () => battle.activate(ships));
+            battle.set_player_ships(ship_placement.deactivate());
+            menu_buttons.ready.clickable(false);
+
+            socket.emit('ready', (other_ready) => {
+                if(other_ready) {
+                    start_battle();
+                } else {
+                    menu_buttons.ready.hide();
+                    text_handlers.game_msg.change(
+                        'Waiting for <strong>'+opponent_name+'</strong>'+
+                        ' to finish ship placement ...'
+                    );
+                }
+            });
         },
-        messages.battle_start,
+        undefined,
         messages.invalid_placement
     );
+
+    socket.on('opponent ready', start_battle);
+
 
     menu_buttons.slide = new MenuButton(
         'slide',
@@ -287,4 +305,10 @@ function set_grid_split(active) {
 
 function adjacent_grids() {
     return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
+}
+
+function start_battle() {
+    battle.activate();
+    show_menu_buttons(['slide', 'leave']);
+    text_handlers.game_msg.change(messages.battle_start);
 }

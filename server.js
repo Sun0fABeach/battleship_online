@@ -74,6 +74,15 @@ io.on('connection', (socket) => {
         callback(true);
     });
 
+    socket.on('ready', (callback) => {
+        const player = players[socket.id];
+
+        if(!player || player.game_open() || !player.is_paired() || player.ready)
+            return;
+
+        callback(player.set_ready());
+    });
+
     socket.on('disconnecting', () => {
         const player = players[socket.id];
 
@@ -110,6 +119,7 @@ class Player {
         this._socket = socket;
         this._game_open = false;
         this._opponent = null;
+        this._ready = false;
     }
 
     get name() {
@@ -122,6 +132,10 @@ class Player {
 
     get name_id() {
         return {name: this.name, id: this.id};
+    }
+
+    get ready() {
+        return this._ready;
     }
 
     game_open() {
@@ -151,7 +165,9 @@ class Player {
     unpair() {
         this._opponent.send('opponent left');
         this._opponent._opponent = null;
+        this._opponent._ready = null;
         this._opponent = null;
+        this._ready = null;
     }
 
     is_paired() {
@@ -179,5 +195,16 @@ class Player {
 
     to_host_watchers(...args) {
         this._socket.to('host watchers').emit(...args);
+    }
+
+    set_ready() {
+        this._ready = true;
+
+        if(this._opponent.ready) {
+            this._opponent.send('opponent ready');
+            return true;
+        }
+
+        return false;
     }
 }
