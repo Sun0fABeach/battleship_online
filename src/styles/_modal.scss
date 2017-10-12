@@ -1,2 +1,32 @@
 #host-modal {
+  .modal-dialog {
+    height: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 3%;
+    padding-bottom: 3%;
+
+    @include media-breakpoint-up(lg) {
+      padding-bottom: 5%;
+    }
+    @include media-breakpoint-up(xl) {
+      padding-bottom: 7%;
+    }
+
+    .modal-content {
+      max-height: 100%;
+
+      /* give header & footer their fixed bootstrap size, so opera doesn't squash
+      them when the host list gets very long */
+      .modal-header {
+        min-height: 69px;
+      }
+      .modal-footer {
+        min-height: 69px;
+      }
+      .modal-body {
+        overflow-y: auto;
+      }
+    }
+  }
 }
