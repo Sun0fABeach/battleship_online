@@ -45,14 +45,16 @@ export function init(socket) {
     $grids_container = $('#grids-container');
     $name_input = $('#player-name');
 
+    init_text_handlers();
+    init_modals(socket);
+    init_menu_buttons(socket);
+}
+
+
+function init_text_handlers() {
     text_handlers.player_name = new Text($('#player-side > p:first-child'));
     text_handlers.opponent_name = new Text($('#opponent-side > p:first-child'));
     text_handlers.game_msg = new Text($('#main-menu > p:first-child > span'));
-
-    init_modals(socket);
-    init_menu_buttons(socket);
-
-    $('#main-menu form').on('submit', menu_buttons.enter.click);
 }
 
 
@@ -88,8 +90,7 @@ function init_modals(socket) {
 
 
 function init_menu_buttons(socket) {
-    menu_buttons.enter = new MenuButton(
-        'enter',
+    menu_buttons.enter = new MenuButton('enter',
         () => {
             if(!validate_player_name()) {
                 $name_input.focus();
@@ -102,6 +103,8 @@ function init_menu_buttons(socket) {
         }
     );
 
+    $('#main-menu form').on('submit', menu_buttons.enter.click);
+
     socket.on('name taken', () => {
         menu_buttons.enter.invalid();
         menu_buttons.enter.clickable(true);
@@ -109,15 +112,14 @@ function init_menu_buttons(socket) {
     });
 
     socket.on('name accepted', () => {
-        hide_name_input();
+        $name_input.fadeOut();
         show_menu_buttons(['host', 'open_hosts']);
         text_handlers.player_name.change(player_name);
         text_handlers.game_msg.change(messages.host_or_join);
     });
 
 
-    menu_buttons.host = new MenuButton(
-        'host',
+    menu_buttons.host = new MenuButton('host',
         () => {
             menu_buttons.open_hosts.clickable(false);
             socket.emit('host');
@@ -146,8 +148,7 @@ function init_menu_buttons(socket) {
     });
 
 
-    menu_buttons.open_hosts = new MenuButton(
-        'open-hosts',
+    menu_buttons.open_hosts = new MenuButton('open-hosts',
         () => {
             modals.host_list.open(player_name);
             show_menu_buttons(null);
@@ -167,18 +168,8 @@ function init_menu_buttons(socket) {
         }
     );
 
-    menu_buttons.leave = new MenuButton(
-        'leave',
-        () => {
-            $player_side.find('.game-grid').slideDown(() => {
-                ship_placement.activate();
-                toggle_dual_grid(false);
-            });
-            show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
-            text_handlers.opponent_name.change('Opponent');
-            text_handlers.game_msg.change(messages.host_or_join);
-        }
-    );
+
+    menu_buttons.leave = new MenuButton('leave', end_battle);
 
     socket.on('opponent left', () => {
         /* rare corner case: player clicked abort, grid is made single and
@@ -186,21 +177,12 @@ function init_menu_buttons(socket) {
            disconnected at the same time. */
         if(!is_dual_grid())
             return;
-
         modals.error.open(opponent_name + ' has left the game.');
-
-        $player_side.find('.game-grid').slideDown(() => {
-            ship_placement.activate();
-            toggle_dual_grid(false);
-        });
-        show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
-        text_handlers.opponent_name.change('Opponent');
-        text_handlers.game_msg.change(messages.host_or_join);
+        end_battle();
     });
 
 
-    menu_buttons.ready = new MenuButton(
-        'ready',
+    menu_buttons.ready = new MenuButton('ready',
         () => {
             if(!ship_placement.is_valid()) {
                 menu_buttons.ready.invalid();
@@ -228,8 +210,7 @@ function init_menu_buttons(socket) {
     socket.on('opponent ready', start_battle);
 
 
-    menu_buttons.slide = new MenuButton(
-        'slide',
+    menu_buttons.slide = new MenuButton('slide',
         () => $player_side.find('.game-grid').slideToggle()
     );
 }
@@ -271,10 +252,6 @@ function get_player_name() {
     return $name_input.val().trim();
 }
 
-function hide_name_input() {
-    $name_input.fadeOut();
-}
-
 function toggle_dual_grid(active) {
     if(adjacent_grids()) {
         $grids_container.fadeOut(() => {
@@ -305,4 +282,14 @@ function start_battle() {
     battle.activate();
     show_menu_buttons(['slide', 'leave']);
     text_handlers.game_msg.change(messages.battle_start);
+}
+
+function end_battle() {
+    $player_side.find('.game-grid').slideDown(() => {
+        ship_placement.activate();
+        toggle_dual_grid(false);
+    });
+    show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
+    text_handlers.opponent_name.change('Opponent');
+    text_handlers.game_msg.change(messages.host_or_join);
 }
