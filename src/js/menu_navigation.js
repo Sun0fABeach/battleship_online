@@ -6,7 +6,7 @@ import Text from './classes/text';
 
 
 let $player_side, $both_sides, $grids_container;
-let $name_input
+let $name_input;
 let player_name, opponent_name;
 const text_handlers = {};
 const modals = {};
@@ -17,6 +17,8 @@ const messages = {
     'Please enter your <strong>name</strong>.',
     name_taken:
     'The name you entered is already in use.',
+    choose_host:
+    'Choose a host.',
     host_or_join:
     'Choose <strong>Host</strong> to host a game, ' +
     'or <strong>Join</strong> to join a hosted game.',
@@ -80,18 +82,18 @@ function init_modals(socket) {
 
 
 function init_menu_buttons(socket) {
-    MenuButton.init(text_handlers.game_msg);
-
     menu_buttons.enter = new MenuButton(
         'enter',
-        validate_player_name,
         () => {
-            player_name = get_player_name();
-            socket.emit('name register', player_name);
-            menu_buttons.enter.clickable(false);
-        },
-        undefined,
-        messages.name_enter
+            if(!validate_player_name()) {
+                $name_input.focus();
+                text_handlers.game_msg.change(messages.name_enter);
+            } else {
+                player_name = get_player_name();
+                socket.emit('name register', player_name);
+                menu_buttons.enter.clickable(false);
+            }
+        }
     );
 
     socket.on('name taken', () => {
@@ -110,13 +112,10 @@ function init_menu_buttons(socket) {
 
     menu_buttons.host = new MenuButton(
         'host',
-        () => true,
         () => {
             menu_buttons.open_hosts.clickable(false);
             socket.emit('host');
-        },
-        undefined,
-        undefined
+        }
     );
 
     socket.on('host failed', (reason) => {
@@ -143,41 +142,36 @@ function init_menu_buttons(socket) {
 
     menu_buttons.open_hosts = new MenuButton(
         'open-hosts',
-        () => true,
         () => {
             modals.host_list.open(player_name);
             show_menu_buttons(null);
-        },
-        'Choose a host.',
-        undefined
+            text_handlers.game_msg.change(messages.choose_host);
+        }
     );
+
 
     menu_buttons.abort = new MenuButton(
         'abort',
-        () => true,
         () => {
             socket.emit('abort');
             toggle_dual_grid(false);
-            text_handlers.opponent_name.change('Opponent');
             show_menu_buttons(['host', 'open_hosts']);
-        },
-        messages.host_or_join,
-        undefined
+            text_handlers.opponent_name.change('Opponent');
+            text_handlers.game_msg.change(messages.host_or_join);
+        }
     );
 
     menu_buttons.leave = new MenuButton(
         'leave',
-        () => true,
         () => {
             $player_side.find('.game-grid').slideDown(() => {
                 ship_placement.activate();
                 toggle_dual_grid(false);
             });
-            text_handlers.opponent_name.change('Opponent');
             show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
-        },
-        messages.host_or_join,
-        undefined
+            text_handlers.opponent_name.change('Opponent');
+            text_handlers.game_msg.change(messages.host_or_join);
+        }
     );
 
     socket.on('opponent left', () => {
@@ -193,16 +187,21 @@ function init_menu_buttons(socket) {
             ship_placement.activate();
             toggle_dual_grid(false);
         });
+        show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
         text_handlers.opponent_name.change('Opponent');
         text_handlers.game_msg.change(messages.host_or_join);
-        show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
     });
 
 
     menu_buttons.ready = new MenuButton(
         'ready',
-        () => ship_placement.is_valid(),
         () => {
+            if(!ship_placement.is_valid()) {
+                menu_buttons.ready.invalid();
+                text_handlers.game_msg.change(messages.invalid_placement);
+                return;
+            }
+
             battle.set_player_ships(ship_placement.deactivate());
             menu_buttons.ready.clickable(false);
 
@@ -217,9 +216,7 @@ function init_menu_buttons(socket) {
                     );
                 }
             });
-        },
-        undefined,
-        messages.invalid_placement
+        }
     );
 
     socket.on('opponent ready', start_battle);
@@ -227,10 +224,7 @@ function init_menu_buttons(socket) {
 
     menu_buttons.slide = new MenuButton(
         'slide',
-        () => true,
-        () => $player_side.find('.game-grid').slideToggle(),
-        undefined,
-        undefined
+        () => $player_side.find('.game-grid').slideToggle()
     );
 }
 
@@ -264,11 +258,7 @@ function show_menu_buttons_do_action(menu_buttons_to_show, action) {
 }
 
 function validate_player_name() {
-    if(get_player_name() === '') {
-        $name_input.focus();
-        return false;
-    }
-    return true;
+    return get_player_name() !== '';
 }
 
 function get_player_name() {

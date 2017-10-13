@@ -1,25 +1,10 @@
 export default class MenuButton {
-    // must be called before using a button object!
-    static init(msg_box) {
-        this.msg_handler = msg_box;
-    }
-
-    constructor(btn_name, valid_test, action, valid_msg, invalid_msg) {
+    constructor(btn_name, action) {
         this._$btn = $('#main-menu button[name="'+btn_name+'"]');
         this._click_cb = (event) => {
             event.preventDefault();
             event.stopPropagation();
-
-            if(valid_test()) {
-                // this._button_valid();
-                action();
-                if(valid_msg)
-                    MenuButton.msg_handler.change(valid_msg);
-            } else {
-                this.invalid();
-                if(invalid_msg)
-                    MenuButton.msg_handler.change(invalid_msg);
-            }
+            action();
         };
 
         this._$btn
@@ -60,7 +45,7 @@ export default class MenuButton {
         this._$btn.addClass('btn-danger');
     }
 
-    _button_valid() {
+    valid() {
         this._$btn.addClass('btn-success');
     }
 
