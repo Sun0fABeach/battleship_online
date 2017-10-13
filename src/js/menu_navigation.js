@@ -94,6 +94,8 @@ function init_menu_buttons(socket) {
         () => {
             if(!validate_player_name()) {
                 $name_input.focus();
+                menu_buttons.enter.invalid();
+                $name_input.one('input', () => menu_buttons.enter.normal());
                 text_handlers.game_msg.change(messages.name_enter);
             } else {
                 player_name = get_player_name();
@@ -245,7 +247,11 @@ function show_menu_buttons_do_action(menu_buttons_to_show, action) {
 }
 
 function validate_player_name() {
-    return get_player_name() !== '';
+    if(get_player_name() === '') {
+        $name_input.val('');
+        return false;
+    }
+    return true;
 }
 
 function get_player_name() {

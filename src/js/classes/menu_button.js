@@ -8,7 +8,7 @@ export default class MenuButton {
         };
 
         this._$btn
-        .blur(() => this._button_normal())
+        .blur(() => this.normal())
         .click(this._click_cb);
     }
 
@@ -49,7 +49,7 @@ export default class MenuButton {
         this._$btn.addClass('btn-success');
     }
 
-    _button_normal() {
+    normal() {
         this._$btn.removeClass('btn-success btn-danger');
     }
 }
