@@ -83,6 +83,13 @@ io.on('connection', (socket) => {
         callback(player.set_ready());
     });
 
+    socket.on('give up', () => {
+        const player = players[socket.id];
+        if(!player)
+            return;
+        player.handle_goodbye();
+    });
+
     socket.on('disconnecting', () => {
         const player = players[socket.id];
 
@@ -139,7 +146,7 @@ class Player {
     }
 
     game_open() {
-        return this._game_open && !this.is_paired();
+        return this._game_open;
     }
 
     open_game() {
@@ -163,11 +170,15 @@ class Player {
     }
 
     unpair() {
-        this._opponent.send('opponent left');
+        if(this.ready && this._opponent.ready) // ongoing battle
+            this._opponent.send('opponent gave up');
+        else
+            this._opponent.send('opponent aborted');
+
         this._opponent._opponent = null;
-        this._opponent._ready = null;
+        this._opponent._ready = false;
         this._opponent = null;
-        this._ready = null;
+        this._ready = false;
     }
 
     is_paired() {

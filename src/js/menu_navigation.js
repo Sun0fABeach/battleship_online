@@ -159,8 +159,7 @@ function init_menu_buttons(socket) {
     );
 
 
-    menu_buttons.abort = new MenuButton(
-        'abort',
+    menu_buttons.abort = new MenuButton('abort',
         () => {
             socket.emit('abort');
             toggle_dual_grid(false);
@@ -170,17 +169,17 @@ function init_menu_buttons(socket) {
         }
     );
 
-
-    menu_buttons.leave = new MenuButton('leave', end_battle);
-
-    socket.on('opponent left', () => {
+    socket.on('opponent aborted', () => {
         /* rare corner case: player clicked abort, grid is made single and
            shortly afterwards, this event arrives b/c opponent aborted or
            disconnected at the same time. */
         if(!is_dual_grid())
             return;
         modals.error.open(opponent_name + ' has left the game.');
-        end_battle();
+        toggle_dual_grid(false);
+        show_menu_buttons(['host', 'open_hosts']);
+        text_handlers.opponent_name.change('Opponent');
+        text_handlers.game_msg.change(messages.host_or_join);
     });
 
 
@@ -199,7 +198,7 @@ function init_menu_buttons(socket) {
                 if(other_ready) {
                     start_battle();
                 } else {
-                    menu_buttons.ready.hide();
+                    show_menu_buttons(['abort']);
                     const msg = messages.placement_wait;
                     text_handlers.game_msg.change(
                         msg[0] + opponent_name + msg[1]
@@ -210,6 +209,24 @@ function init_menu_buttons(socket) {
     );
 
     socket.on('opponent ready', start_battle);
+
+
+    menu_buttons.give_up = new MenuButton('give-up',
+        () => {
+            socket.emit('give up');
+            end_battle();
+        }
+    );
+
+    socket.on('opponent gave up', () => {
+        /* rare corner case: player gave up, grid is made single and
+           shortly afterwards, this event arrives b/c opponent gave up or
+           disconnected at the same time. */
+        if(!is_dual_grid())
+            return;
+        modals.error.open(opponent_name + ' has left the game.');
+        end_battle();
+    });
 
 
     menu_buttons.slide = new MenuButton('slide',
@@ -286,7 +303,7 @@ function adjacent_grids() {
 
 function start_battle() {
     battle.activate();
-    show_menu_buttons(['slide', 'leave']);
+    show_menu_buttons(['slide', 'give_up']);
     text_handlers.game_msg.change(messages.battle_start);
 }
 
