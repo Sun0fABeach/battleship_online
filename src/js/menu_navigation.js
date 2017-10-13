@@ -24,10 +24,16 @@ const messages = {
     'or <strong>Join</strong> to join a hosted game.',
     wait_for_join:
     'Waiting for an opponent to join ...',
+    opponent_joined:
+    ['Player <strong>', '</strong> joined.'],
+    connected:
+    ['Connected to <strong>', '</strong>.'],
     finish_placement:
     'Finish ship placement and press <strong>Ready</strong>.',
     invalid_placement:
     'You have <strong>invalid</strong> ship placements.',
+    placement_wait:
+    ['Waiting for <strong>', '</strong> to finish ship placement ...'],
     battle_start:
     'Commencing battle!',
 };
@@ -62,9 +68,9 @@ function init_modals(socket) {
             opponent_name = host_name;
             toggle_dual_grid(true);
             text_handlers.opponent_name.change(host_name);
+            const msg = messages.connected;
             text_handlers.game_msg.change(
-                'Connected to <strong>'+host_name+'</strong>. ' +
-                messages.finish_placement
+                msg[0] + host_name + msg[1] + ' ' + messages.finish_placement
             );
             show_menu_buttons(['abort', 'ready']);
         },
@@ -133,9 +139,9 @@ function init_menu_buttons(socket) {
         opponent_name = opponent;
         show_menu_buttons(['abort', 'ready']);
         text_handlers.opponent_name.change(opponent_name);
+        const msg = messages.opponent_joined;
         text_handlers.game_msg.change(
-            'Player <strong>'+opponent_name+'</strong> joined. ' +
-            messages.finish_placement
+            msg[0] + opponent_name + msg[1] + ' ' + messages.finish_placement
         );
     });
 
@@ -210,9 +216,9 @@ function init_menu_buttons(socket) {
                     start_battle();
                 } else {
                     menu_buttons.ready.hide();
+                    const msg = messages.placement_wait;
                     text_handlers.game_msg.change(
-                        'Waiting for <strong>'+opponent_name+'</strong>'+
-                        ' to finish ship placement ...'
+                        msg[0] + opponent_name + msg[1]
                     );
                 }
             });
