@@ -35,7 +35,11 @@ const messages = {
     placement_wait:
     ['Waiting for <strong>', '</strong> to finish ship placement ...'],
     battle_start:
-    'Commencing battle!',
+    'Battle commencing!',
+    player_begins:
+    'You take the first shot.',
+    opponent_begins:
+    ['<strong>', '</strong> takes the first shot.']
 };
 
 
@@ -191,12 +195,12 @@ function init_menu_buttons(socket) {
                 return;
             }
 
-            battle.set_player_ships(ship_placement.deactivate());
+            ship_placement.deactivate();
             menu_buttons.ready.clickable(false);
 
             socket.emit('ready', (other_ready) => {
                 if(other_ready) {
-                    start_battle();
+                    start_battle(false);
                 } else {
                     show_menu_buttons(['abort']);
                     const msg = messages.placement_wait;
@@ -208,7 +212,7 @@ function init_menu_buttons(socket) {
         }
     );
 
-    socket.on('opponent ready', start_battle);
+    socket.on('opponent ready', () => start_battle(true));
 
 
     menu_buttons.give_up = new MenuButton('give-up',
@@ -301,10 +305,20 @@ function adjacent_grids() {
     return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
 }
 
-function start_battle() {
-    battle.activate();
+function start_battle(player_begins) {
+    battle.activate(player_begins);
     show_menu_buttons(['slide', 'give_up']);
-    text_handlers.game_msg.change(messages.battle_start);
+
+    if(player_begins) {
+        text_handlers.game_msg.change(
+            messages.battle_start + ' ' + messages.player_begins
+        );
+    } else {
+        const msg = messages.opponent_begins;
+        text_handlers.game_msg.change(
+            messages.battle_start + ' ' + msg[0] + opponent_name + msg[1]
+        );
+    }
 }
 
 function end_battle() {

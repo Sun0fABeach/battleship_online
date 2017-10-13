@@ -42,15 +42,13 @@ export default class Ship {
 
     prepare_for_battle() {
         this._intact = Array.from(this.coords);
-        this._destroyed = [];
     }
 
-    take_shot(shot_coords) {
+    receive_shot(shot_coords) {
         let hit = false;
 
         this._intact.forEach((coord_pair, index) => {
             if(this._equal_coords(shot_coords, coord_pair)) {
-                this._destroyed.push(coord_pair);
                 this._intact.splice(index, 1);
                 hit = true;
                 return;
@@ -58,7 +56,7 @@ export default class Ship {
         });
 
         if(hit)
-            return this._intact.length === 0 ? this : true;
+            return this._intact.length === 0 ? this.coords : true;
 
         return false;
     }

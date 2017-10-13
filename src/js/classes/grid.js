@@ -6,6 +6,7 @@ export default class Grid {
         this._width = $rows.eq(0).find('td').length;
         this._height = $rows.length;
         this._coords_tile_mapping = this._init_mapping($rows);
+        this._ships = [];
     }
 
     get width() {
@@ -24,9 +25,12 @@ export default class Grid {
         return this._$table;
     }
 
-    set_ship(ship) {
-        for(const coord_pair of ship.coords)
-            this.coords_to_tile(coord_pair).data('ship', ship);
+    set_ships(ships) {
+        this._ships = ships;
+
+        for(const ship of ships)
+            for(const coord_pair of ship.coords)
+                this.coords_to_tile(coord_pair).data('ship', ship);
     }
 
     get_ship(target) {
@@ -37,6 +41,7 @@ export default class Grid {
     }
 
     clear_ships() {
+        this._ships = [];
         this.tiles.removeData('ship');
         return this;
     }

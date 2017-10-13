@@ -1,4 +1,3 @@
-import Grid from './classes/grid';
 import Ship from './classes/ship';
 
 /* TODO:
@@ -24,8 +23,8 @@ let drag_init_tile_count;
 let z_index_val;
 
 
-export function init() {
-    player_grid = new Grid($('#player-side table'));
+export function init(plyr_grid) {
+    player_grid = plyr_grid;
     player_grid.tiles.droppable(drop_config);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
 }
@@ -39,8 +38,9 @@ export function activate() {
 }
 
 export function deactivate() {
+    ships.forEach(ship => ship.prepare_for_battle());
+    player_grid.set_ships(ships);
     player_grid.table.siblings('.draggable').remove();
-    return ships;
 }
 
 export function is_valid() {

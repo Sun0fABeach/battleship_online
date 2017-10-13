@@ -77,10 +77,19 @@ io.on('connection', (socket) => {
     socket.on('ready', (callback) => {
         const player = players[socket.id];
 
-        if(!player || player.game_open() || !player.is_paired() || player.ready)
+        if(!player || !player.is_paired() || player.ready)
             return;
 
         callback(player.set_ready());
+    });
+
+    socket.on('shot', (coords, result_cb) => {
+        const player = players[socket.id];
+
+        if(!player || !player.is_paired() || !player.ready)
+            return;
+
+        player.shoot(coords, result_cb);
     });
 
     socket.on('give up', () => {
@@ -217,5 +226,9 @@ class Player {
         }
 
         return false;
+    }
+
+    shoot(coords, result_cb) {
+        this._opponent.send('shot', coords, result_cb);
     }
 }
