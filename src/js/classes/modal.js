@@ -69,6 +69,11 @@ export class HostModal extends Modal {
         });
     }
 
+    set_completion_handlers(join_cb, close_cb) {
+        this._join_cb = join_cb;
+        this._close_cb = close_cb;
+    }
+
     open(player_name) {
         this._player_name = player_name; // needed for networking
         this._set_default_state();
@@ -88,7 +93,8 @@ export class HostModal extends Modal {
     _close() {
         this._socket.emit('host unwatch');
         super._close();
-        this._close_cb();
+        if(this._close_cb)
+            this._close_cb();
     }
 
     _add_item(host) {
@@ -130,7 +136,8 @@ export class HostModal extends Modal {
 
             if(success) {
                 super._close();
-                this._join_cb(host.name);
+                if(this._join_cb)
+                    this._join_cb(host.name);
                 return;
             }
         });

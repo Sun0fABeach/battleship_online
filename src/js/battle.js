@@ -1,15 +1,13 @@
 import Ship from './classes/ship';
+import { grids } from './ui';
 
 let socket;
-let player_grid, opponent_grid;
 let battle_active;
 
 
-export function init(sock, plyr_grid, oppnt_grid) {
+export function init(sock) {
     battle_active = false;
     socket = sock;
-    player_grid = plyr_grid;
-    opponent_grid = oppnt_grid;
 }
 
 export function activate(player_begins) {
@@ -24,14 +22,14 @@ export function deactivate() {
     battle_active = false;
     set_crosshair(false);
 
-    opponent_grid
+    grids.opponent
     .tiles
     .removeClass('ship')
     .children().remove();
 
-    opponent_grid.table.off('click');
+    grids.opponent.table.off('click');
 
-    player_grid
+    grids.player
     .unregister_ships()
     .tiles
     .children().remove();
@@ -40,13 +38,13 @@ export function deactivate() {
 function let_player_shoot() {
     set_crosshair(true);
 
-    opponent_grid.table.one('click', 'td:not(:has(i))', function() {
+    grids.opponent.table.one('click', 'td:not(:has(i))', function() {
         const $tile = $(this);
         set_crosshair(false);
 
         socket.emit(
             'shot',
-            opponent_grid.tile_to_coords($tile),
+            grids.opponent.tile_to_coords($tile),
             (shot_result) => handle_player_shot_result(shot_result, $tile)
         );
     });
@@ -75,8 +73,8 @@ function handle_opponent_shot(coord_pair, inform_result_cb) {
     if(!battle_active) // might have been aborted before shot arrived
         return;
 
-    const $tile = player_grid.coords_to_tile(coord_pair);
-    const ship = player_grid.get_ship($tile);
+    const $tile = grids.player.coords_to_tile(coord_pair);
+    const ship = grids.player.get_ship($tile);
 
     if(ship) {
         inform_result_cb(ship.receive_shot(coord_pair));
@@ -99,9 +97,9 @@ function mark_miss($tile) {
 
 function reveal_ship(ship_coords) {
     for(const coord_pair of ship_coords)
-        opponent_grid.coords_to_tile(coord_pair).addClass('ship');
+        grids.opponent.coords_to_tile(coord_pair).addClass('ship');
 }
 
 function set_crosshair(active) {
-    opponent_grid.table.css('cursor', active ? 'crosshair' : '');
+    grids.opponent.table.css('cursor', active ? 'crosshair' : '');
 }

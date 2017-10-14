@@ -1,4 +1,5 @@
 import Ship from './classes/ship';
+import { grids } from './ui';
 
 /* TODO:
 *   exact calculation of draggable size for styling?
@@ -18,14 +19,12 @@ const ships_as_coords = [
 ];
 
 let ships;
-let player_grid;
 let drag_init_tile_count;
 let z_index_val;
 
 
-export function init(plyr_grid) {
-    player_grid = plyr_grid;
-    player_grid.tiles.droppable(drop_config);
+export function init() {
+    grids.player.tiles.droppable(drop_config);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
 }
 
@@ -39,12 +38,12 @@ export function activate() {
 
 export function deactivate() {
     ships.forEach(ship => ship.prepare_for_battle());
-    player_grid.register_ships(ships);
-    player_grid.table.siblings('.draggable').remove();
+    grids.player.register_ships(ships);
+    grids.player.table.siblings('.draggable').remove();
 }
 
 export function is_valid() {
-    return player_grid.tiles.filter('.over, .forbidden').length === 0;
+    return grids.player.tiles.filter('.over, .forbidden').length === 0;
 }
 
 
@@ -64,7 +63,7 @@ const drag_config = {
 
 function init_draggables() {
     drag_config.snapTolerance = Math.round(
-        player_grid.tiles.outerWidth() / 2
+        grids.player.tiles.outerWidth() / 2
     ) + 1;
 
     for(const ship of ships) {
@@ -73,7 +72,7 @@ function init_draggables() {
         .on('mousedown', draggable_mousedown_handler)
         .data('ship', ship)
         .css('position', 'absolute')
-        .insertAfter(player_grid.table);
+        .insertAfter(grids.player.table);
 
         span_draggable_movable($draggable);
     }
@@ -85,7 +84,7 @@ function draggable_mousedown_handler() {
 
     // register rotation handler first
     $draggable.one('mouseup', function() {
-        if(ship.rotate(player_grid)) {
+        if(ship.rotate(grids.player)) {
             draw_grid();
             span_draggable_movable($draggable);
         }
@@ -114,7 +113,7 @@ function draggable_mousedown_handler() {
 function span_draggable_movable($draggable) {
     const ship = $draggable.data('ship');
     const [cells_x, cells_y] = ship.dimensions;
-    const $starting_tile = player_grid.coords_to_tile(ship.coords[0]);
+    const $starting_tile = grids.player.coords_to_tile(ship.coords[0]);
 
     $draggable.css({
         top: $starting_tile.position().top,
@@ -130,7 +129,7 @@ function span_draggable_movable($draggable) {
 function span_draggable_displayable($draggable) {
     const ship = $draggable.data('ship');
 
-    const tiles = ship.coords.map(pair => player_grid.coords_to_tile(pair));
+    const tiles = ship.coords.map(pair => grids.player.coords_to_tile(pair));
     const tile_sizes = tiles.map($tile => {
         return [$tile.outerWidth(), $tile.outerHeight()];
     });
@@ -152,8 +151,8 @@ function span_draggable_displayable($draggable) {
 
 function set_dragging_cursor(drag_happening) {
     // set on multiple elements for consistent (uninterrupted) cursor change
-    const $elements = player_grid.table.add(
-        player_grid.table.siblings('.draggable')
+    const $elements = grids.player.table.add(
+        grids.player.table.siblings('.draggable')
     );
     const drag_class = 'dragging';
     if(drag_happening)
@@ -163,7 +162,7 @@ function set_dragging_cursor(drag_happening) {
 }
 
 function adjust_draggables() {
-    player_grid.table.siblings('.draggable').each(function(i, draggable) {
+    grids.player.table.siblings('.draggable').each(function(i, draggable) {
         span_draggable_movable($(draggable));
     });
 }
@@ -217,13 +216,13 @@ function draw_grid(highlighted_ship) {
 }
 
 function clear_grid() {
-    player_grid.tiles.removeClass('ship forbidden overlap highlighted');
+    grids.player.tiles.removeClass('ship forbidden overlap highlighted');
 }
 
 function draw_ships(highlighted_ship) {
     for(const ship of ships) {
         const tiles = ship.coords.map(
-            coords => player_grid.coords_to_tile(coords)
+            coords => grids.player.coords_to_tile(coords)
         );
         for(const $tile of tiles) {
             $tile.addClass($tile.hasClass('ship') ? 'overlap' : 'ship');
@@ -247,7 +246,7 @@ function mark_forbidden() {
             for(const adjacent of surrounding_coords) {
                 if(ship.has_coords(adjacent))
                     continue; // is part of this ship
-                const $tile = player_grid.coords_to_tile(adjacent);
+                const $tile = grids.player.coords_to_tile(adjacent);
                 if(!$tile)
                     continue; // is outside grid
                 if($tile.hasClass('ship') && !$tile.hasClass('overlap'))

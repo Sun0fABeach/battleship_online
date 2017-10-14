@@ -1,20 +1,19 @@
 import * as menu_navigation from './menu_navigation';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
-import { Grid, OwnGrid } from './classes/grid';
+import * as ui from './ui';
 import io from 'socket.io-client';
 
 
 $(document).ready(function() {
     const socket = io('http://localhost:3000');
-    const player_grid = new OwnGrid($('#player-side table'));
-    const opponent_grid = new Grid($('#opponent-side table'));
 
     socket.on('connect', () => {
+        ui.init(socket);
         menu_navigation.init(socket);
-        ship_placement.init(player_grid);
+        ship_placement.init();
         ship_placement.activate();
-        battle.init(socket, player_grid, opponent_grid);
+        battle.init(socket);
     });
 
     socket.on('connect_error', (error) => {

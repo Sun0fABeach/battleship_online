@@ -1,11 +1,8 @@
 export default class MenuButton {
     constructor(btn_name, action) {
         this._$btn = $('#main-menu button[name="'+btn_name+'"]');
-        this._click_cb = (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            action();
-        };
+        if(action)
+            this._register_click_cb(action);
 
         this._$btn
         .blur(() => this.normal())
@@ -29,8 +26,11 @@ export default class MenuButton {
         .fadeOut(completion_cb);
     }
 
-    click() {
-        this._$btn.click();
+    click(action) {
+        if(action)
+            this._register_click_cb(action);
+        else
+            this._$btn.click();
     }
 
     clickable(active) {
@@ -51,5 +51,14 @@ export default class MenuButton {
 
     normal() {
         this._$btn.removeClass('btn-success btn-danger');
+    }
+
+    _register_click_cb(action) {
+        this._click_cb = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            action();
+        };
+        this._$btn.click(this._click_cb);
     }
 }
