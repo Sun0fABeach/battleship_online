@@ -1,13 +1,13 @@
 import * as menu_navigation from './menu_navigation';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
-import Grid from './classes/grid';
+import { Grid, OwnGrid } from './classes/grid';
 import io from 'socket.io-client';
 
 
 $(document).ready(function() {
     const socket = io('http://localhost:3000');
-    const player_grid = new Grid($('#player-side table'));
+    const player_grid = new OwnGrid($('#player-side table'));
     const opponent_grid = new Grid($('#opponent-side table'));
 
     socket.on('connect', () => {

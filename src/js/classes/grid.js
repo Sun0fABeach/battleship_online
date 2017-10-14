@@ -1,4 +1,4 @@
-export default class Grid {
+export class Grid {
     constructor($table) {
         this._$table = $table;
         this._$tiles = $table.find('td');
@@ -6,7 +6,6 @@ export default class Grid {
         this._width = $rows.eq(0).find('td').length;
         this._height = $rows.length;
         this._coords_tile_mapping = this._init_mapping($rows);
-        this._ships = [];
     }
 
     get width() {
@@ -23,27 +22,6 @@ export default class Grid {
 
     get table() {
         return this._$table;
-    }
-
-    set_ships(ships) {
-        this._ships = ships;
-
-        for(const ship of ships)
-            for(const coord_pair of ship.coords)
-                this.coords_to_tile(coord_pair).data('ship', ship);
-    }
-
-    get_ship(target) {
-        if(target instanceof Array)
-            return this.coords_to_tile(target).data('ship');
-        else
-            return target.data('ship');
-    }
-
-    clear_ships() {
-        this._ships = [];
-        this.tiles.removeData('ship');
-        return this;
     }
 
     coords_to_tile(coord_pair) {
@@ -66,5 +44,33 @@ export default class Grid {
         });
 
         return mapping;
+    }
+}
+
+export class OwnGrid extends Grid {
+    constructor($table) {
+        super($table);
+        this._ships = [];
+    }
+
+    register_ships(ships) {
+        this._ships = ships;
+
+        for(const ship of ships)
+            for(const coord_pair of ship.coords)
+                this.coords_to_tile(coord_pair).data('ship', ship);
+    }
+
+    get_ship(target) {
+        if(target instanceof Array)
+            return this.coords_to_tile(target).data('ship');
+        else
+            return target.data('ship');
+    }
+
+    unregister_ships() {
+        this._ships = [];
+        this.tiles.removeData('ship');
+        return this;
     }
 }

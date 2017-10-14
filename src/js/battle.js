@@ -24,17 +24,17 @@ export function deactivate() {
     battle_active = false;
     set_crosshair(false);
 
-    player_grid
-    .tiles
-    .children().remove();
-
     opponent_grid
-    .clear_ships()
     .tiles
     .removeClass('ship')
     .children().remove();
 
     opponent_grid.table.off('click');
+
+    player_grid
+    .unregister_ships()
+    .tiles
+    .children().remove();
 }
 
 function let_player_shoot() {
@@ -66,7 +66,6 @@ function handle_player_shot_result(shot_result, $tile) {
 
     let_opponent_shoot();
 }
-
 
 function let_opponent_shoot() {
     socket.once('shot', handle_opponent_shot);

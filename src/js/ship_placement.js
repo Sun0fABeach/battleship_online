@@ -39,7 +39,7 @@ export function activate() {
 
 export function deactivate() {
     ships.forEach(ship => ship.prepare_for_battle());
-    player_grid.set_ships(ships);
+    player_grid.register_ships(ships);
     player_grid.table.siblings('.draggable').remove();
 }
 
