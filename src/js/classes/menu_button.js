@@ -10,7 +10,14 @@ export default class MenuButton {
     }
 
     is_visible() {
-        return this._$btn.css('display') !== 'none';
+        /* first check style attr used by jquery hide/show. this is necessary
+           b/c the slide button css stays on display: none on larger screens,
+           but we can still determine its state by looking at the style attr. */
+        const style_attr = this._$btn.attr('style');
+        if(style_attr)
+            return !style_attr.match(/display: none/);
+        else
+            return this._$btn.css('display') !== 'none';
     }
 
     show(completion_cb) {
