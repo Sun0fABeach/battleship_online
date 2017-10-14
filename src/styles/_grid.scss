@@ -19,7 +19,7 @@
 .grid-wrapper {
   width: 100%;
 
-  /* width for breakpoint sm is handled via bootstrap via class of
+  /* width for breakpoint sm is handled in bootstrap via class of
      .grids-container in html (col-sm-*)
   */
 
@@ -40,56 +40,6 @@
     // non-mobile first here, so js manipulation is hindered only on mobile
     @include media-breakpoint-down(sm) {
       display: none !important;
-    }
-  }
-
-
-  .game-grid {
-    @include make-square-box;
-
-    table {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-collapse: separate;
-      border-spacing: 1px;
-      background-color: map-get($colors, table-border);
-      table-layout: fixed;
-
-      @include media-breakpoint-up(sm) {
-        outline: 1px solid map-get($colors, table-border);
-      }
-    }
-
-    table td {
-      background-color: map-get($colors, table-cell);
-    }
-
-    .ship {
-      // outline: 1px solid grey;
-      background-color: map-get($colors, ship);
-    }
-
-    .overlap {
-      background-color: map-get($colors, ship-overlap);
-    }
-
-    .forbidden {
-      background-color: map-get($colors, ship-forbidden);
-    }
-
-    .highlighted {
-      box-shadow: 0 0 0.5em 0.5em map-get($colors, ship-highlight-shadow) inset;
-    }
-
-    .draggable {
-      // border: 1px solid black;
-      cursor: grab;
-    }
-    /* set cursor on both dragged element and parent to keep it
-    consistent when dragging */
-    &.dragging, .dragging {
-      cursor: grabbing;
     }
   }
 
@@ -115,8 +65,27 @@
     &.dual-view {
       display: block;
     }
+  }
 
-    td {
+  .game-grid {
+    @include make-square-box;
+
+    table {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-collapse: separate;
+      border-spacing: 1px;
+      background-color: map-get($colors, table-border);
+      table-layout: fixed;
+
+      @include media-breakpoint-up(sm) {
+        outline: 1px solid map-get($colors, table-border);
+      }
+    }
+
+    table td {
+      background-color: map-get($colors, table-cell);
       position: relative;
 
       & .fa {
@@ -147,6 +116,33 @@
           }
         }
       }
+    }
+
+    .ship {
+      // outline: 1px solid grey;
+      background-color: map-get($colors, ship);
+    }
+
+    .overlap {
+      background-color: map-get($colors, ship-overlap);
+    }
+
+    .forbidden {
+      background-color: map-get($colors, ship-forbidden);
+    }
+
+    .highlighted {
+      box-shadow: 0 0 0.5em 0.5em map-get($colors, ship-highlight-shadow) inset;
+    }
+
+    .draggable {
+      // border: 1px solid black;
+      cursor: grab;
+    }
+    /* set cursor on both dragged element and parent to keep it
+    consistent when dragging */
+    &.dragging, .dragging {
+      cursor: grabbing;
     }
   }
 }
