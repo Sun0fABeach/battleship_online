@@ -48,6 +48,10 @@ export function init(socket) {
     init_grids();
 }
 
+export function adjacent_grids() {
+    return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
+}
+
 
 function init_text_handlers() {
     text.player_name = new Text($('#player-side > p:first-child'));

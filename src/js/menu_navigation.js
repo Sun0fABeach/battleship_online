@@ -216,7 +216,7 @@ function get_player_name() {
 }
 
 function toggle_dual_grid(active) {
-    if(adjacent_grids()) {
+    if(ui.adjacent_grids()) {
         $grids_container.fadeOut(() => {
             set_grid_split(active);
             $grids_container.fadeIn();
@@ -235,10 +235,6 @@ function set_grid_split(active) {
         $both_sides.addClass('dual-view');
     else
         $both_sides.removeClass('dual-view');
-}
-
-function adjacent_grids() {
-    return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
 }
 
 function start_battle(player_begins) {
