@@ -59,6 +59,10 @@ export class OwnGrid extends Grid {
         return this._slid_up;
     }
 
+    set slid_up(is_slid_up) {
+        this._slid_up = is_slid_up;
+    }
+
     register_ships(ships) {
         this._ships = ships;
 

@@ -14,7 +14,9 @@ export function init(sock) {
 export function activate(player_begins) {
     battle_active = true;
     if(player_begins) {
-        if(!grids_are_adjacent())
+        if(grids_are_adjacent())            // set without actually sliding up
+            grids.player.slid_up = true;    // for state consistency
+        else
             grids.player.slideUp();
         let_player_shoot();
     } else {
