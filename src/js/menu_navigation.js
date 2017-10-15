@@ -1,7 +1,7 @@
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
-import { grids_are_adjacent } from './helpers';
+import { adjacent_grid_mode } from './helpers';
 
 
 let $player_side, $both_sides, $grids_container;
@@ -215,7 +215,7 @@ function get_player_name() {
 }
 
 function toggle_dual_grid(active) {
-    if(grids_are_adjacent()) {
+    if(adjacent_grid_mode()) {
         $grids_container.fadeOut(() => {
             set_grid_split(active);
             $grids_container.fadeIn();
@@ -264,7 +264,7 @@ function end_battle() {
 
 $(window).resize(function() {
     if(ui.grids.player.slid_up) {
-        if(grids_are_adjacent())
+        if(adjacent_grid_mode())
             ui.grids.player.show();
         else
             ui.grids.player.hide();
