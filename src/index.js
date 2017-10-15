@@ -2,4 +2,4 @@
 import './styles/style.scss';
 import './js/init.js';
 
-localStorage.debug = '*';
+// localStorage.debug = '*';
