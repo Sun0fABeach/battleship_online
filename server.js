@@ -3,28 +3,29 @@ var io = require('socket.io')(3000);
 const players = {};
 
 io.on('connection', (socket) => {
-    socket.on('name register', (player_name) => {
+    socket.on('name register', (player_name, callback) => {
         if(players[socket.id])
             return;
 
         if(name_registered(player_name)) {
-            socket.emit('name taken');
+            callback(false);
             return;
         }
 
         players[socket.id] = new Player(player_name, socket);
-        socket.emit('name accepted')
+        callback(true);
     });
 
-    socket.on('host', () => {
+    socket.on('host', (callback) => {
         const player = players[socket.id];
         if(!player)
             return;
         if(player.game_open()) {
-            player.send('host failed', 'id duplicate');
+            callback(false, 'id duplicate');
             return;
         }
         player.open_game();
+        callback(true);
     });
 
     socket.on('abort', () => {
@@ -159,7 +160,6 @@ class Player {
     }
 
     open_game() {
-        this.send('host success');
         this.to_host_watchers('add host', {name: this.name, id: this.id});
         this._game_open = true;
     }

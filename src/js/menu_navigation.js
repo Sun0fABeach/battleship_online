@@ -48,43 +48,41 @@ function init_menu_button_handlers(socket) {
             ui.text.game_msg.change(ui.msg.name_enter);
         } else {
             player_name = get_player_name();
-            socket.emit('name register', player_name);
             ui.menu_buttons.enter.clickable(false);
+
+            socket.emit('name register', player_name, (success) => {
+                if(success) {
+                    $name_input.fadeOut();
+                    show_menu_buttons(['host', 'open_hosts']);
+                    ui.text.player_name.change(player_name);
+                    ui.text.game_msg.change(ui.msg.host_or_join);
+                } else {
+                    ui.menu_buttons.enter.invalid();
+                    ui.menu_buttons.enter.clickable(true);
+                    ui.text.game_msg.change(ui.msg.name_taken);
+                }
+            });
         }
     });
 
     $('#main-menu form').on('submit', ui.menu_buttons.enter.click);
 
-    socket.on('name taken', () => {
-        ui.menu_buttons.enter.invalid();
-        ui.menu_buttons.enter.clickable(true);
-        ui.text.game_msg.change(ui.msg.name_taken);
-    });
-
-    socket.on('name accepted', () => {
-        $name_input.fadeOut();
-        show_menu_buttons(['host', 'open_hosts']);
-        ui.text.player_name.change(player_name);
-        ui.text.game_msg.change(ui.msg.host_or_join);
-    });
-
 
     ui.menu_buttons.host.click(() => {
         ui.menu_buttons.host.clickable(false);
         ui.menu_buttons.open_hosts.clickable(false);
-        socket.emit('host');
-    });
 
-    socket.on('host failed', (reason) => {
-        ui.menu_buttons.host.clickable(true);
-        ui.menu_buttons.open_hosts.clickable(true);
-        ui.modals.error.open('Failed to host: ' + reason);
-    });
-
-    socket.on('host success', () => {
-        toggle_dual_grid(true);
-        show_menu_buttons(['abort']);
-        ui.text.game_msg.change(ui.msg.wait_for_join);
+        socket.emit('host', (success, fail_reason) => {
+            if(success) {
+                toggle_dual_grid(true);
+                show_menu_buttons(['abort']);
+                ui.text.game_msg.change(ui.msg.wait_for_join);
+            } else {
+                ui.menu_buttons.host.clickable(true);
+                ui.menu_buttons.open_hosts.clickable(true);
+                ui.modals.error.open('Failed to host: ' + fail_reason);
+            }
+        });
     });
 
     socket.on('opponent entered', (opponent) => {
