@@ -170,7 +170,7 @@ function init_menu_button_handlers(socket) {
 
 
     ui.menu_buttons.slide.click(
-        () => $player_side.find('.game-grid').slideToggle()
+        () => ui.grids.player.slideToggle()
     );
 }
 
@@ -258,7 +258,7 @@ function start_battle(player_begins) {
 }
 
 function end_battle() {
-    $player_side.find('.game-grid').slideDown(() => {
+    ui.grids.player.slideDown(() => {
         ship_placement.activate();
         toggle_dual_grid(false);
     });

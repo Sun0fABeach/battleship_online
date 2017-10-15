@@ -1,8 +1,9 @@
 export class Grid {
-    constructor($table) {
-        this._$table = $table;
-        this._$tiles = $table.find('td');
-        const $rows = $table.find('tr');
+    constructor($container) {
+        this._$table_wrapper = $container.find('.game-grid');
+        this._$table = this._$table_wrapper.find('table');
+        this._$tiles = this._$table.find('td');
+        const $rows = this._$table.find('tr');
         this._width = $rows.eq(0).find('td').length;
         this._height = $rows.length;
         this._coords_tile_mapping = this._init_mapping($rows);
@@ -72,5 +73,17 @@ export class OwnGrid extends Grid {
         this._ships = [];
         this.tiles.removeData('ship');
         return this;
+    }
+
+    slideToggle(callback) {
+        this._$table_wrapper.slideToggle(callback);
+    }
+
+    slideUp(callback) {
+        this._$table_wrapper.slideUp(callback);
+    }
+
+    slideDown(callback) {
+        this._$table_wrapper.slideDown(callback);
     }
 }

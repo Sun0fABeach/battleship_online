@@ -81,6 +81,6 @@ function init_menu_buttons() {
 }
 
 function init_grids() {
-    grids.player = new OwnGrid($('#player-side table'));
-    grids.opponent = new Grid($('#opponent-side table'));
+    grids.player = new OwnGrid($('#player-side'));
+    grids.opponent = new Grid($('#opponent-side'));
 }
