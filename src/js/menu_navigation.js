@@ -257,7 +257,10 @@ function end_battle() {
 
     animate_toggle_dual_grid(false, () => {
         battle.deactivate();
-        ui.grids.player.show();
+        if(ui.grids.player.slid_up) {
+            ui.grids.player.show(); // instant show here, so we have to
+            ui.grids.player.slid_up = false; // manually set the slid up state
+        }
     });
 }
 
