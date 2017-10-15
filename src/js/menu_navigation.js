@@ -24,7 +24,7 @@ function init_modal_handlers() {
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
             opponent_name = host_name;
-            toggle_dual_grid(true);
+            animate_toggle_dual_grid(true);
             ui.text.opponent_name.change(host_name);
             const msg = ui.msg.connected;
             ui.text.game_msg.change(
@@ -75,7 +75,7 @@ function init_menu_button_handlers(socket) {
 
         socket.emit('host', (success, fail_reason) => {
             if(success) {
-                toggle_dual_grid(true);
+                animate_toggle_dual_grid(true);
                 show_menu_buttons(['abort']);
                 ui.text.game_msg.change(ui.msg.wait_for_join);
             } else {
@@ -106,7 +106,7 @@ function init_menu_button_handlers(socket) {
 
     ui.menu_buttons.abort.click(() => {
         socket.emit('abort');
-        toggle_dual_grid(false);
+        animate_toggle_dual_grid(false);
         show_menu_buttons(['host', 'open_hosts']);
         ui.text.opponent_name.change('Opponent');
         ui.text.game_msg.change(ui.msg.host_or_join);
@@ -119,7 +119,7 @@ function init_menu_button_handlers(socket) {
         if(!is_dual_grid())
             return;
         ui.modals.error.open(opponent_name + ' has left the game.');
-        toggle_dual_grid(false);
+        animate_toggle_dual_grid(false);
         show_menu_buttons(['host', 'open_hosts']);
         ui.text.opponent_name.change('Opponent');
         ui.text.game_msg.change(ui.msg.host_or_join);
@@ -214,22 +214,20 @@ function get_player_name() {
     return $name_input.val().trim();
 }
 
-function toggle_dual_grid(active) {
-    if(adjacent_grid_mode()) {
-        $grids_container.fadeOut(() => {
-            set_grid_split(active);
-            $grids_container.fadeIn();
-        });
-    } else {
-        set_grid_split(active);
-    }
+function animate_toggle_dual_grid(active, fadeout_cb) {
+    $grids_container.fadeOut(() => {
+        if(fadeout_cb)
+            fadeout_cb();
+        toggle_dual_grid(active);
+        $grids_container.fadeIn();
+    });
 }
 
 function is_dual_grid() {
     return $both_sides.hasClass('dual-view');
 }
 
-function set_grid_split(active) {
+function toggle_dual_grid(active) {
     if(active)
         $both_sides.addClass('dual-view');
     else
@@ -253,13 +251,14 @@ function start_battle(player_begins) {
 }
 
 function end_battle() {
-    ui.grids.player.slideDown(() => {
-        ship_placement.activate();
-        toggle_dual_grid(false);
-    });
-    show_menu_buttons(['host', 'open_hosts'], battle.deactivate);
+    show_menu_buttons(['host', 'open_hosts']);
     ui.text.opponent_name.change('Opponent');
     ui.text.game_msg.change(ui.msg.host_or_join);
+
+    animate_toggle_dual_grid(false, () => {
+        battle.deactivate();
+        ui.grids.player.show();
+    });
 }
 
 $(window).resize(function() {

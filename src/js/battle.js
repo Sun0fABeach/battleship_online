@@ -28,13 +28,20 @@ export function deactivate() {
     battle_active = false;
     set_crosshair(false);
 
+    clear_opponent_grid();
+    clear_player_grid();
+}
+
+function clear_opponent_grid() {
     grids.opponent
     .tiles
     .removeClass('ship')
     .children().remove();
 
     grids.opponent.table.off('click');
+}
 
+function clear_player_grid() {
     grids.player
     .unregister_ships()
     .tiles
