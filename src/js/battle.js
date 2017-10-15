@@ -1,5 +1,6 @@
 import Ship from './classes/ship';
-import { grids, adjacent_grids } from './ui';
+import { grids } from './ui';
+import { grids_are_adjacent } from './helpers';
 
 let socket;
 let battle_active;
@@ -13,7 +14,7 @@ export function init(sock) {
 export function activate(player_begins) {
     battle_active = true;
     if(player_begins) {
-        if(!adjacent_grids())
+        if(!grids_are_adjacent())
             grids.player.slideUp();
         let_player_shoot();
     } else {
@@ -99,7 +100,7 @@ function display_miss($tile, on_player=false) {
 }
 
 function display_shot($tile, marker_classes, on_player) {
-    if(adjacent_grids()) {
+    if(grids_are_adjacent()) {
         mark_shot($tile, marker_classes);
     } else {
         if(on_player) {
