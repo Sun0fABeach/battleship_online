@@ -52,6 +52,11 @@ export class OwnGrid extends Grid {
     constructor($table) {
         super($table);
         this._ships = [];
+        this._slid_up = false; // state saved to handle window resizing
+    }
+
+    get slid_up() {
+        return this._slid_up;
     }
 
     register_ships(ships) {
@@ -75,15 +80,26 @@ export class OwnGrid extends Grid {
         return this;
     }
 
+    show(callback) {
+        this._$table_wrapper.show(callback);
+    }
+
+    hide(callback) {
+        this._$table_wrapper.hide(callback);
+    }
+
     slideToggle(callback) {
         this._$table_wrapper.slideToggle(callback);
+        this._slid_up = !this._slid_up;
     }
 
     slideUp(callback) {
         this._$table_wrapper.slideUp(callback);
+        this._slid_up = true;
     }
 
     slideDown(callback) {
         this._$table_wrapper.slideDown(callback);
+        this._slid_up = false;
     }
 }

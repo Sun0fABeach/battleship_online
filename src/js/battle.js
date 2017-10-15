@@ -1,5 +1,5 @@
 import Ship from './classes/ship';
-import { grids } from './ui';
+import { grids, adjacent_grids } from './ui';
 
 let socket;
 let battle_active;
@@ -12,10 +12,13 @@ export function init(sock) {
 
 export function activate(player_begins) {
     battle_active = true;
-    if(player_begins)
+    if(player_begins) {
+        if(!adjacent_grids())
+            grids.player.slideUp();
         let_player_shoot();
-    else
+    } else {
         let_opponent_shoot();
+    }
 }
 
 export function deactivate() {
@@ -55,11 +58,11 @@ function handle_player_shot_result(shot_result, $tile) {
         return;
 
     if(shot_result) {
-        mark_hit($tile);
+        display_hit($tile);
         if(shot_result instanceof Array)
             reveal_ship(shot_result);
     } else {
-        mark_miss($tile);
+        display_miss($tile);
     }
 
     let_opponent_shoot();
@@ -78,21 +81,48 @@ function handle_opponent_shot(coord_pair, inform_result_cb) {
 
     if(ship) {
         inform_result_cb(ship.receive_shot(coord_pair));
-        mark_hit($tile);
+        display_hit($tile, true);
     } else {
         inform_result_cb(false);
-        mark_miss($tile);
+        display_miss($tile, true);
     }
 
     let_player_shoot();
 }
 
-function mark_hit($tile) {
-    $('<i>').addClass('fa fa-times').appendTo($tile);
+function display_hit($tile, on_player=false) {
+    display_shot($tile, 'fa fa-times', on_player);
 }
 
-function mark_miss($tile) {
-    $('<i>').addClass('fa fa-bullseye').appendTo($tile);
+function display_miss($tile, on_player=false) {
+    display_shot($tile, 'fa fa-bullseye', on_player);
+}
+
+function display_shot($tile, marker_classes, on_player) {
+    if(adjacent_grids()) {
+        mark_shot($tile, marker_classes);
+    } else {
+        if(on_player) {
+            grids.player.slideDown(() => {
+                setTimeout(() => {
+                    mark_shot($tile, marker_classes);
+                    setTimeout(() => {
+                        grids.player.slideUp();
+                    }, 700);
+                }, 200);
+            });
+        } else {
+            grids.player.slideUp(() => {
+                setTimeout(() => {
+                    mark_shot($tile, marker_classes);
+                }, 200);
+            });
+        }
+    }
+}
+
+function mark_shot($tile, marker_classes) {
+    $('<i>').addClass(marker_classes).appendTo($tile);
 }
 
 function reveal_ship(ship_coords) {

@@ -262,3 +262,12 @@ function end_battle() {
     ui.text.opponent_name.change('Opponent');
     ui.text.game_msg.change(ui.msg.host_or_join);
 }
+
+$(window).resize(function() {
+    if(ui.grids.player.slid_up) {
+        if(ui.adjacent_grids())
+            ui.grids.player.show();
+        else
+            ui.grids.player.hide();
+    }
+});
