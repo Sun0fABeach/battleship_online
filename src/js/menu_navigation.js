@@ -39,15 +39,10 @@ function init_modal_handlers() {
     );
 }
 
-
 function init_menu_button_handlers(socket) {
     ui.menu_buttons.enter.click(() => {
-        if(!validate_player_name()) {
-            $name_input.focus();
-            ui.menu_buttons.enter.invalid();
-            $name_input.one('input', () => ui.menu_buttons.enter.normal());
-            ui.text.game_msg.change(ui.msg.name_enter);
-        } else {
+
+        if(validate_player_name()) {
             player_name = get_player_name();
             ui.menu_buttons.enter.clickable(false);
 
@@ -63,10 +58,13 @@ function init_menu_button_handlers(socket) {
                     ui.text.game_msg.change(ui.msg.name_taken);
                 }
             });
+        } else {
+            $name_input.focus();
+            ui.menu_buttons.enter.invalid();
+            $name_input.one('input', () => ui.menu_buttons.enter.normal());
+            ui.text.game_msg.change(ui.msg.name_enter);
         }
     });
-
-    $('#main-menu form').on('submit', ui.menu_buttons.enter.click);
 
 
     ui.menu_buttons.host.click(() => {

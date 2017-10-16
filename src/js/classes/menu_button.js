@@ -1,8 +1,8 @@
 export default class MenuButton {
     constructor(btn_name, action) {
         this._$btn = $('#main-menu button[name="'+btn_name+'"]');
-        if(action)
-            this._register_click_cb(action);
+        this._register_click_cb(action);
+        this._clickable = true;
 
         this._$btn
         .blur(() => this.normal())
@@ -21,16 +21,13 @@ export default class MenuButton {
     }
 
     show(completion_cb) {
-        this._$btn
-        .off('click') // avoid difficult duplicate event handler situations
-        .click(this._click_cb)
-        .fadeIn(completion_cb);
+        this.clickable(true);
+        this._$btn.fadeIn(completion_cb);
     }
 
     hide(completion_cb) {
-        this._$btn
-        .off('click') // prohibit clicks on fadeout
-        .fadeOut(completion_cb);
+        this.clickable(false);  // prohibit clicks on fadeout
+        this._$btn.fadeOut(completion_cb);
     }
 
     click(action) {
@@ -41,10 +38,7 @@ export default class MenuButton {
     }
 
     clickable(active) {
-        if(active)
-            this._$btn.click(this._click_cb);
-        else
-            this._$btn.off('click');
+        this._clickable = active;
     }
 
     invalid() {
@@ -61,11 +55,11 @@ export default class MenuButton {
     }
 
     _register_click_cb(action) {
-        this._click_cb = (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            action();
-        };
-        this._$btn.click(this._click_cb);
+        this._$btn.click((event) => {
+            event.preventDefault();   // even if no action is to be performed
+            event.stopPropagation();  // we don't allow bubbling or defaults
+            if(this._clickable && action)
+                action();
+        });
     }
 }
