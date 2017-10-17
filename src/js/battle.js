@@ -116,19 +116,21 @@ function display_shot($tile, marker_classes, on_player) {
         mark_shot($tile, marker_classes, on_player);
     } else {
         if(on_player) {
+            const mark_to = grids.player.slid_up ? 200 : 0;
             grids.player.slideDown(() => {
                 setTimeout(() => {
                     mark_shot($tile, marker_classes, on_player);
                     setTimeout(() => {
                         grids.player.slideUp();
-                    }, 700);
-                }, 200);
+                    }, 800);
+                }, mark_to);
             });
         } else {
+            const mark_to = grids.player.slid_up ? 0 : 200;
             grids.player.slideUp(() => {
                 setTimeout(() => {
                     mark_shot($tile, marker_classes, on_player);
-                }, 200);
+                }, mark_to);
             });
         }
     }
