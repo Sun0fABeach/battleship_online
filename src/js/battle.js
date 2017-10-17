@@ -36,7 +36,6 @@ export function deactivate() {
 function clear_opponent_grid() {
     grids.opponent
     .tiles
-    .removeAttr('style')
     .removeClass('ship')
     .children().remove();
 
@@ -47,7 +46,6 @@ function clear_player_grid() {
     grids.player
     .unregister_ships()
     .tiles
-    .removeAttr('style')
     .children().remove();
 }
 
@@ -136,7 +134,7 @@ function display_shot($tile, marker_classes, on_player) {
     }
 }
 
-let prev_shot_tile = {
+let prev_shot_marker = {
     true: null,
     false: null
 };
@@ -145,17 +143,15 @@ function mark_shot($tile, marker_classes, on_player) {
     const $marker = $('<i>').addClass(marker_classes);
     $tile.append($marker);
     const marker_color = $marker.css('color');
-    const tile_color = $tile.css('background-color');
 
-    $tile.animate(
-        { 'background-color': tile_color },
+    $marker.animate(
+        { 'background-color': 'transparent' },
         {
             start: () => {
-                set_recent_shot_indicator($tile, marker_color, on_player)
-                $tile.css('background-color', marker_color);
+                set_recent_shot_indicator($marker, marker_color, on_player);
+                $marker.css('background-color', marker_color);
             },
             complete: () => {
-                $tile.css('background-color', '');
                 if(ship_to_reveal)
                     reveal_ship();
             },
@@ -164,12 +160,12 @@ function mark_shot($tile, marker_classes, on_player) {
     );
 }
 
-function set_recent_shot_indicator($tile, color, side) {
-    if(prev_shot_tile[side])
-        prev_shot_tile[side].css('box-shadow', '');
+function set_recent_shot_indicator($marker, color, side) {
+    if(prev_shot_marker[side])
+        prev_shot_marker[side].css('box-shadow', '');
 
-    $tile.css('box-shadow', '0 0 0.6em 0.2em ' + color + ' inset');
-    prev_shot_tile[side] = $tile;
+    $marker.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
+    prev_shot_marker[side] = $marker;
 }
 
 function reveal_ship() {
