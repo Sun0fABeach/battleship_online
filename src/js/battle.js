@@ -4,6 +4,7 @@ import { adjacent_grid_mode } from './helpers';
 
 let socket;
 let battle_active;
+let ship_to_reveal = null;
 
 
 export function init(sock) {
@@ -35,6 +36,7 @@ export function deactivate() {
 function clear_opponent_grid() {
     grids.opponent
     .tiles
+    .removeAttr('style')
     .removeClass('ship')
     .children().remove();
 
@@ -45,6 +47,7 @@ function clear_player_grid() {
     grids.player
     .unregister_ships()
     .tiles
+    .removeAttr('style')
     .children().remove();
 }
 
@@ -70,7 +73,7 @@ function handle_player_shot_result(shot_result, $tile) {
     if(shot_result) {
         display_hit($tile);
         if(shot_result instanceof Array)
-            reveal_ship(shot_result);
+            ship_to_reveal = shot_result;
     } else {
         display_miss($tile);
     }
@@ -110,12 +113,12 @@ function display_miss($tile, on_player=false) {
 
 function display_shot($tile, marker_classes, on_player) {
     if(adjacent_grid_mode()) {
-        mark_shot($tile, marker_classes);
+        mark_shot($tile, marker_classes, on_player);
     } else {
         if(on_player) {
             grids.player.slideDown(() => {
                 setTimeout(() => {
-                    mark_shot($tile, marker_classes);
+                    mark_shot($tile, marker_classes, on_player);
                     setTimeout(() => {
                         grids.player.slideUp();
                     }, 700);
@@ -124,20 +127,53 @@ function display_shot($tile, marker_classes, on_player) {
         } else {
             grids.player.slideUp(() => {
                 setTimeout(() => {
-                    mark_shot($tile, marker_classes);
+                    mark_shot($tile, marker_classes, on_player);
                 }, 200);
             });
         }
     }
 }
 
-function mark_shot($tile, marker_classes) {
-    $('<i>').addClass(marker_classes).appendTo($tile);
+let prev_shot_tile = {
+    true: null,
+    false: null
+};
+
+function mark_shot($tile, marker_classes, on_player) {
+    const $marker = $('<i>').addClass(marker_classes);
+    $tile.append($marker);
+    const marker_color = $marker.css('color');
+    const tile_color = $tile.css('background-color');
+
+    $tile.animate(
+        { 'background-color': tile_color },
+        {
+            start: () => {
+                set_recent_shot_indicator($tile, marker_color, on_player)
+                $tile.css('background-color', marker_color);
+            },
+            complete: () => {
+                $tile.css('background-color', '');
+                if(ship_to_reveal)
+                    reveal_ship();
+            },
+            duration: 600
+        }
+    );
 }
 
-function reveal_ship(ship_coords) {
-    for(const coord_pair of ship_coords)
+function set_recent_shot_indicator($tile, color, side) {
+    if(prev_shot_tile[side])
+        prev_shot_tile[side].css('box-shadow', '');
+
+    $tile.css('box-shadow', '0 0 0.6em 0.2em ' + color + ' inset');
+    prev_shot_tile[side] = $tile;
+}
+
+function reveal_ship() {
+    for(const coord_pair of ship_to_reveal)
         grids.opponent.coords_to_tile(coord_pair).addClass('ship');
+    ship_to_reveal = null;
 }
 
 function set_crosshair(active) {
