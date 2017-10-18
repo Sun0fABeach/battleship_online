@@ -136,10 +136,8 @@ function mark_shot(shot_data) {
         { 'background-color': 'transparent' },
         {
             start: () => {
-                indicate_recent_shot($marker, marker_color, shot_data.grid);
                 $marker.css('background-color', marker_color);
-            },
-            complete: () => {
+                indicate_recent_shot($marker, marker_color, shot_data.grid);
                 if(shot_data.ship_to_reveal)
                     reveal_ship(shot_data.ship_to_reveal);
             },
