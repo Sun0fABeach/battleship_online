@@ -4,7 +4,6 @@ import { adjacent_grid_mode } from './helpers';
 
 let socket;
 let battle_active;
-let ship_to_reveal = null;
 
 
 export function init(sock) {
@@ -68,13 +67,14 @@ function handle_player_shot_result(shot_result, $tile) {
     if(!battle_active) // battle might have been aborted before result arrives
         return;
 
-    if(shot_result) {
-        display_hit($tile);
-        if(shot_result instanceof Array)
-            ship_to_reveal = shot_result;
-    } else {
-        display_miss($tile);
-    }
+    const sunk_ship = shot_result instanceof Array;
+
+    display_shot({
+        grid: 'opponent',
+        hit: !!shot_result,
+        ship_to_reveal: sunk_ship ? shot_result : null,
+        $tile: $tile
+    });
 
     let_opponent_shoot();
 }
@@ -90,34 +90,26 @@ function handle_opponent_shot(coord_pair, inform_result_cb) {
     const $tile = grids.player.coords_to_tile(coord_pair);
     const ship = grids.player.get_ship($tile);
 
-    if(ship) {
-        inform_result_cb(ship.receive_shot(coord_pair));
-        display_hit($tile, true);
-    } else {
-        inform_result_cb(false);
-        display_miss($tile, true);
-    }
+    inform_result_cb(ship ? ship.receive_shot(coord_pair) : false);
+
+    display_shot({
+        grid: 'player',
+        hit: !!ship,
+        $tile: $tile
+    });
 
     let_player_shoot();
 }
 
-function display_hit($tile, on_player=false) {
-    display_shot($tile, 'fa fa-times', on_player);
-}
-
-function display_miss($tile, on_player=false) {
-    display_shot($tile, 'fa fa-bullseye', on_player);
-}
-
-function display_shot($tile, marker_classes, on_player) {
+function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
-        mark_shot($tile, marker_classes, on_player);
+        mark_shot(shot_data);
     } else {
-        if(on_player) {
+        if(shot_data.grid === 'player') {
             const mark_to = grids.player.slid_up ? 200 : 0;
             grids.player.slideDown(() => {
                 setTimeout(() => {
-                    mark_shot($tile, marker_classes, on_player);
+                    mark_shot(shot_data);
                     setTimeout(() => {
                         grids.player.slideUp();
                     }, 800);
@@ -127,51 +119,53 @@ function display_shot($tile, marker_classes, on_player) {
             const mark_to = grids.player.slid_up ? 0 : 200;
             grids.player.slideUp(() => {
                 setTimeout(() => {
-                    mark_shot($tile, marker_classes, on_player);
+                    mark_shot(shot_data);
                 }, mark_to);
             });
         }
     }
 }
 
-let prev_shot_marker = {
-    true: null,
-    false: null
-};
-
-function mark_shot($tile, marker_classes, on_player) {
+function mark_shot(shot_data) {
+    const marker_classes = shot_data.hit ? 'fa fa-times' : 'fa fa-bullseye';
     const $marker = $('<i>').addClass(marker_classes);
-    $tile.append($marker);
+    shot_data.$tile.append($marker);
     const marker_color = $marker.css('color');
 
     $marker.animate(
         { 'background-color': 'transparent' },
         {
             start: () => {
-                set_recent_shot_indicator($marker, marker_color, on_player);
+                indicate_recent_shot($marker, marker_color, shot_data.grid);
                 $marker.css('background-color', marker_color);
             },
             complete: () => {
-                if(ship_to_reveal)
-                    reveal_ship();
+                if(shot_data.ship_to_reveal)
+                    reveal_ship(shot_data.ship_to_reveal);
             },
             duration: 600
         }
     );
 }
 
-function set_recent_shot_indicator($marker, color, side) {
-    if(prev_shot_marker[side])
+const indicate_recent_shot = function() {
+    const prev_shot_marker = {
+        player: null,
+        opponent: null
+    };
+
+    return function($marker, color, side) {
+        if(prev_shot_marker[side])
         prev_shot_marker[side].css('box-shadow', '');
 
-    $marker.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
-    prev_shot_marker[side] = $marker;
-}
+        $marker.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
+        prev_shot_marker[side] = $marker;
+    };
+}();
 
-function reveal_ship() {
-    for(const coord_pair of ship_to_reveal)
+function reveal_ship(ship_coords) {
+    for(const coord_pair of ship_coords)
         grids.opponent.coords_to_tile(coord_pair).addClass('ship');
-    ship_to_reveal = null;
 }
 
 function set_crosshair(active) {
