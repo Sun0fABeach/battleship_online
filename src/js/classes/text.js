@@ -3,9 +3,14 @@ export default class Text {
         this._$container = $container;
     }
 
-    change(new_text) {
+    change(new_text, fade=true) {
+        if(!fade) {
+            this._$container.html(new_text);
+            return;
+        }
+
         this._$container
-        .fadeOut( // these fades are prevented on mobile via css
+        .fadeOut(
             () => this._$container.html(new_text)
         )
         .fadeIn();
