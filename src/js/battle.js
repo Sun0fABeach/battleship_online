@@ -133,9 +133,9 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 
 function display_sunk_ship_count(first_shot) {
     let num_sunk = ship_count.total - ship_count.intact.opponent;
-    if(num_sunk < 10)
-        num_sunk = '&nbsp;' + num_sunk;
-    const msg = 'Score: ' + num_sunk + '/' + ship_count.total + ' ships';
+    const msg = 'Score: <strong>' +
+                num_sunk + '/' + ship_count.total +
+                '</strong> ships';
     text.game_msg.change(msg, first_shot);
 }
 
