@@ -40,7 +40,14 @@ function init_modal_handlers() {
 
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
-
+            $grids_container.fadeOut(() => {
+                battle.deactivate();
+                player_grid_instant_show();
+                ship_placement.activate();
+                $grids_container.fadeIn();
+            });
+            show_menu_buttons(['abort', 'ready']);
+            ui.text.game_msg.change(ui.msg.finish_placement);
         },
         end_battle
     );
@@ -263,11 +270,16 @@ function end_battle() {
 
     animate_toggle_dual_grid(false, () => {
         battle.deactivate();
-        if(ui.grids.player.slid_up) {
-            ui.grids.player.show(); // instant show here, so we have to
-            ui.grids.player.slid_up = false; // manually set the slid up state
-        }
+        ship_placement.activate();
+        player_grid_instant_show();
     });
+}
+
+function player_grid_instant_show() {
+    if(ui.grids.player.slid_up) {
+        ui.grids.player.show(); // instant show here, so we have to
+        ui.grids.player.slid_up = false; // manually set the slid up state
+    }
 }
 
 $(window).resize(function() {

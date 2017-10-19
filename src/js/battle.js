@@ -22,7 +22,7 @@ export function activate(player_begins) {
     battle_active = true;
     ship_count.total = grids.player.num_ships;
     ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
-    socket.once('defeat', game_over_handler);
+    socket.once('defeat', () => game_over_handler(true));
 
     if(player_begins) {
         if(adjacent_grid_mode())            // set without actually sliding up
@@ -128,7 +128,7 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 
     if(shot_sank_ship(shot_result) && --ship_count.intact.player === 0) {
         socket.emit('defeat');
-        game_over_handler();
+        game_over_handler(false);
     } else {
         let_player_shoot();
     }
@@ -138,9 +138,9 @@ function shot_sank_ship(shot_result) {
     return shot_result instanceof Array;
 }
 
-function game_over_handler() {
+function game_over_handler(victory) {
     battle_active = false;
-    setTimeout(() => modals.game_over.open(), 1500);
+    setTimeout(() => modals.game_over.open(victory), 1500);
 }
 
 function display_sunk_ship_count(first_shot) {

@@ -104,9 +104,20 @@ io.on('connection', (socket) => {
 
     socket.on('give up', () => {
         const player = players[socket.id];
+
         if(!player)
             return;
+
         player.handle_goodbye();
+    });
+
+    socket.on('regame', (decision, callback) => {
+        const player = players[socket.id];
+
+        if(!player || !player.is_paired())
+            return;
+
+        player.negotiate_regame(decision, callback);
     });
 
     socket.on('disconnecting', () => {
@@ -146,6 +157,7 @@ class Player {
         this._game_open = false;
         this._opponent = null;
         this._ready = false;
+        this._regame_decision = null;
     }
 
     get name() {
@@ -193,10 +205,12 @@ class Player {
         else
             this._opponent.send('opponent aborted');
 
+        this._opponent._regame_decision = null;
         this._opponent._opponent = null;
         this._opponent._ready = false;
-        this._opponent = null;
+        this._regame_decision = null;
         this._ready = false;
+        this._opponent = null;
     }
 
     is_paired() {
@@ -243,5 +257,33 @@ class Player {
 
     announce_defeat() {
         this._opponent.send('defeat');
+        this._opponent._regame_decision = null;
+        this._regame_decision = null;
+    }
+
+    negotiate_regame(player_wants_regame, decision_cb) {
+        this._ready = false;
+        const opp_decision = this._opponent._regame_decision;
+
+        if(!opp_decision) {
+            this._regame_decision = {answer: player_wants_regame};
+            if(player_wants_regame) {
+                decision_cb(null); // inform that opponent decision pending
+            } else {
+                this._opponent = null;
+            }
+            return;
+        }
+
+        if(opp_decision.answer === true)
+            this._opponent.send('regame', {answer: player_wants_regame});
+
+        if(player_wants_regame) {
+            decision_cb(opp_decision);
+        } else {
+            if(opp_decision.answer === true)
+                this._opponent._opponent = null;
+            this._opponent = null;
+        }
     }
 }

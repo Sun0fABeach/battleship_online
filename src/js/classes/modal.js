@@ -1,3 +1,7 @@
+import Text from './text';
+import { text } from '../ui';
+
+
 class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
@@ -221,27 +225,79 @@ export class GameOverModal extends Modal {
         this._socket = socket;
         this._yes_regame_cb = yes_regame_cb;
         this._no_regame_cb = no_regame_cb;
-        this._$msg_container = this._$modal.find('p');
+        this._msg = new Text(this._$modal.find('p'));
         this._$regame_yes = $modal.find('button[name="regame-yes"]');
         this._$regame_no = $modal.find('button[name="regame-no"]');
-
-        this._$regame_no.click(() => {
-            socket.emit('give up'); // TODO: change me
-            super._close();
-            if(this._no_regame_cb)
-                this._no_regame_cb();
-        });
+        this._$regame_abort = $modal.find('button[name="regame-abort"]');
+        this._$regame_ok = $modal.find('button[name="regame-ok"]');
     }
 
-    open() {
-        this._$msg_container.html(
-            'You have been <strong>defeated</strong>! Do you want a regame?'
-        );
+    open(victory) {
+        const msg = victory ? 'You <strong>win</strong>! ' :
+                                'You have been <strong>defeated</strong>! ';
+        this._msg.change(msg + 'Do you want a regame?', false);
+        this._$regame_yes.off().one('click', () => this._regame_yes_handler());
+        this._$regame_no.off().one('click', () => this._regame_no_handler());
+        this._$regame_abort.off().one('click', () => this._regame_no_handler());
+        this._$regame_ok.off().one('click', () => this._regame_no_ok_handler());
+        this._$regame_abort.hide();
+        this._$regame_ok.hide();
+        this._$regame_yes.show();
+        this._$regame_no.show();
         super._open();
     }
 
     set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
         this._yes_regame_cb = yes_regame_cb;
         this._no_regame_cb = no_regame_cb;
+    }
+
+    _regame_no_handler() {
+        this._socket.emit('regame', false);
+        super._close();
+        this._no_regame_cb();
+    }
+
+    _regame_no_ok_handler() {
+        super._close();
+        this._no_regame_cb();
+    }
+
+    _regame_yes_handler() {
+        this._socket.emit('regame', true, (regame_reply) => {
+            if(regame_reply) {
+                this._handle_regame_reply(regame_reply.answer);
+            } else {
+                this._socket.once('regame', (later_reply) => {
+                    this._handle_regame_reply(later_reply.answer);
+                });
+                this._msg.change(
+                    'Waiting for answer of <strong>' +
+                    text.opponent_name.text +
+                    '</strong> ...',
+                    false
+                );
+                this._$regame_yes.hide();
+                this._$regame_no.hide();
+                this._$regame_abort.show();
+            }
+        });
+    }
+
+    _handle_regame_reply(opponent_wants_regame) {
+        if(opponent_wants_regame) {
+            super._close();
+            this._yes_regame_cb();
+        } else {
+            this._msg.change(
+                '<strong>' + text.opponent_name.text + '</strong> ' +
+                "doesn't want a regame.",
+                false
+            );
+            this._$regame_yes.hide();
+            this._$regame_no.hide();
+            this._$regame_abort.hide();
+            this._$regame_ok.show();
+        }
     }
 }

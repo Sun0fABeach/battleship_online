@@ -15,4 +15,8 @@ export default class Text {
         )
         .fadeIn();
     }
+
+    get text() {
+        return this._$container.text();
+    }
 }
