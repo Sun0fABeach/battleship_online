@@ -1,5 +1,5 @@
 import { Grid, OwnGrid } from './classes/grid';
-import { HostModal, ErrorModal } from './classes/modal';
+import { HostModal, GameOverModal, ErrorModal } from './classes/modal';
 import MenuButton from './classes/menu_button';
 import Text from './classes/text';
 
@@ -58,6 +58,14 @@ function init_text_handlers() {
 function init_modals(socket) {
     modals.host_list = new HostModal(
         $('#host-modal'),
+        {
+            backdrop: 'static',
+            keyboard: false
+        },
+        socket
+    );
+    modals.game_over = new GameOverModal(
+        $('#game-over-modal'),
         {
             backdrop: 'static',
             keyboard: false

@@ -1,5 +1,5 @@
 import Ship from './classes/ship';
-import { grids, text } from './ui';
+import { grids, text, modals } from './ui';
 import { adjacent_grid_mode } from './helpers';
 
 let socket;
@@ -22,6 +22,7 @@ export function activate(player_begins) {
     battle_active = true;
     ship_count.total = grids.player.num_ships;
     ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
+    socket.once('defeat', game_over_handler);
 
     if(player_begins) {
         if(adjacent_grid_mode())            // set without actually sliding up
@@ -79,8 +80,8 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
     if(!battle_active) // battle might have been aborted before result arrives
         return;
 
-    const sunk_ship = shot_result instanceof Array;
-    if(sunk_ship) {
+    const sank_ship = shot_sank_ship(shot_result);
+    if(sank_ship) {
         --ship_count.intact.opponent;
         display_sunk_ship_count(first_shot);
     } else if(first_shot) {
@@ -90,7 +91,7 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
     display_shot({
         grid: 'opponent',
         hit: !!shot_result,
-        ship_to_reveal: sunk_ship ? shot_result : null,
+        ship_to_reveal: sank_ship ? shot_result : null,
         $tile: $tile
     });
 
@@ -114,11 +115,8 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
     const ship = grids.player.get_ship($tile);
     let shot_result = false;
 
-    if(ship) {
+    if(ship)
         shot_result = ship.receive_shot(coord_pair);
-        if(shot_result instanceof Array)
-            --ship_count.intact.player;
-    }
 
     inform_result_cb(shot_result);
 
@@ -128,7 +126,21 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
         $tile: $tile
     });
 
-    let_player_shoot();
+    if(shot_sank_ship(shot_result) && --ship_count.intact.player === 0) {
+        socket.emit('defeat');
+        game_over_handler();
+    } else {
+        let_player_shoot();
+    }
+}
+
+function shot_sank_ship(shot_result) {
+    return shot_result instanceof Array;
+}
+
+function game_over_handler() {
+    battle_active = false;
+    setTimeout(() => modals.game_over.open(), 1500);
 }
 
 function display_sunk_ship_count(first_shot) {
@@ -149,7 +161,9 @@ function display_shot(shot_data) {
                 setTimeout(() => {
                     mark_shot(shot_data);
                     setTimeout(() => {
-                        grids.player.slideUp();
+                        // don't slide up when the shot defeated the player
+                        if(battle_active)
+                            grids.player.slideUp();
                     }, 800);
                 }, mark_to);
             });

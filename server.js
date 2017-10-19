@@ -93,6 +93,15 @@ io.on('connection', (socket) => {
         player.shoot(coords, result_cb);
     });
 
+    socket.on('defeat', () => {
+        const player = players[socket.id];
+
+        if(!player || !player.is_paired() || !player.ready)
+            return;
+
+        player.announce_defeat();
+    });
+
     socket.on('give up', () => {
         const player = players[socket.id];
         if(!player)
@@ -230,5 +239,9 @@ class Player {
 
     shoot(coords, result_cb) {
         this._opponent.send('shot', coords, result_cb);
+    }
+
+    announce_defeat() {
+        this._opponent.send('defeat');
     }
 }

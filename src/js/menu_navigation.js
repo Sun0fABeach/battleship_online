@@ -37,6 +37,13 @@ function init_modal_handlers() {
             show_menu_buttons(['host', 'open_hosts']);
         }
     );
+
+    ui.modals.game_over.set_regame_decision_handlers(
+        () => {
+
+        },
+        end_battle
+    );
 }
 
 function init_menu_button_handlers(socket) {
@@ -249,9 +256,10 @@ function start_battle(player_begins) {
 }
 
 function end_battle() {
-    show_menu_buttons(['host', 'open_hosts']);
+    opponent_name = null;
     ui.text.opponent_name.change('Opponent');
     ui.text.game_msg.change(ui.msg.host_or_join);
+    show_menu_buttons(['host', 'open_hosts']);
 
     animate_toggle_dual_grid(false, () => {
         battle.deactivate();

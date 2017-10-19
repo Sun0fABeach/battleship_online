@@ -17,11 +17,11 @@ class Modal {
 export class ErrorModal extends Modal {
     constructor($modal, config) {
         super($modal, config);
-        this._msg_container = this._$modal.find('p');
+        this._$msg_container = this._$modal.find('p');
     }
 
     open(error_msg) {
-        this._msg_container.html('<strong>'+error_msg+'</strong>');
+        this._$msg_container.html('<strong>'+error_msg+'</strong>');
         super._open();
     }
 }
@@ -211,5 +211,37 @@ export class HostModal extends Modal {
 
     _hide_entry($entry) {
         $entry.removeClass('d-flex').addClass('d-none');
+    }
+}
+
+
+export class GameOverModal extends Modal {
+    constructor($modal, config, socket, yes_regame_cb, no_regame_cb) {
+        super($modal, config);
+        this._socket = socket;
+        this._yes_regame_cb = yes_regame_cb;
+        this._no_regame_cb = no_regame_cb;
+        this._$msg_container = this._$modal.find('p');
+        this._$regame_yes = $modal.find('button[name="regame-yes"]');
+        this._$regame_no = $modal.find('button[name="regame-no"]');
+
+        this._$regame_no.click(() => {
+            socket.emit('give up'); // TODO: change me
+            super._close();
+            if(this._no_regame_cb)
+                this._no_regame_cb();
+        });
+    }
+
+    open() {
+        this._$msg_container.html(
+            'You have been <strong>defeated</strong>! Do you want a regame?'
+        );
+        super._open();
+    }
+
+    set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
+        this._yes_regame_cb = yes_regame_cb;
+        this._no_regame_cb = no_regame_cb;
     }
 }
