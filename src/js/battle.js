@@ -41,6 +41,9 @@ export function deactivate() {
 
     clear_opponent_grid();
     clear_player_grid();
+
+    text.opponent_name.bold(false);
+    text.player_name.bold(false);
 }
 
 function clear_opponent_grid() {
@@ -61,6 +64,8 @@ function clear_player_grid() {
 
 function let_player_shoot(first_shot=false) {
     set_crosshair(true);
+    text.opponent_name.bold(true);
+    text.player_name.bold(false);
 
     grids.opponent.table.one('click', 'td:not(:has(i))', function() {
         const $tile = $(this);
@@ -99,6 +104,9 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
 }
 
 function let_opponent_shoot(first_shot=false) {
+    text.opponent_name.bold(false);
+    text.player_name.bold(true);
+
     socket.once('shot',
         (coord_pair, inform_result_cb) =>
         handle_opponent_shot(coord_pair, inform_result_cb, first_shot)
