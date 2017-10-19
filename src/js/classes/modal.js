@@ -247,6 +247,11 @@ export class GameOverModal extends Modal {
         super._open();
     }
 
+    close() {
+        this._socket.off('regame');
+        super._close();
+    }
+
     set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
         this._yes_regame_cb = yes_regame_cb;
         this._no_regame_cb = no_regame_cb;
@@ -254,12 +259,12 @@ export class GameOverModal extends Modal {
 
     _regame_no_handler() {
         this._socket.emit('regame', false);
-        super._close();
+        this.close();
         this._no_regame_cb();
     }
 
     _regame_no_ok_handler() {
-        super._close();
+        this.close();
         this._no_regame_cb();
     }
 
@@ -286,7 +291,7 @@ export class GameOverModal extends Modal {
 
     _handle_regame_reply(opponent_wants_regame) {
         if(opponent_wants_regame) {
-            super._close();
+            this.close();
             this._yes_regame_cb();
         } else {
             this._msg.change(
