@@ -162,6 +162,10 @@ function display_sunk_ship_count(first_shot) {
 function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
+        /* notice how any shot reveal would end up with a slid up player grid
+           on small screens (else-block below). therefore, we set the slid_up
+           state manually here for state consistency. */
+        grids.player.slid_up = true;
     } else {
         if(shot_data.grid === 'player') {
             const mark_to = grids.player.slid_up ? 200 : 0;
