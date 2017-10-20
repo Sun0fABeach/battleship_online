@@ -45,20 +45,20 @@ export default class Ship {
     }
 
     receive_shot(shot_coords) {
-        let hit = false;
+        let shot_hit = false;
 
         this._intact.forEach((coord_pair, index) => {
             if(this._equal_coords(shot_coords, coord_pair)) {
                 this._intact.splice(index, 1);
-                hit = true;
+                shot_hit = true;
                 return;
             }
         });
 
-        if(hit)
-            return this._intact.length === 0 ? this.coords : true;
-
-        return false;
+        return {
+            hit: shot_hit,
+            sunken_ship: this._intact.length === 0 ? this.coords : null
+        };
     }
 
     sort_coords() {

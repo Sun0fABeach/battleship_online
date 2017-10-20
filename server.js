@@ -93,15 +93,6 @@ io.on('connection', (socket) => {
         player.shoot(coords, result_cb);
     });
 
-    socket.on('defeat', () => {
-        const player = players[socket.id];
-
-        if(!player || !player.is_paired() || !player.ready)
-            return;
-
-        player.announce_defeat();
-    });
-
     socket.on('give up', () => {
         const player = players[socket.id];
 
@@ -242,6 +233,7 @@ class Player {
 
     set_ready() {
         this._ready = true;
+        this._regame_decision = null;
 
         if(this._opponent.ready) {
             this._opponent.send('opponent ready');
@@ -253,12 +245,6 @@ class Player {
 
     shoot(coords, result_cb) {
         this._opponent.send('shot', coords, result_cb);
-    }
-
-    announce_defeat() {
-        this._opponent.send('defeat');
-        this._opponent._regame_decision = null;
-        this._regame_decision = null;
     }
 
     negotiate_regame(player_wants_regame, decision_cb) {

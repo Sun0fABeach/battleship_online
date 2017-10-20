@@ -22,7 +22,6 @@ export function activate(player_begins) {
     battle_active = true;
     ship_count.total = grids.player.num_ships;
     ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
-    socket.once('defeat', () => game_over_handler(true));
 
     if(player_begins) {
         if(adjacent_grid_mode())            // set without actually sliding up
@@ -85,22 +84,24 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
     if(!battle_active) // battle might have been aborted before result arrives
         return;
 
-    const sank_ship = shot_sank_ship(shot_result);
-    if(sank_ship) {
+    if(shot_result.sunken_ship) {
         --ship_count.intact.opponent;
         display_sunk_ship_count(first_shot);
-    } else if(first_shot) {
+    } else if(first_shot) { // switch to displaying score on first shot
         display_sunk_ship_count(true);
     }
 
     display_shot({
         grid: 'opponent',
-        hit: !!shot_result,
-        ship_to_reveal: sank_ship ? shot_result : null,
+        hit: shot_result.hit,
+        ship_to_reveal: shot_result.sunken_ship,
         $tile: $tile
     });
 
-    let_opponent_shoot();
+    if(shot_result.defeat)
+        game_over_handler(true);
+    else
+        let_opponent_shoot();
 }
 
 function let_opponent_shoot(first_shot=false) {
@@ -121,29 +122,22 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 
     const $tile = grids.player.coords_to_tile(coord_pair);
     const ship = grids.player.get_ship($tile);
-    let shot_result = false;
-
-    if(ship)
-        shot_result = ship.receive_shot(coord_pair);
-
-    inform_result_cb(shot_result);
+    const shot_result = ship ? ship.receive_shot(coord_pair) : {hit: false};
 
     display_shot({
         grid: 'player',
-        hit: !!ship,
+        hit: shot_result.hit,
         $tile: $tile
     });
 
-    if(shot_sank_ship(shot_result) && --ship_count.intact.player === 0) {
-        socket.emit('defeat');
+    if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
+        shot_result.defeat = true;
         game_over_handler(false);
     } else {
         let_player_shoot();
     }
-}
 
-function shot_sank_ship(shot_result) {
-    return shot_result instanceof Array;
+    inform_result_cb(shot_result);
 }
 
 function game_over_handler(victory) {
@@ -218,7 +212,7 @@ const indicate_recent_shot = function() {
 
     return function($marker, color, side) {
         if(prev_shot_marker[side])
-        prev_shot_marker[side].css('box-shadow', '');
+            prev_shot_marker[side].css('box-shadow', '');
 
         $marker.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
         prev_shot_marker[side] = $marker;
