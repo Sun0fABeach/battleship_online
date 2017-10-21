@@ -78,8 +78,7 @@ export class HostModal extends Modal {
         this._close_cb = close_cb;
     }
 
-    open(player_name) {
-        this._player_name = player_name; // needed for networking
+    open() {
         this._set_default_state();
 
         super._open();
@@ -134,7 +133,7 @@ export class HostModal extends Modal {
         this._join_inputs_enable(false);
         this._$close.off('click');
 
-        this._socket.emit('join', host.id, this._player_name, (success) => {
+        this._socket.emit('join', host.id, (success) => {
             this._join_inputs_enable(true);
             this._$close.click(() => this._close());
 

@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
         player.stop_host_watching();
     });
 
-    socket.on('join', (host_id, joiner_name, callback) => {
+    socket.on('join', (host_id, callback) => {
         const player = players[socket.id];
         const host = players[host_id];
 
