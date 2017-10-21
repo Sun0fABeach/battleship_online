@@ -161,7 +161,14 @@ function init_menu_button_handlers(socket) {
         });
     });
 
-    socket.on('opponent ready', () => start_battle(true));
+    socket.on('opponent ready', () => {
+        /* rare corner case: player aborted hosting, grid is made single and
+           shortly afterwards, this event arrives b/c opponent pressed 'ready'
+           at the same time. */
+        if(!is_dual_grid())
+            return;
+        start_battle(true)
+    });
 
 
     ui.menu_buttons.give_up.click(() => {
