@@ -1,7 +1,7 @@
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
-import { adjacent_grid_mode } from './helpers';
+import { adjacent_grid_mode, swap_in_socket_handlers } from './helpers';
 
 
 let $player_side, $both_sides, $grids_container;
@@ -15,12 +15,12 @@ export function init(socket) {
     $grids_container = $('#grids-container');
     $name_input = $('#player-name');
 
-    init_modal_handlers();
+    init_modal_handlers(socket);
     init_menu_button_handlers(socket);
 }
 
 
-function init_modal_handlers() {
+function init_modal_handlers(socket) {
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
             opponent_name = host_name;
@@ -30,11 +30,16 @@ function init_modal_handlers() {
             ui.text.game_msg.change(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            show_menu_buttons(['abort', 'ready']);
+            swap_in_menu_buttons(['abort', 'ready']);
+
+            swap_in_socket_handlers(socket, () =>
+                register_abort_handler(socket, false)
+            );
         },
         () => {
             ui.text.game_msg.change(ui.msg.host_or_join);
-            show_menu_buttons(['host', 'open_hosts']);
+            swap_in_menu_buttons(['host', 'open_hosts']);
+            swap_in_socket_handlers(socket, null);
         }
     );
 
@@ -46,10 +51,13 @@ function init_modal_handlers() {
                 ship_placement.activate();
                 $grids_container.fadeIn();
             });
-            show_menu_buttons(['abort', 'ready']);
             ui.text.game_msg.change(ui.msg.finish_placement);
+            swap_in_menu_buttons(['abort', 'ready']);
+            swap_in_socket_handlers(socket, () =>
+                register_abort_handler(socket, false)
+            );
         },
-        end_battle
+        () => end_battle(socket)
     );
 }
 
@@ -63,7 +71,7 @@ function init_menu_button_handlers(socket) {
             socket.emit('name register', player_name, (success) => {
                 if(success) {
                     $name_input.fadeOut();
-                    show_menu_buttons(['host', 'open_hosts']);
+                    swap_in_menu_buttons(['host', 'open_hosts']);
                     ui.text.player_name.change(player_name);
                     ui.text.game_msg.change(ui.msg.host_or_join);
                 } else {
@@ -88,7 +96,7 @@ function init_menu_button_handlers(socket) {
         socket.emit('host', (success, fail_reason) => {
             if(success) {
                 animate_toggle_dual_grid(true);
-                show_menu_buttons(['abort']);
+                swap_in_menu_buttons(['abort']);
                 ui.text.game_msg.change(ui.msg.wait_for_join);
             } else {
                 ui.menu_buttons.host.clickable(true);
@@ -96,45 +104,34 @@ function init_menu_button_handlers(socket) {
                 ui.modals.error.open('Failed to host: ' + fail_reason);
             }
         });
-    });
 
-    socket.on('opponent entered', (opponent) => {
-        opponent_name = opponent;
-        show_menu_buttons(['abort', 'ready']);
-        ui.text.opponent_name.change(opponent_name);
-        const msg = ui.msg.opponent_joined;
-        ui.text.game_msg.change(
-            msg[0] + opponent_name + msg[1] + ' ' + ui.msg.finish_placement
-        );
+        swap_in_socket_handlers(socket, () => {
+        socket.on('opponent entered', (opponent) => {
+            opponent_name = opponent;
+            swap_in_menu_buttons(['abort', 'ready']);
+            ui.text.opponent_name.change(opponent_name);
+            const msg = ui.msg.opponent_joined;
+            ui.text.game_msg.change(
+                msg[0] + opponent_name + msg[1] + ' ' +
+                ui.msg.finish_placement
+            );
+            swap_in_socket_handlers(socket, () =>
+                register_abort_handler(socket, false)
+            );
+        });
+        });
     });
-
 
     ui.menu_buttons.open_hosts.click(() => {
-        ui.modals.host_list.open(player_name);
-        show_menu_buttons(null);
+        ui.modals.host_list.open();
+        swap_in_menu_buttons(null);
         ui.text.game_msg.change(ui.msg.choose_host);
     });
 
 
     ui.menu_buttons.abort.click(() => {
         socket.emit('abort');
-        animate_toggle_dual_grid(false);
-        show_menu_buttons(['host', 'open_hosts']);
-        ui.text.opponent_name.change('Opponent');
-        ui.text.game_msg.change(ui.msg.host_or_join);
-    });
-
-    socket.on('opponent aborted', () => {
-        /* rare corner case: player clicked abort, grid is made single and
-           shortly afterwards, this event arrives b/c opponent aborted or
-           disconnected at the same time. */
-        if(!is_dual_grid())
-            return;
-        ui.modals.error.open(opponent_name + ' has left the game.');
-        animate_toggle_dual_grid(false);
-        show_menu_buttons(['host', 'open_hosts']);
-        ui.text.opponent_name.change('Opponent');
-        ui.text.game_msg.change(ui.msg.host_or_join);
+        go_to_lobby(socket);
     });
 
 
@@ -150,40 +147,28 @@ function init_menu_button_handlers(socket) {
 
         socket.emit('ready', (other_ready) => {
             if(other_ready) {
-                start_battle(false);
+                start_battle(socket, false);
             } else {
-                show_menu_buttons(['abort']);
+                swap_in_menu_buttons(['abort']);
                 const msg = ui.msg.placement_wait;
                 ui.text.game_msg.change(
                     msg[0] + opponent_name + msg[1]
                 );
+
+                swap_in_socket_handlers(socket, () => {
+                    socket.on('opponent ready', () => {
+                        start_battle(socket, true);
+                    });
+                    register_abort_handler(socket, false);
+                });
             }
         });
     });
 
-    socket.on('opponent ready', () => {
-        /* rare corner case: player aborted hosting, grid is made single and
-           shortly afterwards, this event arrives b/c opponent pressed 'ready'
-           at the same time. */
-        if(!is_dual_grid())
-            return;
-        start_battle(true)
-    });
-
 
     ui.menu_buttons.give_up.click(() => {
-        socket.emit('give up');
-        end_battle();
-    });
-
-    socket.on('opponent gave up', () => {
-        /* rare corner case: player gave up, grid is made single and
-           shortly afterwards, this event arrives b/c opponent gave up or
-           disconnected at the same time. */
-        if(!is_dual_grid())
-            return;
-        ui.modals.error.open(opponent_name + ' has left the game.');
-        end_battle();
+        socket.emit('abort');
+        end_battle(socket);
     });
 
 
@@ -193,16 +178,14 @@ function init_menu_button_handlers(socket) {
 }
 
 
-function show_menu_buttons(to_show, callback) {
-    let cb_registered = false;
+function swap_in_menu_buttons(to_show) {
+    let show_triggered = false;
 
     for(const button of Object.values(ui.menu_buttons)) {
         if(button.is_visible()) {
-            if(!cb_registered) {
-                button.hide(() => {
-                    show_menu_buttons_do_action(to_show, callback);
-                });
-                cb_registered = true;
+            if(!show_triggered) {
+                button.hide(() => show_menu_buttons(to_show));
+                show_triggered = true;
             } else {
                 button.hide();
             }
@@ -210,15 +193,13 @@ function show_menu_buttons(to_show, callback) {
     }
 
     // if no button was there to hide, we still need to trigger this
-    if(!cb_registered)
-        show_menu_buttons_do_action(to_show, callback);
+    if(!show_triggered)
+        show_menu_buttons(to_show);
 }
 
-function show_menu_buttons_do_action(buttons_to_show, action) {
+function show_menu_buttons(buttons_to_show) {
     if(buttons_to_show)
         buttons_to_show.forEach(name => ui.menu_buttons[name].show());
-    if(action)
-        action();
 }
 
 function validate_player_name() {
@@ -242,10 +223,6 @@ function animate_toggle_dual_grid(active, fadeout_cb) {
     });
 }
 
-function is_dual_grid() {
-    return $both_sides.hasClass('dual-view');
-}
-
 function toggle_dual_grid(active) {
     if(active)
         $both_sides.addClass('dual-view');
@@ -253,9 +230,25 @@ function toggle_dual_grid(active) {
         $both_sides.removeClass('dual-view');
 }
 
-function start_battle(player_begins) {
-    battle.activate(player_begins);
-    show_menu_buttons(['slide', 'give_up']);
+function go_to_lobby(socket, fadeout_cb) {
+    opponent_name = null;
+    ui.text.opponent_name.change('Opponent');
+    ui.text.game_msg.change(ui.msg.host_or_join);
+    swap_in_menu_buttons(['host', 'open_hosts']);
+    animate_toggle_dual_grid(false, fadeout_cb);
+    swap_in_socket_handlers(socket, null);
+}
+
+function end_battle(socket) {
+    go_to_lobby(socket, () => {
+        battle.deactivate();
+        ship_placement.activate();
+        player_grid_instant_show();
+    });
+}
+
+function start_battle(socket, player_begins) {
+    swap_in_menu_buttons(['slide', 'give_up']);
 
     if(player_begins) {
         ui.text.game_msg.change(
@@ -267,19 +260,13 @@ function start_battle(player_begins) {
             ui.msg.battle_start + ' ' + msg[0] + opponent_name + msg[1]
         );
     }
-}
 
-function end_battle() {
-    opponent_name = null;
-    ui.text.opponent_name.change('Opponent');
-    ui.text.game_msg.change(ui.msg.host_or_join);
-    show_menu_buttons(['host', 'open_hosts']);
-
-    animate_toggle_dual_grid(false, () => {
-        battle.deactivate();
-        ship_placement.activate();
-        player_grid_instant_show();
-    });
+    swap_in_socket_handlers(socket, () =>
+        register_abort_handler(socket, true)
+    );
+    // activate after swapping socket handlers so battle doesn't get its own
+    // handlers overwritten
+    battle.activate(player_begins);
 }
 
 function player_grid_instant_show() {
@@ -287,6 +274,16 @@ function player_grid_instant_show() {
         ui.grids.player.show(); // instant show here, so we have to
         ui.grids.player.slid_up = false; // manually set the slid up state
     }
+}
+
+function register_abort_handler(socket, in_battle) {
+    socket.on('opponent aborted', () => {
+        ui.modals.error.open(opponent_name + ' has left the game.');
+        if(in_battle)
+            end_battle(socket);
+        else
+            go_to_lobby(socket);
+    });
 }
 
 $(window).resize(function() {
