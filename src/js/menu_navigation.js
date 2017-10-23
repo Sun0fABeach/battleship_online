@@ -36,8 +36,9 @@ function init_modal_handlers(socket) {
             ui.grids.$container.fadeOut(() => {
                 battle.deactivate();
                 player_grid_instant_show();
-                ship_placement.activate();
-                ui.grids.$container.fadeIn();
+                ui.grids.$container.fadeIn(() =>
+                    ship_placement.activate()
+                );
             });
             ui.text.game_msg.change(ui.msg.finish_placement);
             swap_in_menu_buttons(['abort', 'ready']);
@@ -201,12 +202,15 @@ function get_player_name() {
     return ui.input.$name.val().trim();
 }
 
-function animate_toggle_dual_grid(active, fadeout_cb) {
+function animate_toggle_dual_grid(active, fadeout_cb, fadein_cb) {
     ui.grids.$container.fadeOut(() => {
         if(fadeout_cb)
             fadeout_cb();
         toggle_dual_grid(active);
-        ui.grids.$container.fadeIn();
+        ui.grids.$container.fadeIn(() => {
+            if(fadein_cb)
+                fadein_cb();
+        });
     });
 }
 
@@ -217,20 +221,24 @@ function toggle_dual_grid(active) {
         ui.grids.$both.removeClass('dual-view');
 }
 
-function go_to_lobby(socket, fadeout_cb) {
+function go_to_lobby(socket, fadeout_cb, fadein_cb) {
     ui.text.opponent_name.change('Opponent');
     ui.text.game_msg.change(ui.msg.host_or_join);
     swap_in_menu_buttons(['host', 'open_hosts']);
-    animate_toggle_dual_grid(false, fadeout_cb);
+    animate_toggle_dual_grid(false, fadeout_cb, fadein_cb);
     swap_in_socket_handlers(socket, null);
 }
 
 function end_battle(socket) {
-    go_to_lobby(socket, () => {
-        battle.deactivate();
-        ship_placement.activate();
-        player_grid_instant_show();
-    });
+    go_to_lobby(socket,
+        () => {
+            battle.deactivate();
+            player_grid_instant_show();
+        },
+        () => {
+            ship_placement.activate();
+        }
+    );
 }
 
 function start_battle(socket, player_begins) {
