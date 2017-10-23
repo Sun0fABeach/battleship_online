@@ -10,17 +10,17 @@ export default class Text {
     change(new_text, fade=true) {
         if(!fade) {
             this._$container.html(new_text);
-            return;
+        } else {
+            this._$container
+            .fadeOut(() =>
+                this._$container.html(new_text)
+            )
+            .fadeIn();
         }
-
-        this._$container
-        .fadeOut(
-            () => this._$container.html(new_text)
-        )
-        .fadeIn();
+        return this;
     }
 
-    bold(active) {
+    bold(active=true) {
         if(active) {
             if(this._$container.parent('strong').length === 0)
                 this._$container.wrap('<strong>');
@@ -28,5 +28,6 @@ export default class Text {
             while(this._$container.parent('strong').length > 0)
                 this._$container.unwrap('strong');
         }
+        return this;
     }
 }
