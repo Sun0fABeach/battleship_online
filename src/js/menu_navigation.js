@@ -4,26 +4,14 @@ import * as ui from './ui';
 import { adjacent_grid_mode, swap_in_socket_handlers } from './helpers';
 
 
-let $player_side, $both_sides, $grids_container;
-let $name_input;
-let player_name, opponent_name;
-
-
 export function init(socket) {
-    $player_side = $('#player-side');
-    $both_sides = $('.grid-wrapper');
-    $grids_container = $('#grids-container');
-    $name_input = $('#player-name');
-
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);
 }
 
-
 function init_modal_handlers(socket) {
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
-            opponent_name = host_name;
             animate_toggle_dual_grid(true);
             ui.text.opponent_name.change(host_name);
             const msg = ui.msg.connected;
@@ -45,11 +33,11 @@ function init_modal_handlers(socket) {
 
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
-            $grids_container.fadeOut(() => {
+            ui.grids.$container.fadeOut(() => {
                 battle.deactivate();
                 player_grid_instant_show();
                 ship_placement.activate();
-                $grids_container.fadeIn();
+                ui.grids.$container.fadeIn();
             });
             ui.text.game_msg.change(ui.msg.finish_placement);
             swap_in_menu_buttons(['abort', 'ready']);
@@ -65,12 +53,12 @@ function init_menu_button_handlers(socket) {
     ui.menu_buttons.enter.click(() => {
 
         if(validate_player_name()) {
-            player_name = get_player_name();
+            const player_name = get_player_name();
             ui.menu_buttons.enter.clickable(false);
 
             socket.emit('name register', player_name, (success) => {
                 if(success) {
-                    $name_input.fadeOut();
+                    ui.input.$name.fadeOut();
                     swap_in_menu_buttons(['host', 'open_hosts']);
                     ui.text.player_name.change(player_name);
                     ui.text.game_msg.change(ui.msg.host_or_join);
@@ -81,9 +69,9 @@ function init_menu_button_handlers(socket) {
                 }
             });
         } else {
-            $name_input.focus();
+            ui.input.$name.focus();
             ui.menu_buttons.enter.invalid();
-            $name_input.one('input', () => ui.menu_buttons.enter.normal());
+            ui.input.$name.one('input', () => ui.menu_buttons.enter.normal());
             ui.text.game_msg.change(ui.msg.name_enter);
         }
     });
@@ -106,8 +94,7 @@ function init_menu_button_handlers(socket) {
         });
 
         swap_in_socket_handlers(socket, () => {
-        socket.on('opponent entered', (opponent) => {
-            opponent_name = opponent;
+        socket.on('opponent entered', (opponent_name) => {
             swap_in_menu_buttons(['abort', 'ready']);
             ui.text.opponent_name.change(opponent_name);
             const msg = ui.msg.opponent_joined;
@@ -152,7 +139,7 @@ function init_menu_button_handlers(socket) {
                 swap_in_menu_buttons(['abort']);
                 const msg = ui.msg.placement_wait;
                 ui.text.game_msg.change(
-                    msg[0] + opponent_name + msg[1]
+                    msg[0] + ui.text.opponent_name.text + msg[1]
                 );
 
                 swap_in_socket_handlers(socket, () => {
@@ -204,34 +191,33 @@ function show_menu_buttons(buttons_to_show) {
 
 function validate_player_name() {
     if(get_player_name() === '') {
-        $name_input.val('');
+        ui.input.$name.val('');
         return false;
     }
     return true;
 }
 
 function get_player_name() {
-    return $name_input.val().trim();
+    return ui.input.$name.val().trim();
 }
 
 function animate_toggle_dual_grid(active, fadeout_cb) {
-    $grids_container.fadeOut(() => {
+    ui.grids.$container.fadeOut(() => {
         if(fadeout_cb)
             fadeout_cb();
         toggle_dual_grid(active);
-        $grids_container.fadeIn();
+        ui.grids.$container.fadeIn();
     });
 }
 
 function toggle_dual_grid(active) {
     if(active)
-        $both_sides.addClass('dual-view');
+        ui.grids.$both.addClass('dual-view');
     else
-        $both_sides.removeClass('dual-view');
+        ui.grids.$both.removeClass('dual-view');
 }
 
 function go_to_lobby(socket, fadeout_cb) {
-    opponent_name = null;
     ui.text.opponent_name.change('Opponent');
     ui.text.game_msg.change(ui.msg.host_or_join);
     swap_in_menu_buttons(['host', 'open_hosts']);
@@ -257,7 +243,8 @@ function start_battle(socket, player_begins) {
     } else {
         const msg = ui.msg.opponent_begins;
         ui.text.game_msg.change(
-            ui.msg.battle_start + ' ' + msg[0] + opponent_name + msg[1]
+            ui.msg.battle_start + ' ' +
+            msg[0] + ui.text.opponent_name.text + msg[1]
         );
     }
 
@@ -278,7 +265,9 @@ function player_grid_instant_show() {
 
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
-        ui.modals.error.open(opponent_name + ' has left the game.');
+        ui.modals.error.open(
+            ui.text.opponent_name.text + ' has left the game.'
+        );
         if(in_battle)
             end_battle(socket);
         else

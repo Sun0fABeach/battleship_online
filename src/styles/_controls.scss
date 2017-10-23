@@ -9,7 +9,7 @@
   }
 
   input {
-    &#player-name {
+    &[name="player-name"] {
       width: 66%;
 
       @include media-breakpoint-up(sm) {

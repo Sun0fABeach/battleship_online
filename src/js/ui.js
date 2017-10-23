@@ -39,6 +39,7 @@ export const text = {};
 export const modals = {};
 export const menu_buttons = {};
 export const grids = {};
+export const input = {};
 
 
 export function init(socket) {
@@ -46,6 +47,7 @@ export function init(socket) {
     init_modals(socket);
     init_menu_buttons();
     init_grids();
+    init_input();
 }
 
 
@@ -89,6 +91,12 @@ function init_menu_buttons() {
 }
 
 function init_grids() {
+    grids.$container = $('#grids-container');
+    grids.$both = $('.grid-wrapper');
     grids.player = new OwnGrid($('#player-side'));
     grids.opponent = new Grid($('#opponent-side'));
+}
+
+function init_input() {
+    input.$name = $('input[name=player-name]');
 }
