@@ -103,12 +103,18 @@ export class OwnGrid extends Grid {
         return this;
     }
 
-    show(callback) {
-        this._$table_wrapper.show(callback);
+    show(visible, stateful=true) {
+        if(visible)
+            this._$table_wrapper.show();
+        else
+            this._$table_wrapper.hide();
+
+        if(stateful)
+            this._slid_up = !visible;
     }
 
-    hide(callback) {
-        this._$table_wrapper.hide(callback);
+    show_from_state() {
+        this.show(!this._slid_up, false);
     }
 
     slideToggle(callback) {

@@ -35,7 +35,7 @@ function init_modal_handlers(socket) {
         () => {
             ui.grids.$container.fadeOut(() => {
                 battle.deactivate();
-                player_grid_instant_show();
+                ui.grids.player.show(true);
                 ui.grids.$container.fadeIn(() =>
                     ship_placement.activate()
                 );
@@ -233,7 +233,7 @@ function end_battle(socket) {
     go_to_lobby(socket,
         () => {
             battle.deactivate();
-            player_grid_instant_show();
+            ui.grids.player.show(true);
         },
         () => {
             ship_placement.activate();
@@ -264,13 +264,6 @@ function start_battle(socket, player_begins) {
     battle.activate(player_begins);
 }
 
-function player_grid_instant_show() {
-    if(ui.grids.player.slid_up) {
-        ui.grids.player.show(); // instant show here, so we have to
-        ui.grids.player.slid_up = false; // manually set the slid up state
-    }
-}
-
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
         ui.modals.error.open(
@@ -284,10 +277,8 @@ function register_abort_handler(socket, in_battle) {
 }
 
 $(window).resize(function() {
-    if(ui.grids.player.slid_up) {
-        if(adjacent_grid_mode())
-            ui.grids.player.show();
-        else
-            ui.grids.player.hide();
-    }
+    if(adjacent_grid_mode())
+        ui.grids.player.show(true, false);
+    else
+        ui.grids.player.show_from_state();
 });
