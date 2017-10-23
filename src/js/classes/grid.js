@@ -7,6 +7,7 @@ export class Grid {
         this._width = $rows.eq(0).find('td').length;
         this._height = $rows.length;
         this._coords_tile_mapping = this._init_mapping($rows);
+        this._highlight_state = false;
     }
 
     get width() {
@@ -23,6 +24,20 @@ export class Grid {
 
     get table() {
         return this._$table;
+    }
+
+    set highlight_state(new_state) {
+        this._highlight_state = new_state;
+    }
+
+    highlight_from_state() {
+        this.highlight(this._highlight_state, false);
+    }
+
+    highlight(active, stateful=true) {
+        this.table.css('box-shadow', active ? '0 0 0.8rem 0.4rem grey' : '');
+        if(stateful)
+            this.highlight_state = active;
     }
 
     coords_to_tile(coord_pair) {

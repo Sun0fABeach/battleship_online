@@ -41,8 +41,7 @@ export function deactivate() {
     clear_opponent_grid();
     clear_player_grid();
 
-    ui.text.opponent_name.bold(false);
-    ui.text.player_name.bold(false);
+    highlight_actor(null);
 }
 
 function clear_opponent_grid() {
@@ -61,10 +60,13 @@ function clear_player_grid() {
     .children().remove();
 }
 
+function set_crosshair(active) {
+    ui.grids.opponent.table.css('cursor', active ? 'crosshair' : '');
+}
+
 function let_player_shoot(first_shot=false) {
     set_crosshair(true);
-    ui.text.opponent_name.bold(true);
-    ui.text.player_name.bold(false);
+    highlight_actor('player');
 
     ui.grids.opponent.table.one('click', 'td:not(:has(i))', function() {
         ui.menu_buttons.give_up.clickable(false); // disable until shot result
@@ -108,8 +110,7 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
 }
 
 function let_opponent_shoot(first_shot=false) {
-    ui.text.opponent_name.bold(false);
-    ui.text.player_name.bold(true);
+    highlight_actor('opponent');
 
     socket.once('shot',
         (coord_pair, inform_result_cb) =>
@@ -228,6 +229,36 @@ function reveal_ship(ship_coords) {
         ui.grids.opponent.coords_to_tile(coord_pair).addClass('ship');
 }
 
-function set_crosshair(active) {
-    ui.grids.opponent.table.css('cursor', active ? 'crosshair' : '');
+function highlight_actor(actor) {
+    if(!actor) {
+        ui.text.opponent_name.bold(false);
+        ui.text.player_name.bold(false);
+        ui.grids.opponent.highlight(false);
+        ui.grids.player.highlight(false);
+        return;
+    }
+
+    const waiter = actor === 'player' ? 'opponent' : 'player';
+    ui.text[actor+'_name'].bold(true);
+    ui.text[waiter+'_name'].bold(false);
+
+    if(adjacent_grid_mode()) {
+        ui.grids[actor].highlight(false);
+        ui.grids[waiter].highlight(true);
+    } else { // even though we don't highlight, we keep state consistency:
+        ui.grids[actor].highlight_state = false;
+        ui.grids[waiter].highlight_state = true;
+    }
 }
+
+$(window).resize(function() {
+    if(battle_active) {
+        if(adjacent_grid_mode()) {
+            ui.grids.player.highlight_from_state();
+            ui.grids.opponent.highlight_from_state();
+        } else {
+            ui.grids.player.highlight(false, false);
+            ui.grids.opponent.highlight(false, false);
+        }
+    }
+});
