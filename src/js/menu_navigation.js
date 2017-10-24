@@ -13,9 +13,9 @@ function init_modal_handlers(socket) {
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
             animate_toggle_dual_grid(true);
-            ui.text.opponent_name.change(host_name);
+            ui.text.opponent_name.fade_swap(host_name);
             const msg = ui.msg.connected;
-            ui.text.game_msg.change(
+            ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
             swap_in_menu_buttons(['abort', 'ready']);
@@ -25,7 +25,7 @@ function init_modal_handlers(socket) {
             );
         },
         () => {
-            ui.text.game_msg.change(ui.msg.host_or_join);
+            ui.text.game_msg.fade_swap(ui.msg.host_or_join);
             swap_in_menu_buttons(['host', 'open_hosts']);
             swap_in_socket_handlers(socket, null);
         }
@@ -40,7 +40,7 @@ function init_modal_handlers(socket) {
                     ship_placement.activate()
                 );
             });
-            ui.text.game_msg.change(ui.msg.finish_placement);
+            ui.text.game_msg.fade_swap(ui.msg.finish_placement);
             swap_in_menu_buttons(['abort', 'ready']);
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
@@ -61,19 +61,19 @@ function init_menu_button_handlers(socket) {
                 if(success) {
                     ui.input.$name.fadeOut();
                     swap_in_menu_buttons(['host', 'open_hosts']);
-                    ui.text.player_name.change(player_name);
-                    ui.text.game_msg.change(ui.msg.host_or_join);
+                    ui.text.player_name.fade_swap(player_name);
+                    ui.text.game_msg.fade_swap(ui.msg.host_or_join);
                 } else {
                     ui.menu_buttons.enter.invalid();
                     ui.menu_buttons.enter.clickable(true);
-                    ui.text.game_msg.change(ui.msg.name_taken);
+                    ui.text.game_msg.fade_swap(ui.msg.name_taken);
                 }
             });
         } else {
             ui.input.$name.focus();
             ui.menu_buttons.enter.invalid();
             ui.input.$name.one('input', () => ui.menu_buttons.enter.normal());
-            ui.text.game_msg.change(ui.msg.name_enter);
+            ui.text.game_msg.fade_swap(ui.msg.name_enter);
         }
     });
 
@@ -86,7 +86,7 @@ function init_menu_button_handlers(socket) {
             if(success) {
                 animate_toggle_dual_grid(true);
                 swap_in_menu_buttons(['abort']);
-                ui.text.game_msg.change(ui.msg.wait_for_join);
+                ui.text.game_msg.fade_swap(ui.msg.wait_for_join);
             } else {
                 ui.menu_buttons.host.clickable(true);
                 ui.menu_buttons.open_hosts.clickable(true);
@@ -97,9 +97,9 @@ function init_menu_button_handlers(socket) {
         swap_in_socket_handlers(socket, () => {
         socket.on('opponent entered', (opponent_name) => {
             swap_in_menu_buttons(['abort', 'ready']);
-            ui.text.opponent_name.change(opponent_name);
+            ui.text.opponent_name.fade_swap(opponent_name);
             const msg = ui.msg.opponent_joined;
-            ui.text.game_msg.change(
+            ui.text.game_msg.fade_swap(
                 msg[0] + opponent_name + msg[1] + ' ' +
                 ui.msg.finish_placement
             );
@@ -113,7 +113,7 @@ function init_menu_button_handlers(socket) {
     ui.menu_buttons.open_hosts.click(() => {
         ui.modals.host_list.open();
         swap_in_menu_buttons(null);
-        ui.text.game_msg.change(ui.msg.choose_host);
+        ui.text.game_msg.fade_swap(ui.msg.choose_host);
     });
 
 
@@ -126,7 +126,7 @@ function init_menu_button_handlers(socket) {
     ui.menu_buttons.ready.click(() => {
         if(!ship_placement.is_valid()) {
             ui.menu_buttons.ready.invalid();
-            ui.text.game_msg.change(ui.msg.invalid_placement);
+            ui.text.game_msg.fade_swap(ui.msg.invalid_placement);
             return;
         }
 
@@ -139,7 +139,7 @@ function init_menu_button_handlers(socket) {
             } else {
                 swap_in_menu_buttons(['abort']);
                 const msg = ui.msg.placement_wait;
-                ui.text.game_msg.change(
+                ui.text.game_msg.fade_swap(
                     msg[0] + ui.text.opponent_name.text + msg[1]
                 );
 
@@ -222,8 +222,8 @@ function toggle_dual_grid(active) {
 }
 
 function go_to_lobby(socket, fadeout_cb, fadein_cb) {
-    ui.text.opponent_name.change('Opponent');
-    ui.text.game_msg.change(ui.msg.host_or_join);
+    ui.text.opponent_name.fade_swap('Opponent');
+    ui.text.game_msg.fade_swap(ui.msg.host_or_join);
     swap_in_menu_buttons(['host', 'open_hosts']);
     animate_toggle_dual_grid(false, fadeout_cb, fadein_cb);
     swap_in_socket_handlers(socket, null);
@@ -245,12 +245,12 @@ function start_battle(socket, player_begins) {
     swap_in_menu_buttons(['slide', 'give_up']);
 
     if(player_begins) {
-        ui.text.game_msg.change(
+        ui.text.game_msg.fade_swap(
             ui.msg.battle_start + ' ' + ui.msg.player_begins
         );
     } else {
         const msg = ui.msg.opponent_begins;
-        ui.text.game_msg.change(
+        ui.text.game_msg.fade_swap(
             ui.msg.battle_start + ' ' +
             msg[0] + ui.text.opponent_name.text + msg[1]
         );

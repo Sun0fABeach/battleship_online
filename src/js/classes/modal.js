@@ -240,7 +240,7 @@ export class GameOverModal extends Modal {
     open(victory) {
         const msg = victory ? 'You <strong>win</strong>! ' :
                                 'You have been <strong>defeated</strong>! ';
-        this._msg.change(msg + 'Do you want a regame?', false);
+        this._msg.set_text(msg + 'Do you want a regame?');
         this._$regame_yes.off().one('click', () => this._regame_yes_handler());
         this._$regame_no.off().one('click', () => this._regame_no_handler());
         this._$regame_abort.off().one('click', () => this._regame_no_handler());
@@ -288,11 +288,10 @@ export class GameOverModal extends Modal {
             this.close();
             this._yes_regame_cb();
         } else {
-            this._msg.change(
+            this._msg.set_text(
                 'Waiting for answer of <strong>' +
                 text.opponent_name.text +
-                '</strong> ...',
-                false
+                '</strong> ...'
             );
             this._$regame_yes.hide();
             this._$regame_no.hide();
@@ -307,10 +306,9 @@ export class GameOverModal extends Modal {
                 this.close();
                 this._yes_regame_cb();
             } else {
-                this._msg.change(
+                this._msg.set_text(
                     '<strong>' + text.opponent_name.text + '</strong> ' +
-                    " wants a regame!",
-                    false
+                    " wants a regame!"
                 );
                 this._opp_wants_regame = true;
             }
@@ -319,10 +317,9 @@ export class GameOverModal extends Modal {
 
     _register_opponent_abort_handler(socket) {
         socket.on('opponent aborted', () => {
-            this._msg.change(
+            this._msg.set_text(
                 '<strong>' + text.opponent_name.text + '</strong> ' +
-                "doesn't want a regame.",
-                false
+                "doesn't want a regame."
             );
             this._$regame_yes.hide();
             this._$regame_no.hide();

@@ -155,7 +155,7 @@ function display_sunk_ship_count(first_shot) {
     const msg = 'Score: <strong>' +
                 num_sunk + '/' + ship_count.total +
                 '</strong> ships';
-    ui.text.game_msg.change(msg, first_shot);
+    ui.text.game_msg.set_text(msg);
 }
 
 function display_shot(shot_data) {
