@@ -231,16 +231,12 @@ function reveal_ship(ship_coords) {
 
 function highlight_actor(actor) {
     if(!actor) {
-        ui.text.opponent_name.bold(false);
-        ui.text.player_name.bold(false);
         ui.grids.opponent.highlight(false);
         ui.grids.player.highlight(false);
         return;
     }
 
     const waiter = actor === 'player' ? 'opponent' : 'player';
-    ui.text[actor+'_name'].bold(true);
-    ui.text[waiter+'_name'].bold(false);
 
     if(adjacent_grid_mode()) {
         ui.grids[actor].highlight(false);

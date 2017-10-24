@@ -13,7 +13,7 @@ function init_modal_handlers(socket) {
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
             animate_toggle_dual_grid(true);
-            ui.text.opponent_name.fade_swap(host_name);
+            ui.text.opponent_name.fade_swap(host_name, true);
             const msg = ui.msg.connected;
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
@@ -61,7 +61,7 @@ function init_menu_button_handlers(socket) {
                 if(success) {
                     ui.input.$name.fadeOut();
                     swap_in_menu_buttons(['host', 'open_hosts']);
-                    ui.text.player_name.fade_swap(player_name);
+                    ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
                 } else {
                     ui.menu_buttons.enter.invalid();
@@ -97,7 +97,7 @@ function init_menu_button_handlers(socket) {
         swap_in_socket_handlers(socket, () => {
         socket.on('opponent entered', (opponent_name) => {
             swap_in_menu_buttons(['abort', 'ready']);
-            ui.text.opponent_name.fade_swap(opponent_name);
+            ui.text.opponent_name.fade_swap(opponent_name, true);
             const msg = ui.msg.opponent_joined;
             ui.text.game_msg.fade_swap(
                 msg[0] + opponent_name + msg[1] + ' ' +

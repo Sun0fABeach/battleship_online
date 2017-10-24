@@ -7,16 +7,15 @@ export default class Text {
         return this._$container.text();
     }
 
-    set_text(new_text, bold) {
+    set_text(new_text, make_bold=false) {
         this._$container.html(new_text);
-        if(bold)
-            this.bold();
+        this.bold(make_bold);
     }
 
-    fade_swap(new_text, bold) {
+    fade_swap(new_text, make_bold=false) {
         this._$container
         .fadeOut(() => {
-            this.set_text(new_text, bold);
+            this.set_text(new_text, make_bold);
         })
         .fadeIn();
 
