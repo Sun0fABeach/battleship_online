@@ -267,7 +267,8 @@ function start_battle(socket, player_begins) {
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
         ui.modals.error.open(
-            ui.text.opponent_name.text + ' has left the game.'
+            '<strong>' + ui.text.opponent_name.text +
+            '</strong> has left the game.'
         );
         if(in_battle)
             end_battle(socket);

@@ -26,7 +26,7 @@ export class ErrorModal extends Modal {
     }
 
     open(error_msg) {
-        this._$msg_container.html('<strong>'+error_msg+'</strong>');
+        this._$msg_container.html(error_msg);
         super._open();
     }
 }
