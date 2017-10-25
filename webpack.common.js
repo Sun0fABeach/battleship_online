@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 
 module.exports = {
@@ -50,14 +51,14 @@ module.exports = {
                 options: {
                     limit: 10000,
                     mimetype: 'application/font-woff',
-                    outputPath: 'assets/'
+                    outputPath: 'assets/fonts/'
                 }
             },
             {
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: 'file-loader',
                 options: {
-                    outputPath: 'assets/'
+                    outputPath: 'assets/fonts/'
                 }
             }
         ]
@@ -67,7 +68,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             inject: 'body',
-            // favicon: 'assets/favicon.png'
             // minify: {collapseWhitespace: true}
         }),
         // ensures vendor bundle hash doesn't change when app content changes
@@ -89,5 +89,39 @@ module.exports = {
             'window.$': 'jquery',
             Popper: ['popper.js', 'default'],
         }),
+
+        // see https://github.com/haydenbleasel/favicons#usage
+        new FaviconsWebpackPlugin({
+            logo: './src/assets/crosshair1.jpg',
+            // The prefix for all image files (might be a folder or a name)
+            prefix: 'assets/icons-[hash]/',
+            // Emit all stats of the generated icons
+            emitStats: false,
+            // The name of the json containing all favicon information
+            statsFilename: 'iconstats-[hash].json',
+            // Generate a cache file with control hashes and
+            // don't rebuild the favicons until those hashes change
+            persistentCache: true,
+            // Inject the html into the html-webpack-plugin
+            inject: true,
+            // favicon background color
+            background: '#fff',
+            // favicon app title
+            title: 'Battleship PvP',
+
+            // which icons should be generated
+            icons: {
+                android: true,
+                appleIcon: true,
+                appleStartup: true,
+                firefox: true,
+                windows: true,
+                favicons: true,
+                coast: false,
+                opengraph: false,
+                twitter: false,
+                yandex: false,
+            }
+        })
     ],
 };
