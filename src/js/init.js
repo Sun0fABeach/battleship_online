@@ -7,7 +7,8 @@ import io from 'socket.io-client';
 
 
 $(document).ready(function() {
-    const socket = io('http://localhost:3000');
+    // const socket = io('http://localhost:3000');
+    const socket = io();
 
     socket.on('connect', () => {
         swap_in_socket_handlers(socket);

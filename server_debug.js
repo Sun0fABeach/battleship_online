@@ -1,34 +1,4 @@
-const app = require('http').createServer(handler)
-const io = require('socket.io')(app);
-const fs = require('fs');
-const path = require('path');
-const url = require("url");
-
-function handler(req, res) {
-    const url_data = url.parse(req.url);
-    let requested_path = url_data.pathname;
-    if(requested_path === '/')
-        requested_path = 'index.html';
-    const full_path = path.join(process.cwd(), 'dist/', requested_path);
-
-    fs.readFile(full_path, function(err, data) {
-        if(err) {
-            if(err.code === 'ENOENT') {
-                res.writeHead(404, {'Content-Type': 'text/plain'});
-                res.end('404 Not Found');
-            } else {
-                res.writeHead(500, {'Content-Type': 'text/plain'});
-                res.end('Error loading ' + url_data.href);
-            }
-        } else {
-            res.writeHead(200);
-            res.end(data);
-        }
-    });
-}
-
-app.listen(8000);
-
+var io = require('socket.io')(3000);
 
 const state_rules = {
     'in lobby':              ['host', 'watch hosts', 'failure unpaired'],
