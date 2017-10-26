@@ -33,8 +33,9 @@ function init_modal_handlers(socket) {
 
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
+            battle.deactivate();
             ui.grids.$container.fadeOut(() => {
-                battle.deactivate();
+                battle.clear_grids();
                 ui.grids.player.show(true);
                 ui.grids.$container.fadeIn(() =>
                     ship_placement.activate()
@@ -230,9 +231,10 @@ function go_to_lobby(socket, fadeout_cb, fadein_cb) {
 }
 
 function end_battle(socket) {
+    battle.deactivate();
     go_to_lobby(socket,
         () => {
-            battle.deactivate();
+            battle.clear_grids();
             ui.grids.player.show(true);
         },
         () => {

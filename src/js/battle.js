@@ -37,10 +37,11 @@ export function activate(player_begins) {
 export function deactivate() {
     battle_active = false;
     set_crosshair(false);
+}
 
+export function clear_grids() {
     clear_opponent_grid();
     clear_player_grid();
-
     highlight_actor(null);
 }
 
@@ -171,13 +172,22 @@ function display_shot(shot_data, first_shot) {
                 ui.grids.player.slideDown(() => {
                     setTimeout(() => {
                         mark_shot(shot_data);
-                        setTimeout(() => ui.grids.player.slideUp(), 800);
+                        setTimeout(() => {
+                            // battle could be over after timeout due to
+                            // defeat or surrender
+                            if(battle_active)
+                                ui.grids.player.slideUp();
+                        }, 800);
                     }, 200);
                 });
             } else {
                 mark_shot(shot_data);
-                if(first_shot)
-                    setTimeout(() => ui.grids.player.slideUp(), 800);
+                if(first_shot) {
+                    setTimeout(() => {
+                        if(battle_active)
+                            ui.grids.player.slideUp();
+                    }, 800);
+                }
             }
         } else {
             /* corner case: player shot, slid grid down immediately afterwards,
