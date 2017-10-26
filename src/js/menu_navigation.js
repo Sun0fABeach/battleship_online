@@ -47,7 +47,7 @@ function init_modal_handlers(socket) {
                 register_abort_handler(socket, false)
             );
         },
-        () => end_battle(socket)
+        () => end_battle_back_to_lobby(socket)
     );
 }
 
@@ -157,7 +157,7 @@ function init_menu_button_handlers(socket) {
 
     ui.menu_buttons.give_up.click(() => {
         socket.emit('abort');
-        end_battle(socket);
+        end_battle_back_to_lobby(socket);
     });
 
 
@@ -230,7 +230,7 @@ function go_to_lobby(socket, fadeout_cb, fadein_cb) {
     swap_in_socket_handlers(socket, null);
 }
 
-function end_battle(socket) {
+function end_battle_back_to_lobby(socket) {
     battle.deactivate();
     go_to_lobby(socket,
         () => {
@@ -273,7 +273,7 @@ function register_abort_handler(socket, in_battle) {
             '</strong> has left the game.'
         );
         if(in_battle)
-            end_battle(socket);
+            end_battle_back_to_lobby(socket);
         else
             go_to_lobby(socket);
     });
