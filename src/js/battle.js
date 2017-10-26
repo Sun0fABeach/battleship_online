@@ -19,6 +19,9 @@ export function init(sock) {
 }
 
 export function activate(player_begins) {
+    if(battle_active)
+        return;
+
     battle_active = true;
     ship_count.total = ui.grids.player.num_ships;
     ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
@@ -35,6 +38,9 @@ export function activate(player_begins) {
 }
 
 export function deactivate() {
+    if(!battle_active)
+        return;
+
     battle_active = false;
     set_crosshair(false);
 }
