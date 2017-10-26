@@ -99,7 +99,7 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
         hit: shot_result.hit,
         ship_to_reveal: shot_result.sunken_ship,
         $tile: $tile
-    });
+    }, first_shot);
 
     if(shot_result.defeat) {
         game_over_handler(true);
@@ -132,7 +132,7 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
         grid: 'player',
         hit: shot_result.hit,
         $tile: $tile
-    });
+    }, first_shot);
 
     if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
         shot_result.defeat = true;
@@ -158,7 +158,7 @@ function display_sunk_ship_count(first_shot) {
     ui.text.game_msg.set_text(msg);
 }
 
-function display_shot(shot_data) {
+function display_shot(shot_data, first_shot) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
         /* notice how any shot reveal would end up with a slid up player grid
@@ -167,23 +167,25 @@ function display_shot(shot_data) {
         ui.grids.player.slid_up = true;
     } else {
         if(shot_data.grid === 'player') {
-            const mark_to = ui.grids.player.slid_up ? 200 : 0;
-            ui.grids.player.slideDown(() => {
-                setTimeout(() => {
-                    mark_shot(shot_data);
+            if(ui.grids.player.slid_up) {
+                ui.grids.player.slideDown(() => {
                     setTimeout(() => {
-                        // don't slide up when the shot defeated the player
-                        if(battle_active)
-                            ui.grids.player.slideUp();
-                    }, 800);
-                }, mark_to);
-            });
+                        mark_shot(shot_data);
+                        setTimeout(() => ui.grids.player.slideUp(), 800);
+                    }, 200);
+                });
+            } else {
+                mark_shot(shot_data);
+                if(first_shot)
+                    setTimeout(() => ui.grids.player.slideUp(), 800);
+            }
         } else {
+            /* corner case: player shot, slid grid down immediately afterwards,
+               then shot result arrives and needs to be displayed. to handle
+               this, we always slide up before displaying the shot. */
             const mark_to = ui.grids.player.slid_up ? 0 : 200;
             ui.grids.player.slideUp(() => {
-                setTimeout(() => {
-                    mark_shot(shot_data);
-                }, mark_to);
+                setTimeout(() => mark_shot(shot_data), mark_to);
             });
         }
     }
