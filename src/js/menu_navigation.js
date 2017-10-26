@@ -222,11 +222,14 @@ function toggle_dual_grid(active) {
         ui.grids.$both.removeClass('dual-view');
 }
 
-function go_to_lobby(socket, fadeout_cb, fadein_cb) {
+function go_to_lobby(socket, fadeout_cb) {
     ui.text.opponent_name.fade_swap('Opponent');
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
     swap_in_menu_buttons(['host', 'open_hosts']);
-    animate_toggle_dual_grid(false, fadeout_cb, fadein_cb);
+    animate_toggle_dual_grid(false, fadeout_cb, () => {
+        if(!ship_placement.is_active())
+            ship_placement.activate();
+    });
     swap_in_socket_handlers(socket, null);
 }
 
@@ -236,9 +239,6 @@ function end_battle_back_to_lobby(socket) {
         () => {
             battle.clear_grids();
             ui.grids.player.show(true);
-        },
-        () => {
-            ship_placement.activate();
         }
     );
 }

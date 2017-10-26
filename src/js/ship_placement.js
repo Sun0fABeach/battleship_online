@@ -21,14 +21,20 @@ const ships_as_coords = [
 let ships;
 let drag_init_tile_count;
 let z_index_val;
+let placement_active;
 
 
 export function init() {
     grids.player.tiles.droppable(drop_config);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
+    placement_active = false;
 }
 
 export function activate() {
+    if(placement_active)
+        return;
+
+    placement_active = true;
     drag_init_tile_count = 0;
     z_index_val = 0;
 
@@ -37,9 +43,17 @@ export function activate() {
 }
 
 export function deactivate() {
+    if(!placement_active)
+        return;
+
     ships.forEach(ship => ship.prepare_for_battle());
     grids.player.register_ships(ships);
     grids.player.table.siblings('.draggable').remove();
+    placement_active = false;
+}
+
+export function is_active() {
+    return placement_active;
 }
 
 export function is_valid() {
