@@ -100,13 +100,16 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
         hit: shot_result.hit,
         ship_to_reveal: shot_result.sunken_ship,
         $tile: $tile
-    }, first_shot);
+    });
 
     if(shot_result.defeat) {
         game_over_handler(true);
     } else {
         ui.menu_buttons.give_up.clickable(true); // re-enable
-        let_opponent_shoot();
+        if(shot_result.hit)
+            let_player_shoot();
+        else
+            let_opponent_shoot();
     }
 }
 
@@ -133,13 +136,16 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
         grid: 'player',
         hit: shot_result.hit,
         $tile: $tile
-    }, first_shot);
+    });
 
     if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
         shot_result.defeat = true;
         game_over_handler(false);
     } else {
-        let_player_shoot();
+        if(shot_result.hit)
+            let_opponent_shoot();
+        else
+            let_player_shoot();
     }
 
     inform_result_cb(shot_result);
@@ -159,36 +165,30 @@ function display_sunk_ship_count(first_shot) {
     ui.text.game_msg.set_text(msg);
 }
 
-function display_shot(shot_data, first_shot) {
+function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
-        /* notice how any shot reveal would end up with a slid up player grid
-           on small screens (else-block below). therefore, we set the slid_up
-           state manually here for state consistency. */
-        ui.grids.player.slid_up = true;
+        /* set the slid_up state manually here for state consistency. */
+        if(shot_data.grid === 'player')
+            ui.grids.player.slid_up = !shot_data.hit;
+        else
+            ui.grids.player.slid_up = true;
     } else {
         if(shot_data.grid === 'player') {
-            if(ui.grids.player.slid_up) {
-                ui.grids.player.slideDown(() => {
-                    setTimeout(() => {
-                        mark_shot(shot_data);
+            const mark_to = ui.grids.player.slid_up ? 200 : 0;
+            ui.grids.player.slideDown(() => {
+                setTimeout(() => {
+                    mark_shot(shot_data);
+                    if(!shot_data.hit) {
                         setTimeout(() => {
                             // battle could be over after timeout due to
                             // defeat or surrender
                             if(battle_active)
                                 ui.grids.player.slideUp();
                         }, 800);
-                    }, 200);
-                });
-            } else {
-                mark_shot(shot_data);
-                if(first_shot) {
-                    setTimeout(() => {
-                        if(battle_active)
-                            ui.grids.player.slideUp();
-                    }, 800);
-                }
-            }
+                    }
+                }, mark_to);
+            });
         } else {
             /* corner case: player shot, slid grid down immediately afterwards,
                then shot result arrives and needs to be displayed. to handle
