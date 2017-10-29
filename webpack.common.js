@@ -19,6 +19,12 @@ module.exports = {
             'socket.io-client'
         ],
     },
+    // prevent jquery from being bundled twice
+    resolve: {
+        alias: {
+            'jquery': __dirname + '/node_modules/jquery/',
+        },
+    },
     output: {
         path: path.resolve(__dirname, 'dist')
     },
