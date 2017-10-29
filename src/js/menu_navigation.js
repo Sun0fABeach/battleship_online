@@ -60,7 +60,12 @@ function init_menu_button_handlers(socket) {
 
             socket.emit('name register', player_name, (success) => {
                 if(success) {
-                    ui.input.$name.fadeOut();
+                    /* after fading out the name input, the vertical scrollbar
+                     * might disappear, giving the window more horizontal space.
+                     * since the grid will resize itself to occupy the newly won
+                     * space, we also have to readjust the draggables on top
+                     * of it, which can be done by triggering a resize event. */
+                    ui.input.$name.fadeOut(() => $(window).trigger('resize'));
                     swap_in_menu_buttons(['host', 'open_hosts']);
                     ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
