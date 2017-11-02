@@ -14,7 +14,7 @@
   "author": "Markus Appel",
   "license": "ISC",
   "devDependencies": {
-    "autoprefixer": "^7.1.4",
+    "autoprefixer": "^7.1.6",
     "clean-webpack-plugin": "^0.1.17",
     "css-loader": "^0.28.7",
     "favicons-webpack-plugin": "0.0.7",
@@ -23,24 +23,24 @@
     "html-webpack-plugin": "^2.30.1",
     "jshint": "^2.9.5",
     "jshint-loader": "^0.8.4",
-    "less": "^2.7.2",
+    "less": "^2.7.3",
     "node-sass": "^4.5.3",
-    "postcss-loader": "^2.0.6",
+    "postcss-loader": "^2.0.8",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
-    "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
+    "uglifyjs-webpack-plugin": "^1.0.1",
     "url-loader": "^0.5.9",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1",
-    "webpack-merge": "^4.1.0"
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4",
+    "webpack-merge": "^4.1.1"
   },
   "dependencies": {
-    "bootstrap": "^4.0.0-beta",
+    "bootstrap": "^4.0.0-beta.2",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
-    "popper.js": "^1.12.5",
-    "socket.io": "^2.0.3",
-    "socket.io-client": "^2.0.3",
+    "popper.js": "^1.12.6",
+    "socket.io": "^2.0.4",
+    "socket.io-client": "^2.0.4",
     "webpack-jquery-ui": "^1.0.0"
   }
 }
