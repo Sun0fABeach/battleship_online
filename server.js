@@ -34,7 +34,7 @@ if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
         });
     }
 
-    app.listen(8000);
+    app.listen(process.env.PORT || 8000);
 }
 
 
