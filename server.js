@@ -28,6 +28,14 @@ if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
                     res.end('Error loading ' + url_data.href);
                 }
             } else {
+                let ctype = '';
+                if(full_path.endsWith('.js'))
+                    ctype = 'application/javascript';
+                else if(full_path.endsWith('.html'))
+                    ctype = 'text/html';
+
+                if(ctype)
+                    res.setHeader('Content-Type', ctype + '; charset=UTF-8');
                 res.writeHead(200);
                 res.end(data);
             }
