@@ -7,7 +7,7 @@ module.exports = merge(common, {
     output: {
         filename: '[name].[chunkhash].js',
     },
-    devtool: 'source-map',
+    // devtool: 'source-map',
     module: {
         rules: [
             {
@@ -24,7 +24,7 @@ module.exports = merge(common, {
     },
     plugins: [
         new UglifyJSPlugin({
-            sourceMap: true
+            // sourceMap: true
         }),
         // tells some node libs that it's production time via env variable
         new webpack.DefinePlugin({
