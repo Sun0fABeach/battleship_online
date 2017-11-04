@@ -8,6 +8,20 @@ module.exports = merge(common, {
         filename: '[name].[chunkhash].js',
     },
     devtool: 'source-map',
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['env']
+                    }
+                }
+            }
+        ]
+    },
     plugins: [
         new UglifyJSPlugin({
             sourceMap: true
