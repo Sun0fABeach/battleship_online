@@ -175,7 +175,8 @@ function init_menu_button_handlers(socket) {
 function swap_in_menu_buttons(to_show) {
     let show_triggered = false;
 
-    for(const button of Object.values(ui.menu_buttons)) {
+    for(const btn_name of Object.keys(ui.menu_buttons)) {
+        const button = ui.menu_buttons[btn_name];
         if(button.is_visible()) {
             if(!show_triggered) {
                 button.hide(() => show_menu_buttons(to_show));
