@@ -18,15 +18,22 @@ function init_modal_handlers(socket) {
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            swap_in_menu_buttons('abort', 'ready');
-
+            ui.footer.fadeOut(() => {
+                ui.menu_buttons.abort.show();
+                ui.menu_buttons.ready.show();
+                ui.footer.fadeIn();
+            });
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
         },
         () => {
             ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-            swap_in_menu_buttons('host', 'open_hosts');
+            ui.footer.fadeOut(() => {
+                ui.menu_buttons.host.show();
+                ui.menu_buttons.open_hosts.show();
+                ui.footer.fadeIn();
+            });
             swap_in_socket_handlers(socket, null);
         }
     );
@@ -173,6 +180,9 @@ function init_menu_button_handlers(socket) {
 
 
 function swap_in_menu_buttons(...to_show) {
+    // fade out+in footer to have a smooth change of its vertical position
+    ui.footer.fadeOut(() => ui.footer.fadeIn());
+
     let show_triggered = false;
 
     for(const btn_name of Object.keys(ui.menu_buttons)) {

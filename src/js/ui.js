@@ -40,6 +40,7 @@ export const modals = {};
 export const menu_buttons = {};
 export const grids = {};
 export const input = {};
+export let footer;
 
 
 export function init(socket) {
@@ -48,6 +49,7 @@ export function init(socket) {
     init_menu_buttons();
     init_grids();
     init_input();
+    footer = $('footer');
 }
 
 
