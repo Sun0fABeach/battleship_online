@@ -18,7 +18,7 @@ function init_modal_handlers(socket) {
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            swap_in_menu_buttons(['abort', 'ready']);
+            swap_in_menu_buttons('abort', 'ready');
 
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
@@ -26,7 +26,7 @@ function init_modal_handlers(socket) {
         },
         () => {
             ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-            swap_in_menu_buttons(['host', 'open_hosts']);
+            swap_in_menu_buttons('host', 'open_hosts');
             swap_in_socket_handlers(socket, null);
         }
     );
@@ -42,7 +42,7 @@ function init_modal_handlers(socket) {
                 );
             });
             ui.text.game_msg.fade_swap(ui.msg.finish_placement);
-            swap_in_menu_buttons(['abort', 'ready']);
+            swap_in_menu_buttons('abort', 'ready');
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
@@ -66,7 +66,7 @@ function init_menu_button_handlers(socket) {
                      * space, we also have to readjust the draggables on top
                      * of it, which can be done by triggering a resize event. */
                     ui.input.$name.fadeOut(() => $(window).trigger('resize'));
-                    swap_in_menu_buttons(['host', 'open_hosts']);
+                    swap_in_menu_buttons('host', 'open_hosts');
                     ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
                 } else {
@@ -91,7 +91,7 @@ function init_menu_button_handlers(socket) {
         socket.emit('host', (success, fail_reason) => {
             if(success) {
                 animate_toggle_dual_grid(true);
-                swap_in_menu_buttons(['abort']);
+                swap_in_menu_buttons('abort');
                 ui.text.game_msg.fade_swap(ui.msg.wait_for_join);
             } else {
                 ui.menu_buttons.host.clickable(true);
@@ -102,7 +102,7 @@ function init_menu_button_handlers(socket) {
 
         swap_in_socket_handlers(socket, () => {
         socket.on('opponent entered', (opponent_name) => {
-            swap_in_menu_buttons(['abort', 'ready']);
+            swap_in_menu_buttons('abort', 'ready');
             ui.text.opponent_name.fade_swap(opponent_name, true);
             const msg = ui.msg.opponent_joined;
             ui.text.game_msg.fade_swap(
@@ -118,7 +118,7 @@ function init_menu_button_handlers(socket) {
 
     ui.menu_buttons.open_hosts.click(() => {
         ui.modals.host_list.open();
-        swap_in_menu_buttons(null);
+        swap_in_menu_buttons();
         ui.text.game_msg.fade_swap(ui.msg.choose_host);
     });
 
@@ -143,7 +143,7 @@ function init_menu_button_handlers(socket) {
             if(other_ready) {
                 start_battle(socket, false);
             } else {
-                swap_in_menu_buttons(['abort']);
+                swap_in_menu_buttons('abort');
                 const msg = ui.msg.placement_wait;
                 ui.text.game_msg.fade_swap(
                     msg[0] + ui.text.opponent_name.text + msg[1]
@@ -172,7 +172,7 @@ function init_menu_button_handlers(socket) {
 }
 
 
-function swap_in_menu_buttons(to_show) {
+function swap_in_menu_buttons(...to_show) {
     let show_triggered = false;
 
     for(const btn_name of Object.keys(ui.menu_buttons)) {
@@ -231,7 +231,7 @@ function toggle_dual_grid(active) {
 function go_to_lobby(socket, fadeout_cb) {
     ui.text.opponent_name.fade_swap('Opponent');
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-    swap_in_menu_buttons(['host', 'open_hosts']);
+    swap_in_menu_buttons('host', 'open_hosts');
     animate_toggle_dual_grid(false, fadeout_cb, () => {
         if(!ship_placement.is_active())
             ship_placement.activate();
@@ -250,7 +250,7 @@ function end_battle_back_to_lobby(socket) {
 }
 
 function start_battle(socket, player_begins) {
-    swap_in_menu_buttons(['slide', 'give_up']);
+    swap_in_menu_buttons('slide', 'give_up');
 
     if(player_begins) {
         ui.text.game_msg.fade_swap(
