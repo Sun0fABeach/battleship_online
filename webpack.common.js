@@ -3,6 +3,7 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
 module.exports = {
@@ -71,6 +72,7 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(['dist/*']),
+        new CopyWebpackPlugin([{from: 'src/robots.txt'}]),
         new HtmlWebpackPlugin({
             template: 'src/index.html',
             inject: 'body',

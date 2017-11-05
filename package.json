@@ -27,6 +27,7 @@
     "babel-preset-env": "^1.6.1",
     "bootstrap": "^4.0.0-beta.2",
     "clean-webpack-plugin": "^0.1.17",
+    "copy-webpack-plugin": "^4.2.0",
     "css-loader": "^0.28.7",
     "favicons-webpack-plugin": "0.0.7",
     "file-loader": "^0.11.2",
