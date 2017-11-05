@@ -1,11 +1,11 @@
 {
-  "name": "battleships_pvp",
+  "name": "battleship_online",
   "version": "1.0.0",
-  "description": "Browser based multiplayer battleships game",
+  "description": "Browser based multiplayer battleship game",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:Sun0fABeach/battleships_pvp.git"
+    "url": "git@bitbucket.org:Sun0fABeach/battleship_online.git"
   },
   "scripts": {
     "build": "webpack --config webpack.prod.js",
