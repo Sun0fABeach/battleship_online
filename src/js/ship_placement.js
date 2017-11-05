@@ -120,7 +120,7 @@ function draggable_mousedown_handler() {
             draw_grid();
             set_dragging_cursor(false);
         });
-    }, 100);
+    }, 65);
 }
 
 // spans the draggable in a way that works for dragging movements
