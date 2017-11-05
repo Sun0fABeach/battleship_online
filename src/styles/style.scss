@@ -26,3 +26,13 @@ input {
 label, button {
   font-weight: bold !important; // overwrite bootstrap
 }
+
+a {
+    color: inherit;
+    text-decoration: underline;
+
+    &:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+}
