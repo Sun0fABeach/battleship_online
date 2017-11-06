@@ -2,6 +2,11 @@ export function adjacent_grid_mode() {
     return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
 }
 
+export function trigger_resize() {
+    // delayed to give elements time to change before resize is triggered
+    setTimeout(() => $(window).trigger('resize'), 10);
+}
+
 export function swap_in_socket_handlers(socket, setter_cb) {
     socket.off();
 

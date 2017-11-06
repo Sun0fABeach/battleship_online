@@ -1,7 +1,11 @@
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
-import { adjacent_grid_mode, swap_in_socket_handlers } from './helpers';
+import {
+    adjacent_grid_mode,
+    swap_in_socket_handlers,
+    trigger_resize
+} from './helpers';
 
 
 export function init(socket) {
@@ -296,11 +300,6 @@ function register_abort_handler(socket, in_battle) {
         else
             go_to_lobby(socket);
     });
-}
-
-function trigger_resize() {
-    // delayed to give elements time to change before resize is triggered
-    setTimeout(() => $(window).trigger('resize'), 10);
 }
 
 $(window).resize(function() {
