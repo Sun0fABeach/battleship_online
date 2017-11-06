@@ -10,14 +10,6 @@ export function init(socket) {
 }
 
 function init_modal_handlers(socket) {
-    function host_list_close_update_ctrl_pane(...btns_to_show) {
-        ui.footer.fadeOut(() => {
-            for(const btn_name of btns_to_show)
-                ui.menu_buttons[btn_name].show();
-            ui.footer.fadeIn();
-            trigger_resize(); // required to adjust draggables
-        });
-    }
 
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
@@ -38,6 +30,15 @@ function init_modal_handlers(socket) {
             swap_in_socket_handlers(socket, null);
         }
     );
+
+    function host_list_close_update_ctrl_pane(...btns_to_show) {
+        ui.footer.fadeOut(() => {
+            for(const btn_name of btns_to_show)
+                ui.menu_buttons[btn_name].show();
+            ui.footer.fadeIn();
+            trigger_resize(); // required to adjust draggables
+        });
+    }
 
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
@@ -68,12 +69,7 @@ function init_menu_button_handlers(socket) {
 
             socket.emit('name register', player_name, (success) => {
                 if(success) {
-                    /* after fading out the name input, the vertical scrollbar
-                     * might disappear, giving the window more horizontal space.
-                     * since the grid will resize itself to occupy the newly won
-                     * space, we also have to readjust the draggables on top
-                     * of it, which can be done by triggering a resize event. */
-                    ui.input.$name.fadeOut(trigger_resize);
+                    ui.input.$name.fadeOut();
                     swap_in_menu_buttons('host', 'open_hosts');
                     ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
@@ -91,6 +87,17 @@ function init_menu_button_handlers(socket) {
         }
     });
 
+    function validate_player_name() {
+        if(get_player_name() === '') {
+            ui.input.$name.val('');
+            return false;
+        }
+        return true;
+    }
+
+    function get_player_name() {
+        return ui.input.$name.val().trim();
+    }
 
     ui.menu_buttons.host.click(() => {
         ui.menu_buttons.host.clickable(false);
@@ -201,25 +208,17 @@ function swap_in_menu_buttons(...to_show) {
     // if no button was there to hide, we still need to trigger this
     if(!show_triggered)
         show_menu_buttons(to_show);
-}
 
-function show_menu_buttons(buttons_to_show) {
-    if(buttons_to_show)
-        buttons_to_show.forEach(name => ui.menu_buttons[name].show());
-
-    trigger_resize(); // required to adjust draggables
-}
-
-function validate_player_name() {
-    if(get_player_name() === '') {
-        ui.input.$name.val('');
-        return false;
+    function show_menu_buttons(buttons_to_show) {
+        if(buttons_to_show)
+            buttons_to_show.forEach(name => ui.menu_buttons[name].show());
+        /* after swapping out the buttons, the vertical scrollbar
+         * might disappear, giving the window more horizontal space.
+         * since the grid will resize itself to occupy the newly won
+         * space, we also have to readjust the draggables on top
+         * of it, which can be done by triggering a resize event. */
+        trigger_resize();
     }
-    return true;
-}
-
-function get_player_name() {
-    return ui.input.$name.val().trim();
 }
 
 function animate_toggle_dual_grid(active, fadeout_cb, fadein_cb) {
@@ -232,14 +231,15 @@ function animate_toggle_dual_grid(active, fadeout_cb, fadein_cb) {
                 fadein_cb();
         });
     });
+
+    function toggle_dual_grid(active) {
+        if(active)
+            ui.grids.$both.addClass('dual-view');
+        else
+            ui.grids.$both.removeClass('dual-view');
+    }
 }
 
-function toggle_dual_grid(active) {
-    if(active)
-        ui.grids.$both.addClass('dual-view');
-    else
-        ui.grids.$both.removeClass('dual-view');
-}
 
 function go_to_lobby(socket, fadeout_cb) {
     ui.text.opponent_name.fade_swap('Opponent');
