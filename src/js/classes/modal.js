@@ -1,13 +1,12 @@
 import Text from './text';
 import { text } from '../ui';
-import { swap_in_socket_handlers, trigger_resize } from '../helpers';
+import { swap_in_socket_handlers } from '../helpers';
 
 
 class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
         this._cfg = config;
-        $modal.on('hidden.bs.modal', trigger_resize);
     }
 
     _open() {

@@ -3,8 +3,7 @@ import * as battle from './battle';
 import * as ui from './ui';
 import {
     adjacent_grid_mode,
-    swap_in_socket_handlers,
-    trigger_resize
+    swap_in_socket_handlers
 } from './helpers';
 
 
@@ -40,7 +39,6 @@ function init_modal_handlers(socket) {
             for(const btn_name of btns_to_show)
                 ui.menu_buttons[btn_name].show();
             ui.footer.fadeIn();
-            trigger_resize(); // required to adjust draggables
         });
     }
 
@@ -216,12 +214,6 @@ function swap_in_menu_buttons(...to_show) {
     function show_menu_buttons(buttons_to_show) {
         if(buttons_to_show)
             buttons_to_show.forEach(name => ui.menu_buttons[name].show());
-        /* after swapping out the buttons, the vertical scrollbar
-         * might disappear, giving the window more horizontal space.
-         * since the grid will resize itself to occupy the newly won
-         * space, we also have to readjust the draggables on top
-         * of it, which can be done by triggering a resize event. */
-        trigger_resize();
     }
 }
 
