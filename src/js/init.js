@@ -17,5 +17,8 @@ $(document).ready(function() {
         ship_placement.init();
         ship_placement.activate();
         battle.init(socket);
+
+        $('#loading-screen > h2').text('Done');
+        $('#loading-screen').slideUp(1500);
     });
 });
