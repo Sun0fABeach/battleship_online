@@ -10,6 +10,15 @@ export function init(socket) {
 }
 
 function init_modal_handlers(socket) {
+    function host_list_close_update_ctrl_pane(...btns_to_show) {
+        ui.footer.fadeOut(() => {
+            for(const btn_name of btns_to_show)
+                ui.menu_buttons[btn_name].show();
+            ui.footer.fadeIn();
+            trigger_resize(); // required to adjust draggables
+        });
+    }
+
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
             animate_toggle_dual_grid(true);
@@ -18,22 +27,14 @@ function init_modal_handlers(socket) {
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            ui.footer.fadeOut(() => {
-                ui.menu_buttons.abort.show();
-                ui.menu_buttons.ready.show();
-                ui.footer.fadeIn();
-            });
+            host_list_close_update_ctrl_pane('abort', 'ready');
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
         },
         () => {
             ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-            ui.footer.fadeOut(() => {
-                ui.menu_buttons.host.show();
-                ui.menu_buttons.open_hosts.show();
-                ui.footer.fadeIn();
-            });
+            host_list_close_update_ctrl_pane('host', 'open_hosts');
             swap_in_socket_handlers(socket, null);
         }
     );
@@ -72,7 +73,7 @@ function init_menu_button_handlers(socket) {
                      * since the grid will resize itself to occupy the newly won
                      * space, we also have to readjust the draggables on top
                      * of it, which can be done by triggering a resize event. */
-                    ui.input.$name.fadeOut(() => $(window).trigger('resize'));
+                    ui.input.$name.fadeOut(trigger_resize);
                     swap_in_menu_buttons('host', 'open_hosts');
                     ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
@@ -205,6 +206,8 @@ function swap_in_menu_buttons(...to_show) {
 function show_menu_buttons(buttons_to_show) {
     if(buttons_to_show)
         buttons_to_show.forEach(name => ui.menu_buttons[name].show());
+
+    trigger_resize(); // required to adjust draggables
 }
 
 function validate_player_name() {
@@ -293,6 +296,11 @@ function register_abort_handler(socket, in_battle) {
         else
             go_to_lobby(socket);
     });
+}
+
+function trigger_resize() {
+    // delayed to give elements time to change before resize is triggered
+    setTimeout(() => $(window).trigger('resize'), 10);
 }
 
 $(window).resize(function() {
