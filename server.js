@@ -58,9 +58,15 @@ const state_rules = {
     'requesting regame':     ['regame decision', 'failure regame']
 };
 
+let online_count = 0;
 const players = {};
 
 io.on('connection', socket => {
+    io.sockets.emit('player count', ++online_count);
+    socket.on('disconnect', () =>
+        io.sockets.emit('player count', --online_count)
+    );
+
     socket.on('name register', (player_name, callback) => {
         if(players[socket.id])
             return;
@@ -261,6 +267,7 @@ function set_failure_handlers(socket, handler_cb) {
             if(handler_cb)
                 handler_cb(player);
             delete players[socket.id];
+            io.sockets.emit('player count', --online_count);
         });
     }
 }
