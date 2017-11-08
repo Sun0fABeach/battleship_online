@@ -106,7 +106,7 @@ module.exports = {
             // favicon background color
             background: '#fff',
             // favicon app title
-            title: 'Battleship PvP',
+            title: 'Battleship Online',
 
             // which icons should be generated
             icons: {
