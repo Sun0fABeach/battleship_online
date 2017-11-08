@@ -13,9 +13,9 @@ module.exports = {
             'webpack-jquery-ui/draggable',
             'webpack-jquery-ui/droppable',
             'webpack-jquery-ui/shake-effect',
-            './src/vendor/jquery.ui.touch-punch.js',
-            './node_modules/bootstrap/scss/bootstrap.scss',
-            'bootstrap',
+            './src/vendor/jquery.ui.touch-punch',
+            './src/vendor/bootstrap/bootstrap',
+            './src/vendor/bootstrap/bootstrap.scss',
             'font-awesome-webpack!./src/config/font-awesome.config.js',
             'socket.io-client'
         ],
