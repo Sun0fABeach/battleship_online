@@ -20,5 +20,14 @@ $(document).ready(function() {
 
         $('#loading-screen > h2').text('Done');
         $('#loading-screen').slideUp(1500);
+
+        /* add dummy element containing font-awesome symbol to trigger font
+           download asynchronously (font needed for shot symbols later) */
+        $('<i>').addClass('fa fa-times').appendTo('body').css({
+            position: 'absolute',
+            top: 0,
+            visibility: 'hidden',
+            zIndex: -9999
+        });
     });
 });

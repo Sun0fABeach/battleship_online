@@ -53,16 +53,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 150000,
-                    mimetype: 'application/font-woff',
-                    outputPath: 'assets/fonts/'
-                }
-            },
-            {
-                test: /\.(ttf|eot|svg|woff)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.(ttf|eot|svg|woff(2)?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'assets/fonts/'
