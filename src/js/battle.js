@@ -78,7 +78,7 @@ function let_player_shoot(first_shot=false) {
     ui.grids.opponent.table.one('click', 'td:not(:has(i))', function() {
         ui.menu_buttons.give_up.clickable(false); // disable until shot result
         const $tile = $(this);                    // has been evaluated
-        const $shot_marker = $('<i>');
+        const $shot_marker = $('<i>').addClass('fa');
         $tile.append($shot_marker);
         set_shot_shadow($shot_marker, true, 'grey'); // shadow indicates fired
         set_crosshair(false);                        // shot with pending result
