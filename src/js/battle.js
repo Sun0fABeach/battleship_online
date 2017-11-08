@@ -78,7 +78,10 @@ function let_player_shoot(first_shot=false) {
     ui.grids.opponent.table.one('click', 'td:not(:has(i))', function() {
         ui.menu_buttons.give_up.clickable(false); // disable until shot result
         const $tile = $(this);                    // has been evaluated
-        set_crosshair(false);
+        const $shot_marker = $('<i>');
+        $tile.append($shot_marker);
+        set_shot_shadow($shot_marker, true, 'grey'); // shadow indicates fired
+        set_crosshair(false);                        // shot with pending result
 
         socket.emit(
             'shot',
@@ -91,6 +94,8 @@ function let_player_shoot(first_shot=false) {
 }
 
 function handle_player_shot_result(shot_result, $tile, first_shot) {
+    set_shot_shadow($tile.children('i'), false);
+
     if(!battle_active) // battle might have been aborted before result arrives
         return;        // (rare networking corner case)
 
@@ -209,8 +214,16 @@ function display_shot(shot_data) {
 
 function mark_shot(shot_data) {
     const marker_classes = shot_data.hit ? 'fa fa-times' : 'fa fa-bullseye';
-    const $marker = $('<i>').addClass(marker_classes);
-    shot_data.$tile.append($marker);
+    let $marker;
+
+    if(shot_data.grid === 'player') {
+        $marker = $('<i>').addClass(marker_classes);
+        shot_data.$tile.append($marker);
+    } else { // marker element already present from shot indication
+        $marker = shot_data.$tile.children('i');
+        $marker.addClass(marker_classes);
+    }
+
     const marker_color = $marker.css('color');
 
     $marker.animate(
@@ -237,10 +250,17 @@ const indicate_recent_shot = function() {
         if(prev_shot_marker[side])
             prev_shot_marker[side].css('box-shadow', '');
 
-        $marker.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
+        set_shot_shadow($marker, true, color);
         prev_shot_marker[side] = $marker;
     };
 }();
+
+function set_shot_shadow($element, active, color) {
+    if(active)
+        $element.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
+    else
+        $element.css('box-shadow', '');
+}
 
 function reveal_ship(ship_coords) {
     for(const coord_pair of ship_coords)
