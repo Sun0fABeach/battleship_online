@@ -199,7 +199,9 @@ function swap_in_menu_buttons(...to_show) {
         const button = ui.menu_buttons[btn_name];
         if(button.is_visible()) {
             if(!show_triggered) {
+                /* jshint ignore:start */
                 button.hide(() => show_menu_buttons(to_show));
+                /* jshint ignore:end */
                 show_triggered = true;
             } else {
                 button.hide();

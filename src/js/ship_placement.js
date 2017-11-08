@@ -236,7 +236,7 @@ function clear_grid() {
 function draw_ships(highlighted_ship) {
     for(const ship of ships) {
         const tiles = ship.coords.map(
-            coords => grids.player.coords_to_tile(coords)
+            coords => grids.player.coords_to_tile(coords) // jshint ignore:line
         );
         for(const $tile of tiles) {
             $tile.addClass($tile.hasClass('ship') ? 'overlap' : 'ship');
@@ -254,9 +254,11 @@ const surrounding_offsets = [
 function mark_forbidden() {
     for(const ship of ships) {
         for(const [ship_x, ship_y] of ship.coords) {
+            /* jshint ignore:start */
             const surrounding_coords = surrounding_offsets.map(
                 ([x_off, y_off]) => [ship_x + x_off, ship_y + y_off]
             );
+            /* jshint ignore:end */
             for(const adjacent of surrounding_coords) {
                 if(ship.has_coords(adjacent))
                     continue; // is part of this ship
