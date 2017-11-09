@@ -80,8 +80,8 @@ function let_player_shoot(first_shot=false) {
         const $tile = $(this);                    // has been evaluated
         const $shot_marker = $('<i>').addClass('fa');
         $tile.append($shot_marker);
-        set_shot_shadow($shot_marker, true, 'grey'); // shadow indicates fired
-        set_crosshair(false);                        // shot with pending result
+        set_shot_shadow($shot_marker, true, '#bfbfbf'); // indicate fired
+        set_crosshair(false);                         // shot w/ pending result
 
         socket.emit(
             'shot',
