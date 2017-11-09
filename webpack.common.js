@@ -65,9 +65,12 @@ module.exports = {
         new CleanWebpackPlugin(['dist/*']),
         new CopyWebpackPlugin([{from: 'src/robots.txt'}]),
         new HtmlWebpackPlugin({
-            template: 'src/index.html',
-            inject: 'body',
-            // minify: {collapseWhitespace: true}
+            template: './src/index.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'imprint.html',
+            template: './src/imprint.html',
+            inject: false
         }),
         // ensures vendor bundle hash doesn't change when app content changes
         // (to avoid unnecessary cache busting)
