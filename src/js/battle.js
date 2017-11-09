@@ -184,7 +184,7 @@ function display_shot(shot_data) {
         if(shot_data.grid === 'player')
             ui.grids.player.slid_up = !shot_data.hit;
         else
-            ui.grids.player.slid_up = true;
+            ui.grids.player.slid_up = shot_data.hit;
     } else {
         if(shot_data.grid === 'player') {
             const mark_to = ui.grids.player.slid_up ? 200 : 0;
@@ -202,13 +202,15 @@ function display_shot(shot_data) {
                 }, mark_to);
             });
         } else {
-            /* corner case: player shot, slid grid down immediately afterwards,
-               then shot result arrives and needs to be displayed. to handle
-               this, we always slide up before displaying the shot. */
+            /* corner case: immediately having shot, player slid grid down.
+               afterwards, the shot result arrives and needs to be displayed.
+               to handle this, we always slide up before displaying the shot. */
             const mark_to = ui.grids.player.slid_up ? 0 : 200;
             ui.grids.player.slideUp(() => {
                 setTimeout(() => mark_shot(shot_data), mark_to);
             });
+            if(!shot_data.hit)
+                setTimeout(() => ui.grids.player.slideDown(), 800);
         }
     }
 }
