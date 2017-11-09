@@ -42,7 +42,7 @@ export function deactivate() {
         return;
 
     battle_active = false;
-    set_crosshair(false);
+    set_grid_cursor(false);
 }
 
 export function clear_grids() {
@@ -67,12 +67,12 @@ function clear_player_grid() {
     .children().remove();
 }
 
-function set_crosshair(active) {
-    ui.grids.opponent.table.css('cursor', active ? 'crosshair' : '');
+function set_grid_cursor(active, type) {
+    ui.grids.opponent.table.css('cursor', active ? type : '');
 }
 
 function let_player_shoot(first_shot=false) {
-    set_crosshair(true);
+    set_grid_cursor(true, 'crosshair');
     highlight_actor('player');
 
     ui.grids.opponent.table.one('click', 'td:not(:has(i))', function() {
@@ -81,7 +81,7 @@ function let_player_shoot(first_shot=false) {
         const $shot_marker = $('<i>').addClass('fa');
         $tile.append($shot_marker);
         set_shot_shadow($shot_marker, true, '#bfbfbf'); // indicate fired
-        set_crosshair(false);                         // shot w/ pending result
+        set_grid_cursor(false);                        // shot w/ pending result
 
         socket.emit(
             'shot',
@@ -126,6 +126,7 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
 
 function let_opponent_shoot(first_shot=false) {
     highlight_actor('opponent');
+    set_grid_cursor(true, 'not-allowed');
 
     socket.once('shot',
         (coord_pair, inform_result_cb) =>
@@ -163,7 +164,7 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 }
 
 function game_over_handler(victory) {
-    battle_active = false;
+    deactivate();
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
     setTimeout(() => ui.modals.game_over.open(victory), 700);
 }
