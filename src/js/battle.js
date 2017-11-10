@@ -177,6 +177,8 @@ function display_sunk_ship_count(first_shot) {
     ui.text.game_msg.set_text(msg);
 }
 
+let pending_shots = 0;
+
 function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
@@ -187,10 +189,12 @@ function display_shot(shot_data) {
             ui.grids.player.slid_up = shot_data.hit;
     } else {
         if(shot_data.grid === 'player') {
-            const mark_to = ui.grids.player.slid_up ? 200 : 0;
+            const mark_to = ui.grids.player.slid_up || pending_shots ? 200 : 0;
+            ++pending_shots;
             ui.grids.player.slideDown(() => {
                 setTimeout(() => {
                     mark_shot(shot_data);
+                    --pending_shots;
                     if(!shot_data.hit) {
                         setTimeout(() => {
                             // battle could be over after timeout due to
