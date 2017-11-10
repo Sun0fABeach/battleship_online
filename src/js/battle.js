@@ -177,8 +177,6 @@ function display_sunk_ship_count(first_shot) {
     ui.text.game_msg.set_text(msg);
 }
 
-let pending_shots = 0;
-
 function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
@@ -188,34 +186,44 @@ function display_shot(shot_data) {
         else
             ui.grids.player.slid_up = shot_data.hit;
     } else {
-        if(shot_data.grid === 'player') {
-            const mark_to = ui.grids.player.slid_up || pending_shots ? 200 : 0;
-            ++pending_shots;
-            ui.grids.player.slideDown(() => {
-                setTimeout(() => {
-                    mark_shot(shot_data);
-                    --pending_shots;
-                    if(!shot_data.hit) {
-                        setTimeout(() => {
-                            // battle could be over after timeout due to
-                            // defeat or surrender
-                            if(battle_active)
-                                ui.grids.player.slideUp();
-                        }, 800);
-                    }
-                }, mark_to);
-            });
-        } else {
-            /* corner case: immediately having shot, player slid grid down.
-               afterwards, the shot result arrives and needs to be displayed.
-               to handle this, we always slide up before displaying the shot. */
-            const mark_to = ui.grids.player.slid_up ? 0 : 200;
-            ui.grids.player.slideUp(() => {
-                setTimeout(() => mark_shot(shot_data), mark_to);
-            });
-            if(!shot_data.hit)
-                setTimeout(() => ui.grids.player.slideDown(), 800);
-        }
+        display_shot_mobile(shot_data);
+    }
+}
+
+/* counter to register shots yet to be displayed due to sliding grid */
+let pending_shots = 0;
+
+function display_shot_mobile(shot_data) {
+    if(shot_data.grid === 'player') {
+        const mark_to = ui.grids.player.slid_up || pending_shots ? 200 : 0;
+        ++pending_shots;
+
+        ui.grids.player.slideDown(() => {
+            setTimeout(() => {
+                mark_shot(shot_data);
+                --pending_shots;
+                if(!shot_data.hit) {
+                    setTimeout(() => {
+                        // battle could be over after timeout due to
+                        // defeat or surrender
+                        if(battle_active)
+                            ui.grids.player.slideUp();
+                    }, 800);
+                }
+            }, mark_to);
+        });
+    } else {
+        /* corner case: immediately having shot, player slid grid down.
+           afterwards, the shot result arrives and needs to be displayed.
+           to handle this, we always slide up before displaying the shot. */
+        const mark_to = ui.grids.player.slid_up ? 0 : 200;
+        ui.grids.player.slideUp(() => {
+            setTimeout(() => {
+                mark_shot(shot_data);
+                if(!shot_data.hit)
+                    setTimeout(() => ui.grids.player.slideDown(), 800);
+            }, mark_to);
+        });
     }
 }
 
