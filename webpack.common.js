@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -64,14 +63,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(['dist/*']),
         new CopyWebpackPlugin([{from: 'src/robots.txt'}]),
-        new HtmlWebpackPlugin({
-            template: './src/index.html'
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'imprint.html',
-            template: './src/imprint.html',
-            inject: false
-        }),
+
         // ensures vendor bundle hash doesn't change when app content changes
         // (to avoid unnecessary cache busting)
         new webpack.HashedModuleIdsPlugin(),

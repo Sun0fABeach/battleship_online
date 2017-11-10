@@ -1,7 +1,9 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
+
 
 module.exports = merge(common, {
     output: {
@@ -23,6 +25,24 @@ module.exports = merge(common, {
         ]
     },
     plugins: [
+        new HtmlWebpackPlugin({
+            template: './src/index.html',
+            minify: {
+                collapseWhitespace: true,
+                minifyCSS: true,
+                removeComments: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'imprint.html',
+            template: './src/imprint.html',
+            inject: false,
+            minify: {
+                collapseWhitespace: true,
+                minifyCSS: true,
+                removeComments: true
+            }
+        }),
         new UglifyJSPlugin({
             // sourceMap: true
         }),
