@@ -1,6 +1,7 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Visualizer = require('webpack-visualizer-plugin');
 
 
 module.exports = merge(common, {
@@ -28,6 +29,7 @@ module.exports = merge(common, {
         ]
     },
     plugins: [
+        new Visualizer(),
         new HtmlWebpackPlugin({
             template: './src/index.html'
         }),
