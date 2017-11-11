@@ -228,7 +228,8 @@ export class GameOverModal extends Modal {
         this._socket = socket;
         this._yes_regame_cb = yes_regame_cb;
         this._no_regame_cb = no_regame_cb;
-        this._msg = new Text(this._$modal.find('p'));
+        this._heading = new Text(this._$modal.find('.modal-title'));
+        this._msg = new Text(this._$modal.find('.modal-body').children().eq(0));
         this._$regame_yes = $modal.find('button[name="regame-yes"]');
         this._$regame_no = $modal.find('button[name="regame-no"]');
         this._$regame_abort = $modal.find('button[name="regame-abort"]');
@@ -238,9 +239,9 @@ export class GameOverModal extends Modal {
     }
 
     open(victory) {
-        const msg = victory ? 'You <strong>win</strong>! ' :
-                                'You have been <strong>defeated</strong>! ';
-        this._msg.set_text(msg + 'Do you want a regame?');
+        this._heading.set_text(victory ? 'You <strong>win</strong>!' :
+                                'You have been <strong>defeated</strong>!');
+        this._msg.set_text('Do you want a regame?');
         this._$regame_yes.off().one('click', () => this._regame_yes_handler());
         this._$regame_no.off().one('click', () => this._regame_no_handler());
         this._$regame_abort.off().one('click', () => this._regame_no_handler());
