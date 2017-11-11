@@ -60,26 +60,9 @@ function init_text_handlers() {
 }
 
 function init_modals(socket) {
-    modals.host_list = new HostModal(
-        $('#host-modal'),
-        {
-            backdrop: 'static',
-            keyboard: false
-        },
-        socket
-    );
-    modals.game_over = new GameOverModal(
-        $('#game-over-modal'),
-        {
-            backdrop: 'static',
-            keyboard: false
-        },
-        socket
-    );
-    modals.error = new ErrorModal(
-        $('#error-modal'),
-        'show'
-    );
+    modals.host_list = new HostModal($('#host-modal'), socket);
+    modals.game_over = new GameOverModal($('#basic-interaction-modal'), socket);
+    modals.error = new ErrorModal($('#basic-interaction-modal'));
 }
 
 function init_menu_buttons() {

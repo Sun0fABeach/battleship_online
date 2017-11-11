@@ -10,7 +10,9 @@ class Modal {
     }
 
     _open() {
-        this._$modal.modal(this._cfg);
+        /* dispose previous config b/c underlying HTML modal element might be
+           reused. previous configs are not overwritten automatically. */
+        this._$modal.modal('dispose').modal(this._cfg);
     }
 
     _close() {
@@ -19,22 +21,151 @@ class Modal {
 }
 
 
-export class ErrorModal extends Modal {
+class BasicInteractionModal extends Modal {
     constructor($modal, config) {
         super($modal, config);
-        this._$msg_container = this._$modal.find('p');
+        this._$head_container = this._$modal.find('.modal-header');
+        this._heading = new Text(
+            this._$head_container.children('.modal-title')
+        );
+        this._msg = new Text(
+            this._$modal.find('.modal-body').children().eq(0)
+        );
+        this._$btn_left = $modal.find('button[name="left"]');
+        this._$btn_right = $modal.find('button[name="right"]');
+    }
+}
+
+
+export class ErrorModal extends BasicInteractionModal {
+    constructor($modal) {
+        super($modal, 'show');
     }
 
     open(error_msg) {
-        this._$msg_container.html(error_msg);
+        this._$head_container.hide();
+        this._msg.set_text(error_msg);
+        this._$btn_left.hide();
+        this._$btn_right
+        .off()
+        .one('click', () => this._close())
+        .text('OK')
+        .show();
+
         super._open();
     }
 }
 
 
+export class GameOverModal extends BasicInteractionModal {
+    constructor($modal, socket, yes_regame_cb, no_regame_cb) {
+        super($modal, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        this._socket = socket;
+        this._yes_regame_cb = yes_regame_cb;
+        this._no_regame_cb = no_regame_cb;
+        this._opp_wants_regame = false;
+        this._player_wants_regame = false;
+    }
+
+    open(victory) {
+        this._$head_container.show();
+        this._heading.set_text(victory ? 'You <strong>win</strong>!' :
+                                'You have been <strong>defeated</strong>!');
+        this._msg.set_text('Do you want a regame?');
+        this._$btn_left.off().one('click', () => this._regame_yes_handler());
+        this._$btn_right.off().one('click', () => this._regame_no_handler());
+        this._$btn_left.text('Yes').show();
+        this._$btn_right.text('No').show();
+        this._opp_wants_regame = false;
+        this._player_wants_regame = false;
+
+        swap_in_socket_handlers(this._socket, socket => {
+            this._register_opponent_regame_handler(socket);
+            this._register_opponent_abort_handler(socket);
+        });
+
+        super._open();
+    }
+
+    close() {
+        this._socket.off('wants regame');
+        super._close();
+    }
+
+    set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
+        this._yes_regame_cb = yes_regame_cb;
+        this._no_regame_cb = no_regame_cb;
+    }
+
+    _regame_no_handler() {
+        this._socket.emit('abort');
+        this.close();
+        this._no_regame_cb();
+    }
+
+    _regame_no_ok_handler() {
+        this.close();
+        this._no_regame_cb();
+    }
+
+    _regame_yes_handler() {
+        this._socket.emit('wants regame');
+
+        if(this._opp_wants_regame) {
+            this.close();
+            this._yes_regame_cb();
+        } else {
+            this._msg.set_text(
+                'Waiting for answer of <strong>' +
+                text.opponent_name.text +
+                '</strong> ...'
+            );
+            this._$btn_left.hide();
+            this._$btn_right.text('Abort');
+            this._player_wants_regame = true;
+        }
+    }
+
+    _register_opponent_regame_handler(socket) {
+        socket.on('wants regame', () => {
+            if(this._player_wants_regame) {
+                this.close();
+                this._yes_regame_cb();
+            } else {
+                this._msg.set_text(
+                    '<strong>' + text.opponent_name.text + '</strong> ' +
+                    " wants a regame!"
+                );
+                this._opp_wants_regame = true;
+            }
+        });
+    }
+
+    _register_opponent_abort_handler(socket) {
+        socket.on('opponent aborted', () => {
+            this._msg.set_text(
+                '<strong>' + text.opponent_name.text + '</strong> ' +
+                "doesn't want a regame."
+            );
+            this._$btn_left.hide();
+            this._$btn_right
+            .off()
+            .one('click', () => this._regame_no_ok_handler())
+            .text('OK');
+        });
+    }
+}
+
+
 export class HostModal extends Modal {
-    constructor($modal, config, socket, join_cb, close_cb) {
-        super($modal, config);
+    constructor($modal, socket, join_cb, close_cb) {
+        super($modal, {
+            backdrop: 'static',
+            keyboard: false
+        });
         this._socket = socket;
         this._join_cb = join_cb;
         this._close_cb = close_cb;
@@ -218,108 +349,5 @@ export class HostModal extends Modal {
 
     _hide_entry($entry) {
         $entry.removeClass('d-flex').addClass('d-none');
-    }
-}
-
-
-export class GameOverModal extends Modal {
-    constructor($modal, config, socket, yes_regame_cb, no_regame_cb) {
-        super($modal, config);
-        this._socket = socket;
-        this._yes_regame_cb = yes_regame_cb;
-        this._no_regame_cb = no_regame_cb;
-        this._heading = new Text(this._$modal.find('.modal-title'));
-        this._msg = new Text(this._$modal.find('.modal-body').children().eq(0));
-        this._$regame_yes = $modal.find('button[name="regame-yes"]');
-        this._$regame_abort = $modal.find('button[name="regame-abort"]');
-        this._opp_wants_regame = false;
-        this._player_wants_regame = false;
-    }
-
-    open(victory) {
-        this._heading.set_text(victory ? 'You <strong>win</strong>!' :
-                                'You have been <strong>defeated</strong>!');
-        this._msg.set_text('Do you want a regame?');
-        this._$regame_yes.off().one('click', () => this._regame_yes_handler());
-        this._$regame_abort.off().one('click', () => this._regame_no_handler());
-        this._$regame_yes.show();
-        this._$regame_abort.text('No').show();
-        this._opp_wants_regame = false;
-        this._player_wants_regame = false;
-
-        swap_in_socket_handlers(this._socket, socket => {
-            this._register_opponent_regame_handler(socket);
-            this._register_opponent_abort_handler(socket);
-        });
-
-        super._open();
-    }
-
-    close() {
-        this._socket.off('wants regame');
-        super._close();
-    }
-
-    set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
-        this._yes_regame_cb = yes_regame_cb;
-        this._no_regame_cb = no_regame_cb;
-    }
-
-    _regame_no_handler() {
-        this._socket.emit('abort');
-        this.close();
-        this._no_regame_cb();
-    }
-
-    _regame_no_ok_handler() {
-        this.close();
-        this._no_regame_cb();
-    }
-
-    _regame_yes_handler() {
-        this._socket.emit('wants regame');
-
-        if(this._opp_wants_regame) {
-            this.close();
-            this._yes_regame_cb();
-        } else {
-            this._msg.set_text(
-                'Waiting for answer of <strong>' +
-                text.opponent_name.text +
-                '</strong> ...'
-            );
-            this._$regame_yes.hide();
-            this._$regame_abort.text('Abort');
-            this._player_wants_regame = true;
-        }
-    }
-
-    _register_opponent_regame_handler(socket) {
-        socket.on('wants regame', () => {
-            if(this._player_wants_regame) {
-                this.close();
-                this._yes_regame_cb();
-            } else {
-                this._msg.set_text(
-                    '<strong>' + text.opponent_name.text + '</strong> ' +
-                    " wants a regame!"
-                );
-                this._opp_wants_regame = true;
-            }
-        });
-    }
-
-    _register_opponent_abort_handler(socket) {
-        socket.on('opponent aborted', () => {
-            this._msg.set_text(
-                '<strong>' + text.opponent_name.text + '</strong> ' +
-                "doesn't want a regame."
-            );
-            this._$regame_yes.hide();
-            this._$regame_abort
-            .off()
-            .one('click', () => this._regame_no_ok_handler())
-            .text('OK');
-        });
     }
 }
