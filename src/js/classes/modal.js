@@ -231,9 +231,7 @@ export class GameOverModal extends Modal {
         this._heading = new Text(this._$modal.find('.modal-title'));
         this._msg = new Text(this._$modal.find('.modal-body').children().eq(0));
         this._$regame_yes = $modal.find('button[name="regame-yes"]');
-        this._$regame_no = $modal.find('button[name="regame-no"]');
         this._$regame_abort = $modal.find('button[name="regame-abort"]');
-        this._$regame_ok = $modal.find('button[name="regame-ok"]');
         this._opp_wants_regame = false;
         this._player_wants_regame = false;
     }
@@ -243,13 +241,9 @@ export class GameOverModal extends Modal {
                                 'You have been <strong>defeated</strong>!');
         this._msg.set_text('Do you want a regame?');
         this._$regame_yes.off().one('click', () => this._regame_yes_handler());
-        this._$regame_no.off().one('click', () => this._regame_no_handler());
         this._$regame_abort.off().one('click', () => this._regame_no_handler());
-        this._$regame_ok.off().one('click', () => this._regame_no_ok_handler());
-        this._$regame_abort.hide();
-        this._$regame_ok.hide();
         this._$regame_yes.show();
-        this._$regame_no.show();
+        this._$regame_abort.text('No').show();
         this._opp_wants_regame = false;
         this._player_wants_regame = false;
 
@@ -295,8 +289,7 @@ export class GameOverModal extends Modal {
                 '</strong> ...'
             );
             this._$regame_yes.hide();
-            this._$regame_no.hide();
-            this._$regame_abort.show();
+            this._$regame_abort.text('Abort');
             this._player_wants_regame = true;
         }
     }
@@ -323,9 +316,10 @@ export class GameOverModal extends Modal {
                 "doesn't want a regame."
             );
             this._$regame_yes.hide();
-            this._$regame_no.hide();
-            this._$regame_abort.hide();
-            this._$regame_ok.show();
+            this._$regame_abort
+            .off()
+            .one('click', () => this._regame_no_ok_handler())
+            .text('OK');
         });
     }
 }
