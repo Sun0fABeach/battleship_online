@@ -42,6 +42,11 @@ function init_modal_handlers(socket) {
         });
     }
 
+    ui.modals.give_up.set_confirmation_handler(() => {
+        socket.emit('abort');
+        end_battle_back_to_lobby(socket);
+    });
+
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
             battle.deactivate();
@@ -176,16 +181,8 @@ function init_menu_button_handlers(socket) {
         });
     });
 
-
-    ui.menu_buttons.give_up.click(() => {
-        socket.emit('abort');
-        end_battle_back_to_lobby(socket);
-    });
-
-
-    ui.menu_buttons.slide.click(
-        () => ui.grids.player.slideToggle()
-    );
+    ui.menu_buttons.give_up.click(() => ui.modals.give_up.open());
+    ui.menu_buttons.slide.click(() => ui.grids.player.slideToggle());
 }
 
 
@@ -238,7 +235,6 @@ function animate_toggle_dual_grid(active, fadeout_cb, fadein_cb) {
     }
 }
 
-
 function go_to_lobby(socket, fadeout_cb) {
     ui.text.opponent_name.fade_swap('Opponent');
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
@@ -285,6 +281,13 @@ function start_battle(socket, player_begins) {
 
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
+        if(ui.modals.give_up.is_open())
+            ui.modals.give_up.close(abort_action);
+        else
+            abort_action();
+    });
+
+    function abort_action() {
         ui.modals.error.open(
             '<strong>' + ui.text.opponent_name.text +
             '</strong> has left the game.'
@@ -293,7 +296,7 @@ function register_abort_handler(socket, in_battle) {
             end_battle_back_to_lobby(socket);
         else
             go_to_lobby(socket);
-    });
+    }
 }
 
 $(window).resize(function() {

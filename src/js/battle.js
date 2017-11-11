@@ -164,9 +164,15 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 }
 
 function game_over_handler(victory) {
-    deactivate();
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
-    setTimeout(() => ui.modals.game_over.open(victory), 700);
+    if(ui.modals.give_up.is_open())
+        ui.modals.give_up.close(() => delayed_open(victory));
+    else
+        delayed_open(victory);
+
+    function delayed_open(victory) {
+        setTimeout(() => ui.modals.game_over.open(victory), 700);
+    }
 }
 
 function display_sunk_ship_count(first_shot) {

@@ -7,16 +7,23 @@ class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
         this._cfg = config;
+        this._open = false;
+    }
+
+    is_open() {
+        return this._open;
     }
 
     _open() {
         /* dispose previous config b/c underlying HTML modal element might be
            reused. previous configs are not overwritten automatically. */
         this._$modal.modal('dispose').modal(this._cfg);
+        this._open = true;
     }
 
     _close() {
         this._$modal.modal('hide');
+        this._open = false;
     }
 }
 
@@ -53,6 +60,51 @@ export class ErrorModal extends BasicInteractionModal {
         .show();
 
         super._open();
+    }
+}
+
+
+export class GiveUpModal extends BasicInteractionModal {
+    constructor($modal, socket, confirm_cb) {
+        super($modal, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        this._socket = socket;
+        this._confirm_cb = confirm_cb;
+    }
+
+    open() {
+        this._$head_container.hide();
+        this._msg.set_text('Do you really want to give up?');
+
+        this._$btn_left
+        .off()
+        .one('click', () => {
+            if(this._confirm_cb)
+                this._confirm_cb();
+            this.close();
+        })
+        .text('Yes')
+        .show();
+
+        this._$btn_right
+        .off()
+        .one('click', () => this.close())
+        .text('No')
+        .show();
+
+        super._open();
+    }
+
+    close(close_cb) {
+        if(close_cb)
+            this._$modal.one('hidden.bs.modal', () => close_cb());
+        super._close();
+    }
+
+    set_confirmation_handler(confirm_cb) {
+        this._confirm_cb = confirm_cb;
     }
 }
 
