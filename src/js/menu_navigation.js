@@ -121,7 +121,7 @@ function init_menu_button_handlers(socket) {
             } else {
                 ui.menu_buttons.host.clickable(true);
                 ui.menu_buttons.open_hosts.clickable(true);
-                ui.modals.error.open('Failed to host: ' + fail_reason);
+                ui.modals.ack.open('Failed to host: ' + fail_reason);
             }
         });
     });
@@ -316,7 +316,7 @@ function register_abort_handler(socket, in_battle) {
         const opp_name = '<strong>' + ui.text.opponent_name.text + '</strong> ';
 
         if(in_battle) {
-            ui.modals.error.open(opp_name + 'has left the game.');
+            ui.modals.ack.open(opp_name + 'has left the game.');
             end_battle_back_to_lobby(socket);
         } else if(player_is_host) {
             ui.text.opponent_name.fade_swap('Opponent');
@@ -329,7 +329,7 @@ function register_abort_handler(socket, in_battle) {
                 register_opponent_join_handler(socket)
             );
         } else {
-            ui.modals.error.open(opp_name + 'has closed the game.');
+            ui.modals.ack.open(opp_name + 'has closed the game.');
             go_to_lobby(socket);
         }
     }

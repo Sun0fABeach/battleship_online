@@ -44,14 +44,14 @@ class BasicInteractionModal extends Modal {
 }
 
 
-export class ErrorModal extends BasicInteractionModal {
+export class AcknowledgeModal extends BasicInteractionModal {
     constructor($modal) {
         super($modal, 'show');
     }
 
-    open(error_msg) {
+    open(msg) {
         this._$head_container.hide();
-        this._msg.set_text(error_msg);
+        this._msg.set_text(msg);
         this._$btn_left.hide();
         this._$btn_right
         .off()
