@@ -64,7 +64,7 @@ export class ErrorModal extends BasicInteractionModal {
 }
 
 
-export class GiveUpModal extends BasicInteractionModal {
+export class LeaveConfirmModal extends BasicInteractionModal {
     constructor($modal, socket, confirm_cb) {
         super($modal, {
             backdrop: 'static',
@@ -76,7 +76,6 @@ export class GiveUpModal extends BasicInteractionModal {
 
     open() {
         this._$head_container.hide();
-        this._msg.set_text('Do you really want to give up?');
 
         this._$btn_left
         .off()
@@ -103,8 +102,14 @@ export class GiveUpModal extends BasicInteractionModal {
         super._close();
     }
 
+    set_message(new_msg) {
+        this._msg.set_text(new_msg);
+        return this;
+    }
+
     set_confirmation_handler(confirm_cb) {
         this._confirm_cb = confirm_cb;
+        return this;
     }
 }
 

@@ -42,11 +42,6 @@ function init_modal_handlers(socket) {
         });
     }
 
-    ui.modals.give_up.set_confirmation_handler(() => {
-        socket.emit('abort');
-        end_battle_back_to_lobby(socket);
-    });
-
     ui.modals.game_over.set_regame_decision_handlers(
         () => {
             battle.deactivate();
@@ -145,12 +140,6 @@ function init_menu_button_handlers(socket) {
     });
 
 
-    ui.menu_buttons.abort.click(() => {
-        socket.emit('abort');
-        go_to_lobby(socket);
-    });
-
-
     ui.menu_buttons.ready.click(() => {
         if(!ship_placement.is_valid()) {
             ui.menu_buttons.ready.invalid();
@@ -181,7 +170,29 @@ function init_menu_button_handlers(socket) {
         });
     });
 
-    ui.menu_buttons.give_up.click(() => ui.modals.give_up.open());
+
+    ui.menu_buttons.abort.click(() => {
+        ui.modals.leave_confirm
+        .set_message('Do you really want to close the game?')
+        .set_confirmation_handler(() => {
+            socket.emit('abort');
+            go_to_lobby(socket);
+        })
+        .open();
+    });
+
+
+    ui.menu_buttons.give_up.click(() => {
+        ui.modals.leave_confirm
+        .set_message('Do you really want to give up?')
+        .set_confirmation_handler(() => {
+            socket.emit('abort');
+            end_battle_back_to_lobby(socket);
+        })
+        .open();
+    });
+
+
     ui.menu_buttons.slide.click(() => ui.grids.player.slideToggle());
 }
 
@@ -281,8 +292,8 @@ function start_battle(socket, player_begins) {
 
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
-        if(ui.modals.give_up.is_open())
-            ui.modals.give_up.close(abort_action);
+        if(ui.modals.leave_confirm.is_open())
+            ui.modals.leave_confirm.close(abort_action);
         else
             abort_action();
     });

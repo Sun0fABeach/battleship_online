@@ -22,6 +22,9 @@ export function activate(player_begins) {
     if(battle_active)
         return;
 
+    if(ui.modals.leave_confirm.is_open())
+        ui.modals.leave_confirm.close();
+
     battle_active = true;
     ship_count.total = ui.grids.player.num_ships;
     ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
@@ -165,8 +168,8 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 
 function game_over_handler(victory) {
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
-    if(ui.modals.give_up.is_open())
-        ui.modals.give_up.close(() => delayed_open(victory));
+    if(ui.modals.leave_confirm.is_open())
+        ui.modals.leave_confirm.close(() => delayed_open(victory));
     else
         delayed_open(victory);
 

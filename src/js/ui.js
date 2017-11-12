@@ -3,7 +3,7 @@ import MenuButton from './classes/menu_button';
 import Text from './classes/text';
 import {
     HostModal,
-    GiveUpModal,
+    LeaveConfirmModal,
     GameOverModal,
     ErrorModal
 } from './classes/modal';
@@ -68,7 +68,7 @@ function init_modals(socket) {
     modals.host_list = new HostModal($('#host-modal'), socket);
     modals.game_over = new GameOverModal($('#basic-interaction-modal'), socket);
     modals.error = new ErrorModal($('#basic-interaction-modal'));
-    modals.give_up = new GiveUpModal($('#basic-interaction-modal'));
+    modals.leave_confirm = new LeaveConfirmModal($('#basic-interaction-modal'));
 }
 
 function init_menu_buttons() {
