@@ -7,6 +7,9 @@ import {
 } from './helpers';
 
 
+let player_is_host;
+
+
 export function init(socket) {
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);
@@ -16,6 +19,7 @@ function init_modal_handlers(socket) {
 
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
+            player_is_host = false;
             animate_toggle_dual_grid(true);
             ui.text.opponent_name.fade_swap(host_name, true);
             const msg = ui.msg.connected;
@@ -107,29 +111,18 @@ function init_menu_button_handlers(socket) {
 
         socket.emit('host', (success, fail_reason) => {
             if(success) {
+                player_is_host = true;
                 animate_toggle_dual_grid(true);
                 swap_in_menu_buttons('abort');
                 ui.text.game_msg.fade_swap(ui.msg.wait_for_join);
+                swap_in_socket_handlers(socket, () =>
+                    register_opponent_join_handler(socket)
+                );
             } else {
                 ui.menu_buttons.host.clickable(true);
                 ui.menu_buttons.open_hosts.clickable(true);
                 ui.modals.error.open('Failed to host: ' + fail_reason);
             }
-        });
-
-        swap_in_socket_handlers(socket, () => {
-        socket.on('opponent entered', (opponent_name) => {
-            swap_in_menu_buttons('abort', 'ready');
-            ui.text.opponent_name.fade_swap(opponent_name, true);
-            const msg = ui.msg.opponent_joined;
-            ui.text.game_msg.fade_swap(
-                msg[0] + opponent_name + msg[1] + ' ' +
-                ui.msg.finish_placement
-            );
-            swap_in_socket_handlers(socket, () =>
-                register_abort_handler(socket, false)
-            );
-        });
         });
     });
 
@@ -172,8 +165,10 @@ function init_menu_button_handlers(socket) {
 
 
     ui.menu_buttons.abort.click(() => {
+        const msg = player_is_host ? 'Do you really want to close the game?' :
+                                        'Do you really want to leave?';
         ui.modals.leave_confirm
-        .set_message('Do you really want to close the game?')
+        .set_message(msg)
         .set_confirmation_handler(() => {
             socket.emit('abort');
             go_to_lobby(socket);
@@ -290,23 +285,53 @@ function start_battle(socket, player_begins) {
     battle.activate(player_begins);
 }
 
+function register_opponent_join_handler(socket) {
+    socket.on('opponent entered', (opponent_name) => {
+        swap_in_menu_buttons('abort', 'ready');
+        ui.text.opponent_name.fade_swap(opponent_name, true);
+        const msg = ui.msg.opponent_joined;
+        ui.text.game_msg.fade_swap(
+            msg[0] + opponent_name + msg[1] + ' ' +
+            ui.msg.finish_placement
+        );
+        swap_in_socket_handlers(socket, () =>
+            register_abort_handler(socket, false)
+        );
+    });
+}
+
 function register_abort_handler(socket, in_battle) {
     socket.on('opponent aborted', () => {
-        if(ui.modals.leave_confirm.is_open())
-            ui.modals.leave_confirm.close(abort_action);
+        /*
+            leave modal open if player is host and joiner leaves before battle
+            has started (less annoying for host, b/c he doesn't need to reopen)
+        */
+        if(ui.modals.leave_confirm.is_open() && (in_battle || !player_is_host))
+            ui.modals.leave_confirm.close(() => abort_action(socket));
         else
-            abort_action();
+            abort_action(socket);
     });
 
-    function abort_action() {
-        ui.modals.error.open(
-            '<strong>' + ui.text.opponent_name.text +
-            '</strong> has left the game.'
-        );
-        if(in_battle)
+    function abort_action(socket) {
+        const opp_name = '<strong>' + ui.text.opponent_name.text + '</strong> ';
+
+        if(in_battle) {
+            ui.modals.error.open(opp_name + 'has left the game.');
             end_battle_back_to_lobby(socket);
-        else
+        } else if(player_is_host) {
+            ui.text.opponent_name.fade_swap('Opponent');
+            ui.text.game_msg.fade_swap(
+                'Player ' + opp_name + 'has left the game. ' +
+                ui.msg.wait_for_join
+            );
+            swap_in_menu_buttons('abort');
+            swap_in_socket_handlers(socket, () =>
+                register_opponent_join_handler(socket)
+            );
+        } else {
+            ui.modals.error.open(opp_name + 'has closed the game.');
             go_to_lobby(socket);
+        }
     }
 }
 

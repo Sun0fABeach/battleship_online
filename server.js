@@ -141,7 +141,7 @@ const listener_registry = {
             }
 
             answer_cb(true);
-            player.pair_with(host);
+            player.join_game(host);
             transition_to_state(player, 'placing ships');
             transition_to_state(host, 'placing ships');
         });
@@ -175,7 +175,10 @@ const listener_registry = {
         });
 
         set_failure_handlers(socket, player => {
-            transition_to_state(player.opponent, 'in lobby');
+            if(player.is_host)
+                transition_to_state(player.opponent, 'in lobby');
+            else
+                transition_to_state(player.opponent, 'opened game');
             player.unpair();
         });
     },
@@ -186,7 +189,10 @@ const listener_registry = {
         set_abort_handler(socket);
 
         set_failure_handlers(socket, player => {
-            transition_to_state(player.opponent, 'in lobby');
+            if(player.is_host)
+                transition_to_state(player.opponent, 'in lobby');
+            else
+                transition_to_state(player.opponent, 'opened game');
             player.unpair();
         });
     },
@@ -250,13 +256,19 @@ const listener_registry = {
 function set_abort_handler(socket, paired=true) {
     socket.on('abort', () => {
         const player = players[socket.id];
-        transition_to_state(player, 'in lobby');
         if(paired) {
-            transition_to_state(player.opponent, 'in lobby');
+            const battle_states = [
+                'in battle', 'deciding on regame', 'wants regame'
+            ];
+            if(battle_states.includes(player.state) || player.is_host)
+                transition_to_state(player.opponent, 'in lobby');
+            else // if joiner aborts before battle: host stays in hosting state
+                transition_to_state(player.opponent, 'opened game');
             player.unpair();
         } else {
             player.close_open_game();
         }
+        transition_to_state(player, 'in lobby');
     });
 }
 
@@ -280,6 +292,7 @@ class Player {
         this._id = socket.id;
         this._opponent = null;
         this._state = null;
+        this._is_host = false;
     }
 
     get socket() {
@@ -296,6 +309,10 @@ class Player {
 
     get opponent() {
         return this._opponent;
+    }
+
+    get is_host() {
+        return this._is_host;
     }
 
     get state() {
@@ -319,14 +336,17 @@ class Player {
     }
 
     open_game() {
+        this._is_host = true;
         this.to_host_watchers('add host', {name: this.name, id: this._id});
     }
 
     close_open_game() {
+        this._is_host = false;
         this.to_host_watchers('remove host', this._id);
     }
 
-    pair_with(host) {
+    join_game(host) {
+        this._is_host = false;
         this._opponent = host;
         host._opponent = this;
 
@@ -336,6 +356,7 @@ class Player {
     }
 
     unpair() {
+        this._is_host = false;
         this._opponent.send('opponent aborted');
         this._opponent._opponent = null;
         this._opponent = null;
