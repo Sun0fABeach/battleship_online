@@ -1,3 +1,9 @@
+/**
+ * Initializes application via $(document).ready().
+ * @module init
+ */
+
+
 import * as menu_navigation from './menu_navigation';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';

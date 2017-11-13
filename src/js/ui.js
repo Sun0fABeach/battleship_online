@@ -1,3 +1,8 @@
+/**
+ * Provides access to objects representing UI elements.
+ * @module ui
+ */
+
 import { Grid, OwnGrid } from './classes/grid';
 import MenuButton from './classes/menu_button';
 import Text from './classes/text';
@@ -48,6 +53,11 @@ export const input = {};
 export let footer;
 
 
+/**
+ * Construct UI element objects to make them available as exported variables.
+ *
+ * @param {io.Socket} socket - Socket.io connection.
+ */
 export function init(socket) {
     init_text_handlers();
     init_modals(socket);

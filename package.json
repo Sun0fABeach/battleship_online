@@ -11,11 +11,13 @@
     "build": "webpack --config webpack.prod.js",
     "serve": "webpack-dev-server --open --config webpack.dev.js",
     "start": "node server.js",
+    "doc": "./node_modules/.bin/jsdoc -c jsdoc.json",
     "heroku-postbuild": "npm run build"
   },
   "author": "Markus Appel",
   "license": "ISC",
   "devDependencies": {
+    "jsdoc": "^3.5.5",
     "jshint": "^2.9.5",
     "jshint-loader": "^0.8.4",
     "webpack-dev-server": "^2.9.4",
