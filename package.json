@@ -22,10 +22,10 @@
     "webpack-visualizer-plugin": "^0.1.11"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.32",
+    "@babel/preset-env": "^7.0.0-beta.32",
     "autoprefixer": "^7.1.6",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
+    "babel-loader": "^8.0.0-beta.0",
     "bootstrap": "^4.0.0-beta.2",
     "clean-webpack-plugin": "^0.1.17",
     "copy-webpack-plugin": "^4.2.0",

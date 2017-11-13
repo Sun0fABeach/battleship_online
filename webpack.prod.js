@@ -18,7 +18,15 @@ module.exports = merge(common, {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['env']
+                        presets: [
+                            ['@babel/preset-env', {
+                                targets: {
+                                    browsers: [
+                                        'last 3 major versions', 'not ie > 0'
+                                    ]
+                                }
+                            }]
+                        ]
                     }
                 }
             }
