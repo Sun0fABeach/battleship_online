@@ -3,49 +3,20 @@ let io;
 
 if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
     io = require('socket.io')(3000);
-
 } else {
-    const fs = require('fs');
-    const path = require('path');
-    const url = require('url');
-    const app = require('http').createServer(handler)
-    io = require('socket.io')(app);
+    const express = require('express');
+    const app = express();
+    const server = require('http').Server(app);
+    const compression = require('compression');
+    io = require('socket.io')(server);
 
-    function handler(req, res) {
-        const url_data = url.parse(req.url);
-        let requested_path = url_data.pathname;
-        if(requested_path === '/')
-            requested_path = 'index.html';
-        const full_path = path.join(process.cwd(), 'dist/', requested_path);
+    app.use(
+        compression(),
+        express.static('dist/', {maxAge: '1y'})
+    );
 
-        fs.readFile(full_path, function(err, data) {
-            if(err) {
-                if(err.code === 'ENOENT') {
-                    res.writeHead(404, {'Content-Type': 'text/plain'});
-                    res.end('404 Not Found');
-                } else {
-                    res.writeHead(500, {'Content-Type': 'text/plain'});
-                    res.end('Error loading ' + url_data.href);
-                }
-            } else {
-                let ctype = '';
-                if(full_path.endsWith('.js'))
-                    ctype = 'application/javascript';
-                else if(full_path.endsWith('.html'))
-                    ctype = 'text/html';
-
-                if(ctype)
-                    res.setHeader('Content-Type', ctype + '; charset=UTF-8');
-                res.writeHead(200);
-                res.end(data);
-            }
-        });
-    }
-
-    app.listen(process.env.PORT || 8000);
+    server.listen(process.env.PORT || 8000);
 }
-
-
 
 
 const state_rules = {
