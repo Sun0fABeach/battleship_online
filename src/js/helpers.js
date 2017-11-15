@@ -1,12 +1,30 @@
+/** Module containing miscellaneous utility functions.
+    @module helpers */
+
+/**
+ * Return whether the grids are in adjacent position (medium to big screens).
+ *
+ * @returns {Boolean} true if grids are adjacent, false otherwise.
+ */
 export function adjacent_grid_mode() {
     return $(window).width() >= 768; // hard-coded bootstrap md-breakpoint
 }
 
+/**
+ * Trigger a window resize event.
+ */
 export function trigger_resize() {
     // delayed to give elements time to change before resize is triggered
     setTimeout(() => $(window).trigger('resize'), 10);
 }
 
+/**
+ * Delete all current socket handlers and register new ones.
+ *
+ * @param {io.Socket} socket -
+ *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+ * @param {Function} setter_cb - callback that registers event handlers.
+ */
 export function swap_in_socket_handlers(socket, setter_cb) {
     socket.off();
 

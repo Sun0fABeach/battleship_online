@@ -1,4 +1,14 @@
+/** Module containing the menu button class.
+    @module classes/menu_button */
+
+/** Class representing a DOM menu button (bottom of main view). */
 export default class MenuButton {
+    /**
+     * Create a MenuButton instance.
+     * @param {String} btn_name - Name of the button as defined via HTML name
+     *                              attribute
+     * @param {Function} action - Callback to trigger on button click
+     */
     constructor(btn_name, action) {
         this._$btn = $('#main-menu button[name="'+btn_name+'"]');
         this._register_click_cb(action);

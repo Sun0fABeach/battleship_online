@@ -1,4 +1,12 @@
+/** Module containing the Ship class.
+    @module classes/ship */
+
+/** Ship class. */
 export default class Ship {
+    /**
+     * Create a Ship instance.
+     * @param {Array} coords - the ship's coordinates.
+     */
     constructor(coords) {
         this._coords = coords;
         this._length = coords.length;

@@ -1,3 +1,8 @@
+/**
+ * Battle logic.
+ * @module battle
+ */
+
 import Ship from './classes/ship';
 import * as ui from './ui';
 import { adjacent_grid_mode } from './helpers';
@@ -12,12 +17,22 @@ const ship_count = {
     }
 };
 
-
+/**
+ * Initialize module.
+ *
+ * @param {io.Socket} socket -
+ *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+ */
 export function init(sock) {
     battle_active = false;
     socket = sock;
 }
 
+/**
+ * Activate battle.
+ *
+ * @param {Boolean} player_begins - whether the player takes the first shot.
+ */
 export function activate(player_begins) {
     if(battle_active)
         return;
@@ -40,6 +55,9 @@ export function activate(player_begins) {
     }
 }
 
+/**
+ * Deactivate battle.
+ */
 export function deactivate() {
     if(!battle_active)
         return;
@@ -48,6 +66,9 @@ export function deactivate() {
     set_grid_cursor(false);
 }
 
+/**
+ * Remove shot markers from both grids and revealed ships from opponent grid.
+ */
 export function clear_grids() {
     clear_opponent_grid();
     clear_player_grid();

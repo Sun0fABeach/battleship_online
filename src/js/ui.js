@@ -13,7 +13,7 @@ import {
     AcknowledgeModal
 } from './classes/modal';
 
-
+/** Game message strings (displayed below grids) */
 export const msg = {
     name_enter:
     'Please enter your <strong>name</strong>.',
@@ -44,19 +44,25 @@ export const msg = {
     ['<strong>', '</strong> takes the first shot.']
 };
 
-
+/** [Text]{@link module:classes/text} objects */
 export const text = {};
+/** [Modal]{@link module:classes/modal} objects */
 export const modals = {};
+/** [MenuButton]{@link module:classes/menu_button} objects */
 export const menu_buttons = {};
+/** [Grid]{@link module:classes/grid} objects */
 export const grids = {};
+/** [jQuery]{@link http://api.jquery.com/Types/#jQuery} text input objects */
 export const input = {};
+/** [jQuery]{@link http://api.jquery.com/Types/#jQuery} site footer object */
 export let footer;
 
 
 /**
  * Construct UI element objects to make them available as exported variables.
  *
- * @param {io.Socket} socket - Socket.io connection.
+ * @param {io.Socket} socket -
+ *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
  */
 export function init(socket) {
     init_text_handlers();

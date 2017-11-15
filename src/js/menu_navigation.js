@@ -1,3 +1,8 @@
+/**
+ * Menu navigation logic.
+ * @module menu_navigation
+ */
+
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
@@ -6,10 +11,15 @@ import {
     swap_in_socket_handlers
 } from './helpers';
 
-
+/** Whether the player is the host of a game. */
 let player_is_host;
 
-
+/**
+ * Initialize module.
+ *
+ * @param {io.Socket} socket -
+ *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+ */
 export function init(socket) {
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);

@@ -1,13 +1,13 @@
-/**
- * Contains definition of the Text class.
- * @module classes/text
- */
+/** Module containing the Text class.
+    @module classes/text */
 
 /** Class representing a modifiable DOM text element. */
 export default class Text {
     /**
      * Create a Text instance.
-     * @param {jQuery} $container - DOM text element to be represented.
+     * @param {jQuery} $container -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  DOM text element to be represented.
      */
     constructor($container) {
         this._$container = $container;

@@ -1,8 +1,15 @@
+/** Module containing modal class definitions.
+    @module classes/modal
+*/
+
 import Text from './text';
 import { text } from '../ui';
 import { swap_in_socket_handlers } from '../helpers';
 
 
+/** Class representing a Bootstrap modal.
+    @abstract
+*/
 class Modal {
     constructor($modal, config) {
         this._$modal = $modal;
@@ -27,7 +34,9 @@ class Modal {
     }
 }
 
-
+/** Modal that requires some sort of reaction by the user.
+    @abstract
+*/
 class BasicInteractionModal extends Modal {
     constructor($modal, config) {
         super($modal, config);
@@ -43,8 +52,14 @@ class BasicInteractionModal extends Modal {
     }
 }
 
-
+/** Modal that informs the user about something. */
 export class AcknowledgeModal extends BasicInteractionModal {
+    /**
+     * Create a AcknowledgeModal instance.
+     * @param {jQuery} $modal -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  Bootstrap modal element to be handled.
+     */
     constructor($modal) {
         super($modal, 'show');
     }
@@ -63,8 +78,17 @@ export class AcknowledgeModal extends BasicInteractionModal {
     }
 }
 
-
+/** Modal that asks the user if she really wants to leave. */
 export class LeaveConfirmModal extends BasicInteractionModal {
+    /**
+     * Create a LeaveConfirmModal instance.
+     * @param {jQuery} $modal -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  Bootstrap modal element to be handled.
+     * @param {io.Socket} socket -
+     *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+     * @param {Function} confirm_cb - action to perform when leaving game.
+     */
     constructor($modal, socket, confirm_cb) {
         super($modal, {
             backdrop: 'static',
@@ -113,8 +137,20 @@ export class LeaveConfirmModal extends BasicInteractionModal {
     }
 }
 
-
+/** Modal that asks the user for a regame. */
 export class GameOverModal extends BasicInteractionModal {
+    /**
+     * Create a GameOverModal instance.
+     * @param {jQuery} $modal -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  Bootstrap modal element to be handled.
+     * @param {io.Socket} socket -
+     *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+     * @param {Function} yes_regame_cb -
+     *  action to perform when player decides to have a regame.
+     * @param {Function} no_regame_cb -
+     *  action to perform when player doesn't want a regame.
+     */
     constructor($modal, socket, yes_regame_cb, no_regame_cb) {
         super($modal, {
             backdrop: 'static',
@@ -216,8 +252,20 @@ export class GameOverModal extends BasicInteractionModal {
     }
 }
 
-
+/** Modal that lists the current hosts and lets the user join them. */
 export class HostModal extends Modal {
+    /**
+     * Create a HostModal instance.
+     * @param {jQuery} $modal -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  Bootstrap modal element to be handled.
+     * @param {io.Socket} socket -
+     *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+     * @param {Function} join_cb -
+     *  action to perform when player joins a game.
+     * @param {Function} close_cb -
+     *  action to perform when player closes the modal.
+     */
     constructor($modal, socket, join_cb, close_cb) {
         super($modal, {
             backdrop: 'static',

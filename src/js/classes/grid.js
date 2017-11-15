@@ -1,4 +1,15 @@
+/** Module containing grid class definitions.
+    @module classes/grid
+*/
+
+/** Class representing a DOM game grid. */
 export class Grid {
+    /**
+     * Create a Grid instance.
+     * @param {jQuery} $container -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  DOM element containing the grid.
+     */
     constructor($container) {
         this._$table_wrapper = $container.find('.game-grid');
         this._$table = this._$table_wrapper.find('table');
@@ -63,9 +74,16 @@ export class Grid {
     }
 }
 
+/** Class representing the players DOM game grid, containing his fleet. */
 export class OwnGrid extends Grid {
-    constructor($table) {
-        super($table);
+    /**
+     * Create a OwnGrid instance.
+     * @param {jQuery} $container -
+     *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *  DOM element containing the grid.
+     */
+    constructor($container) {
+        super($container);
         this._ships = [];
         this._slid_up = false; // state saved to handle window resizing
     }

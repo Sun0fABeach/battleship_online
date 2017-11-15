@@ -1,3 +1,10 @@
+/**
+ * Ship placement logic, using jQuery UI
+ * [drag]{@link https://api.jqueryui.com/draggable/} &
+ * [drop]{@link https://api.jqueryui.com/droppable/}
+ * @module ship_placement
+ */
+
 import Ship from './classes/ship';
 import { grids } from './ui';
 
@@ -5,6 +12,7 @@ import { grids } from './ui';
 *   exact calculation of draggable size for styling?
 */
 
+/** Initial fleet placement */
 const ships_as_coords = [
     [[3, 5], [4, 5], [5, 5], [6, 5]],
     [[3, 1], [3, 2], [3, 3]],
@@ -18,18 +26,27 @@ const ships_as_coords = [
     [[0, 0]],
 ];
 
+/** Fleet as array of [ships]{@link module:classes/ship} */
 let ships;
-let drag_init_tile_count;
-let z_index_val;
+/** Whether ship placement is active */
 let placement_active;
+/** Used for dragging logic, initialized with ship length on drag start */
+let drag_init_tile_count;
+/** CSS z-index value for draggables */
+let z_index_val;
 
-
+/**
+ * Initialize module.
+ */
 export function init() {
     grids.player.tiles.droppable(drop_config);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
     placement_active = false;
 }
 
+/**
+ * Activate ship placement.
+ */
 export function activate() {
     if(placement_active)
         return;
@@ -42,6 +59,9 @@ export function activate() {
     draw_grid();
 }
 
+/**
+ * Deactivate ship placement.
+ */
 export function deactivate() {
     if(!placement_active)
         return;
@@ -52,10 +72,22 @@ export function deactivate() {
     placement_active = false;
 }
 
+/**
+ * Returns whether ship placment is active.
+ *
+ * @returns {Boolean} true if ship placmement is active, false otherwise
+ * @see #activate
+ * @see #deactivate
+ */
 export function is_active() {
     return placement_active;
 }
 
+/**
+ * Returns whether the current ship placment is valid.
+ *
+ * @returns {Boolean} true if ship placement is valid, false otherwise
+ */
 export function is_valid() {
     return grids.player.tiles.filter('.over, .forbidden').length === 0;
 }
