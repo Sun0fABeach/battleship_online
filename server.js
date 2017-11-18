@@ -323,7 +323,7 @@ class Player {
 
         host.send('opponent entered', this.name);
         this.stop_host_watching();
-        this.to_host_watchers('remove host', host.id);
+        this.to_host_watchers('remove host', host._id);
     }
 
     unpair() {
