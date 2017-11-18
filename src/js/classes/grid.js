@@ -59,6 +59,17 @@ export class Grid {
         return $tile.data('coords');
     }
 
+    coords_map() {
+        const map = [];
+        for(let y = 0; y < this.height; ++y) {
+            const row = [];
+            for(let x = 0; x < this.width; ++x)
+                row.push([x, y]);
+            map.push(row);
+        }
+        return map;
+    }
+
     _init_mapping($rows) {
         const mapping = {};
 

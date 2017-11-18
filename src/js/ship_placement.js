@@ -7,24 +7,15 @@
 
 import Ship from './classes/ship';
 import { grids } from './ui';
+import { chance_in_percent, array_choice } from './helpers';
 
 /* TODO:
 *   exact calculation of draggable size for styling?
 */
 
-/** Initial fleet placement */
-const ships_as_coords = [
-    [[3, 5], [4, 5], [5, 5], [6, 5]],
-    [[3, 1], [3, 2], [3, 3]],
-    [[7, 9], [8, 9], [9, 9]],
-    [[1, 8], [2, 8]],
-    [[6, 1], [7, 1]],
-    [[9, 5], [9, 6]],
-    [[7, 3]],
-    [[5, 7]],
-    [[0, 4]],
-    [[0, 0]],
-];
+/** Fleet configuration as array of ship sizes */
+const fleet_config = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
+fleet_config.sort().reverse(); // just in case config not sorted in desc order
 
 /** Fleet as array of [ships]{@link module:classes/ship} */
 let ships;
@@ -35,12 +26,22 @@ let drag_init_tile_count;
 /** CSS z-index value for draggables */
 let z_index_val;
 
+
 /**
  * Initialize module.
  */
 export function init() {
-    grids.player.tiles.droppable(drop_config);
+    const ships_as_coords = fleet_config.reduce((result, ship_size) => {
+        const coords = [];
+        for(let i = 0; i < ship_size; ++i)
+            coords.push([i, 0]);
+        result.push(coords);
+        return result;
+    }, []);
+
+    set_random_ship_coords(ships_as_coords);
     ships = ships_as_coords.map(ship_coords => new Ship(ship_coords));
+    grids.player.tiles.droppable(drop_config);
     placement_active = false;
 }
 
@@ -90,6 +91,123 @@ export function is_active() {
  */
 export function is_valid() {
     return grids.player.tiles.filter('.over, .forbidden').length === 0;
+}
+
+/**
+ * Calculate random ship placement and place ships in new configuration.
+ */
+export function randomize() {
+    const coords_of_ships = ships.map(ship => ship.coords);
+    set_random_ship_coords(coords_of_ships);
+    ships.forEach((ship, idx) => { ship.coords = coords_of_ships[idx]; });
+    adjust_draggables();
+    draw_grid();
+}
+
+/**
+ * Calculate random ship placement coordinates.
+ *
+ * @param {Array} coords_of_ships - Coordinates of each ship. They are
+ *                                  randomized in place.
+ */
+function set_random_ship_coords(coords_of_ships) {
+    const coords_map = grids.player.coords_map();
+
+    for(const ship_coords of coords_of_ships) {
+        const alignment = chance_in_percent(50) ? 'hor' : 'vert';
+        ship_coords[0] = array_choice(
+            get_placement_choices(coords_map, ship_coords.length, alignment)
+        );
+
+        if(ship_coords.length > 1) {
+            const [stable_axis, incr_axis] = alignment === 'hor' ? [1, 0] :
+                                                                   [0, 1];
+            const stable_coord = ship_coords[0][stable_axis];
+            let incr_coord = ship_coords[0][incr_axis];
+            for(let i = 1; i < ship_coords.length; ++i) {
+                ship_coords[i][stable_axis] = stable_coord;
+                ship_coords[i][incr_axis] = ++incr_coord;
+            }
+        }
+
+        for(const [ship_x, ship_y] of ship_coords) {
+            coords_map[ship_y][ship_x] = null;
+            /* jshint ignore:start */
+            surrounding_coords_do(ship_x, ship_y, (coord_pair, $tile) => {
+                coords_map[coord_pair[1]][coord_pair[0]] = null;
+            });
+            /* jshint ignore:end */
+        }
+
+        // let print_map = '';
+        // for(const row of coords_map) {
+        //     row.forEach(coord_pair => print_map += coord_pair ? '0' : '1');
+        //     print_map += '\n';
+        // }
+        // console.log(print_map);
+    }
+}
+
+/**
+ * Acquire all possible coordinate pairs that are placement options for the
+ * given ship. A placement option is supposed to be the first coordinate of the
+ * ship (leftmost for horizontal, topmost for vertical alignment).
+ *
+ * @param {Array} coords_map - 2D map containing the grid's coordinates.
+ * @param {Array} ship_length - Length of ship to be placed.
+ * @param {String} alignment - Alignment of ship (either 'hor' or 'vert').
+ * @returns {Array} Possible placement coordinates.
+ */
+function get_placement_choices(coords_map, ship_length, alignment) {
+    if(ship_length > 1) {
+        const slices = slice_map(coords_map, alignment).filter(
+            slice => slice.length >= ship_length
+        );
+        slices.forEach(slice => slice.splice(-(ship_length-1)));
+        return slices.reduce((result, slice) => result.concat(slice), []);
+    } else {
+        return coords_map.reduce((result, row) => result.concat(row), [])
+                         .filter(coord_pair => coord_pair !== null);
+    }
+}
+
+/**
+ * Acquire horizontal or vertical slices of the map that can be used to
+ * determine the placement options for a ship. Slices are delimited by the map
+ * borders and coordinates set to *null*.
+ *
+ * @param {Array} coords_map - 2D map containing the grid's coordinates.
+ * @param {String} alignment - Alignment of ship (either 'hor' or 'vert'). This
+ *                             determines the axis of the slices.
+ * @return {Array} 2D array containing the coordinate slices.
+ */
+function slice_map(coords_map, alignment) {
+    const access_map = alignment === 'hor' ?
+        (lane_i, slice_i) => coords_map[lane_i][slice_i] :
+        (lane_i, slice_i) => coords_map[slice_i][lane_i];
+
+    const slices = [];
+    for(let lane_i = 0; lane_i < coords_map.length; ++lane_i) {
+        let slice_i;
+        // move to first none-null position in the slice
+        for(slice_i = 0; slice_i < coords_map.length; ++slice_i)
+            if(access_map(lane_i, slice_i) !== null)
+                break;
+        // extract slice sections
+        let section = [];
+        for( ; slice_i < coords_map.length; ++slice_i) {
+            const coord_pair = access_map(lane_i, slice_i);
+            if(coord_pair !== null) {
+                section.push(coord_pair);
+            } else if(section.length > 0) {
+                slices.push(section);
+                section = [];
+            }
+        }
+        if(section.length > 0)
+            slices.push(section);
+    }
+    return slices;
 }
 
 
@@ -278,28 +396,44 @@ function draw_ships(highlighted_ship) {
     }
 }
 
+function mark_forbidden() {
+    for(const ship of ships) {
+        for(const [ship_x, ship_y] of ship.coords) {
+            /* jshint ignore:start */
+            surrounding_coords_do(ship_x, ship_y, (coord_pair, $tile) => {
+                if(ship.has_coords(coord_pair))
+                    return;
+                if($tile.hasClass('ship') && !$tile.hasClass('overlap'))
+                    $tile.addClass('forbidden');
+            });
+            /* jshint ignore:end */
+        }
+    }
+}
+
+/** Coordinate offsets usable to determine surrounding tiles.
+  * @see surrounding_coords_do
+  */
 const surrounding_offsets = [
     [-1, -1], [0, -1], [1, -1],
     [-1, 0],           [1, 0],
     [-1, 1],  [0, 1],  [1, 1]
 ];
-function mark_forbidden() {
-    for(const ship of ships) {
-        for(const [ship_x, ship_y] of ship.coords) {
-            /* jshint ignore:start */
-            const surrounding_coords = surrounding_offsets.map(
-                ([x_off, y_off]) => [ship_x + x_off, ship_y + y_off]
-            );
-            /* jshint ignore:end */
-            for(const adjacent of surrounding_coords) {
-                if(ship.has_coords(adjacent))
-                    continue; // is part of this ship
-                const $tile = grids.player.coords_to_tile(adjacent);
-                if(!$tile)
-                    continue; // is outside grid
-                if($tile.hasClass('ship') && !$tile.hasClass('overlap'))
-                    $tile.addClass('forbidden');
-            }
-        }
+
+/**
+ * For each coordinate surrounding the given coordinate, perform an action.
+ *
+ * @param {Number} x - x coordinate.
+ * @param {Number} y - y coordinate.
+ * @param {Function} action - Callback to call for each surrounding coordinate.
+ */
+function surrounding_coords_do(x, y, action) {
+    const surrounding_coords = surrounding_offsets.map(
+        ([x_off, y_off]) => [x + x_off, y + y_off]
+    );
+    for(const coord_pair of surrounding_coords) {
+        const $tile = grids.player.coords_to_tile(coord_pair);
+        if($tile) // exclude off-grid coords
+            action(coord_pair, $tile);
     }
 }

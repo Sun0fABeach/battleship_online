@@ -91,10 +91,11 @@ function init_menu_buttons() {
     menu_buttons.enter = new MenuButton('enter');
     menu_buttons.host = new MenuButton('host');
     menu_buttons.open_hosts = new MenuButton('open-hosts');
-    menu_buttons.abort = new MenuButton('abort');
+    menu_buttons.randomize = new MenuButton('randomize');
     menu_buttons.ready = new MenuButton('ready');
-    menu_buttons.give_up = new MenuButton('give-up');
+    menu_buttons.abort = new MenuButton('abort');
     menu_buttons.slide = new MenuButton('slide');
+    menu_buttons.give_up = new MenuButton('give-up');
 }
 
 function init_grids() {

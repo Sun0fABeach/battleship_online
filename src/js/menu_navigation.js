@@ -36,7 +36,7 @@ function init_modal_handlers(socket) {
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            host_list_close_update_ctrl_pane('abort', 'ready');
+            host_list_close_update_ctrl_pane('randomize', 'ready', 'abort');
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
@@ -67,7 +67,7 @@ function init_modal_handlers(socket) {
                 );
             });
             ui.text.game_msg.fade_swap(ui.msg.finish_placement);
-            swap_in_menu_buttons('abort', 'ready');
+            swap_in_menu_buttons('randomize', 'ready', 'abort');
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
@@ -142,6 +142,10 @@ function init_menu_button_handlers(socket) {
         ui.text.game_msg.fade_swap(ui.msg.choose_host);
     });
 
+
+    ui.menu_buttons.randomize.click(() => {
+        ship_placement.randomize();
+    });
 
     ui.menu_buttons.ready.click(() => {
         if(!ship_placement.is_valid()) {
@@ -297,7 +301,7 @@ function start_battle(socket, player_begins) {
 
 function register_opponent_join_handler(socket) {
     socket.on('opponent entered', (opponent_name) => {
-        swap_in_menu_buttons('abort', 'ready');
+        swap_in_menu_buttons('randomize', 'ready', 'abort');
         ui.text.opponent_name.fade_swap(opponent_name, true);
         const msg = ui.msg.opponent_joined;
         ui.text.game_msg.fade_swap(

@@ -47,3 +47,37 @@ function update_player_count(num_players) {
     const p = num_players === 1 ? ' player ' : ' players ';
     $('#player-count').text(num_players + p + 'online');
 }
+
+/**
+ * Generate a random integer in a specified range.
+ *
+ * @param {Number} min - Minimum value of the range (inclusive).
+ * @param {Number} max - Maximum value of the range (exclusive).
+ * @return {Number} Random whole number in specified range, or NaN if
+ *                  min >= max.
+ */
+export function random_in_range(min, max) {
+    if(min >= max)
+        return NaN;
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
+/**
+ * Select a random alement of an array.
+ *
+ * @param {Array} arr - Array to select a random element from.
+ * @return {any} A random element of the array, or undefined if it is empty.
+ */
+export function array_choice(arr) {
+    return arr[random_in_range(0, arr.length)];
+}
+
+/**
+ * Return whether a chance in percent succeeded.
+ *
+ * @param {Number} percent - Success chance in percent.
+ * @return {Boolean} True if chance succeeded, false otherwise.
+ */
+export function chance_in_percent(percent) {
+    return Math.random() < percent/100;
+}

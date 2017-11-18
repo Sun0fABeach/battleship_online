@@ -8,8 +8,12 @@ export default class Ship {
      * @param {Array} coords - the ship's coordinates.
      */
     constructor(coords) {
-        this._coords = coords;
-        this._length = coords.length;
+        this.coords = coords;
+    }
+
+    set coords(new_coords) {
+        this._coords = new_coords;
+        this._length = new_coords.length;
         this._alignment = this._calc_alignment();
     }
 
