@@ -146,10 +146,12 @@ const listener_registry = {
         });
 
         set_failure_handlers(socket, player => {
-            if(player.is_host)
+            if(player.is_host) {
                 transition_to_state(player.opponent, 'in lobby');
-            else
+            } else {
                 transition_to_state(player.opponent, 'opened game');
+                player.opponent.open_game();
+            }
             player.unpair();
         });
     },
@@ -160,10 +162,12 @@ const listener_registry = {
         set_abort_handler(socket);
 
         set_failure_handlers(socket, player => {
-            if(player.is_host)
+            if(player.is_host) {
                 transition_to_state(player.opponent, 'in lobby');
-            else
+            } else {
                 transition_to_state(player.opponent, 'opened game');
+                player.opponent.open_game();
+            }
             player.unpair();
         });
     },
@@ -231,10 +235,12 @@ function set_abort_handler(socket, paired=true) {
             const battle_states = [
                 'in battle', 'deciding on regame', 'wants regame'
             ];
-            if(battle_states.includes(player.state) || player.is_host)
+            if(battle_states.includes(player.state) || player.is_host) {
                 transition_to_state(player.opponent, 'in lobby');
-            else // if joiner aborts before battle: host stays in hosting state
+            } else { // if joiner aborts before battle: host keeps hosting
                 transition_to_state(player.opponent, 'opened game');
+                player.opponent.open_game();
+            }
             player.unpair();
         } else {
             player.close_open_game();
