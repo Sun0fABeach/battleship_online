@@ -7,7 +7,7 @@ import Ship from './classes/ship';
 import * as ui from './ui';
 import { adjacent_grid_mode } from './helpers';
 
-let socket;
+
 let battle_active;
 const ship_count = {
     total: 0,
@@ -19,21 +19,19 @@ const ship_count = {
 
 /**
  * Initialize module.
- *
- * @param {io.Socket} socket -
- *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
  */
-export function init(sock) {
+export function init() {
     battle_active = false;
-    socket = sock;
 }
 
 /**
  * Activate battle.
  *
+ * @param {Opponent} opponent - interface for interacting with the
+ *                              [opponent]{@link module:classes/opponent}
  * @param {Boolean} player_begins - whether the player takes the first shot.
  */
-export function activate(player_begins) {
+export function activate(opponent, player_begins) {
     if(battle_active)
         return;
 
@@ -49,9 +47,9 @@ export function activate(player_begins) {
             ui.grids.player.slid_up = true;    // for state consistency
         else
             ui.grids.player.slideUp();
-        let_player_shoot(true);
+        let_player_shoot(opponent, true);
     } else {
-        let_opponent_shoot(true);
+        let_opponent_shoot(opponent, true);
     }
 }
 
@@ -95,7 +93,7 @@ function set_grid_cursor(active, type) {
     ui.grids.opponent.table.css('cursor', active ? type : '');
 }
 
-function let_player_shoot(first_shot=false) {
+function let_player_shoot(opponent, first_shot=false) {
     set_grid_cursor(true, 'crosshair');
     highlight_actor('player');
 
@@ -107,17 +105,16 @@ function let_player_shoot(first_shot=false) {
         set_shot_shadow($shot_marker, true, '#bfbfbf'); // indicate fired
         set_grid_cursor(false);                        // shot w/ pending result
 
-        socket.emit(
-            'shot',
+        opponent.receive_shot(
             ui.grids.opponent.tile_to_coords($tile),
             (shot_result) => handle_player_shot_result(
-                shot_result, $tile, first_shot
+                opponent, shot_result, $tile, first_shot
             )
         );
     });
 }
 
-function handle_player_shot_result(shot_result, $tile, first_shot) {
+function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     set_shot_shadow($tile.children('i'), false);
 
     if(!battle_active) // battle might have been aborted before result arrives
@@ -138,27 +135,28 @@ function handle_player_shot_result(shot_result, $tile, first_shot) {
     });
 
     if(shot_result.defeat) {
-        game_over_handler(true);
+        game_over_handler(opponent, true);
     } else {
         ui.menu_buttons.give_up.clickable(true); // re-enable
         if(shot_result.hit)
-            let_player_shoot();
+            let_player_shoot(opponent);
         else
-            let_opponent_shoot();
+            let_opponent_shoot(opponent);
     }
 }
 
-function let_opponent_shoot(first_shot=false) {
+function let_opponent_shoot(opponent, first_shot=false) {
     highlight_actor('opponent');
     set_grid_cursor(true, 'not-allowed');
 
-    socket.once('shot',
-        (coord_pair, inform_result_cb) =>
-        handle_opponent_shot(coord_pair, inform_result_cb, first_shot)
+    opponent.let_shoot((coord_pair, inform_result_cb) =>
+        handle_opponent_shot(opponent, coord_pair, inform_result_cb, first_shot)
     );
 }
 
-function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
+function handle_opponent_shot(
+    opponent, coord_pair, inform_result_cb, first_shot
+) {
     if(!battle_active) // might have been aborted before shot arrived
         return;
     if(first_shot)
@@ -176,18 +174,18 @@ function handle_opponent_shot(coord_pair, inform_result_cb, first_shot) {
 
     if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
         shot_result.defeat = true;
-        game_over_handler(false);
+        game_over_handler(opponent, false);
     } else {
         if(shot_result.hit)
-            let_opponent_shoot();
+            let_opponent_shoot(opponent);
         else
-            let_player_shoot();
+            let_player_shoot(opponent);
     }
 
     inform_result_cb(shot_result);
 }
 
-function game_over_handler(victory) {
+function game_over_handler(opponent, victory) {
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
     if(ui.modals.leave_confirm.is_open())
         ui.modals.leave_confirm.close(() => delayed_open(victory));
@@ -195,7 +193,7 @@ function game_over_handler(victory) {
         delayed_open(victory);
 
     function delayed_open(victory) {
-        setTimeout(() => ui.modals.game_over.open(victory), 700);
+        setTimeout(() => ui.modals.game_over.open(opponent, victory), 700);
     }
 }
 

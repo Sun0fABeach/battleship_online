@@ -21,7 +21,7 @@ $(document).ready(function() {
         menu_navigation.init(socket);
         ship_placement.init();
         ship_placement.activate();
-        battle.init(socket);
+        battle.init();
 
         $('#loading-screen > h2').text('Done');
         $('#loading-screen').slideUp(1500);

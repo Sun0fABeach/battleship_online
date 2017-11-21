@@ -3,6 +3,7 @@
  * @module menu_navigation
  */
 
+import { Opponent } from './classes/opponent';
 import * as ship_placement from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
@@ -13,6 +14,9 @@ import {
 
 /** Whether the player is the host of a game. */
 let player_is_host;
+/** Interface for interacting with the opponent
+ *  @see {@link module:classes/opponent} */
+let opponent = null;
 
 /**
  * Initialize module.
@@ -29,6 +33,7 @@ function init_modal_handlers(socket) {
 
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
+            opponent = new Opponent(socket);
             player_is_host = false;
             animate_toggle_dual_grid(true);
             ui.text.opponent_name.fade_swap(host_name, true);
@@ -157,7 +162,7 @@ function init_menu_button_handlers(socket) {
         ship_placement.deactivate();
         ui.menu_buttons.ready.clickable(false);
 
-        socket.emit('ready', (other_ready) => {
+        opponent.tell_ready(other_ready => {
             if(other_ready) {
                 start_battle(socket, false);
             } else {
@@ -168,9 +173,9 @@ function init_menu_button_handlers(socket) {
                 );
 
                 swap_in_socket_handlers(socket, () => {
-                    socket.on('opponent ready', () => {
-                        start_battle(socket, true);
-                    });
+                    opponent.set_ready_handler(() =>
+                        start_battle(socket, true)
+                    );
                     register_abort_handler(socket, false);
                 });
             }
@@ -195,7 +200,7 @@ function init_menu_button_handlers(socket) {
         ui.modals.leave_confirm
         .set_message('Do you really want to give up?')
         .set_confirmation_handler(() => {
-            socket.emit('abort');
+            opponent.tell_abort();
             end_battle_back_to_lobby(socket);
         })
         .open();
@@ -256,6 +261,7 @@ function animate_toggle_dual_grid(active, fadeout_cb, fadein_cb) {
 }
 
 function go_to_lobby(socket, fadeout_cb) {
+    opponent = null;
     ui.text.opponent_name.fade_swap('Opponent');
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
     swap_in_menu_buttons('host', 'open_hosts');
@@ -296,11 +302,12 @@ function start_battle(socket, player_begins) {
     );
     // activate after swapping socket handlers so battle doesn't get its own
     // handlers overwritten
-    battle.activate(player_begins);
+    battle.activate(opponent, player_begins);
 }
 
 function register_opponent_join_handler(socket) {
     socket.on('opponent entered', (opponent_name) => {
+        opponent = new Opponent(socket);
         swap_in_menu_buttons('randomize', 'ready', 'abort');
         ui.text.opponent_name.fade_swap(opponent_name, true);
         const msg = ui.msg.opponent_joined;
@@ -315,7 +322,7 @@ function register_opponent_join_handler(socket) {
 }
 
 function register_abort_handler(socket, in_battle) {
-    socket.on('opponent aborted', () => {
+    opponent.set_abort_handler(() => {
         /*
             leave modal open if player is host and joiner leaves before battle
             has started (less annoying for host, b/c he doesn't need to reopen)
@@ -333,6 +340,7 @@ function register_abort_handler(socket, in_battle) {
             ui.modals.ack.open(opp_name + 'has left the game.');
             end_battle_back_to_lobby(socket);
         } else if(player_is_host) {
+            opponent = null;
             ui.text.opponent_name.fade_swap('Opponent');
             ui.text.game_msg.fade_swap(
                 'Player ' + opp_name + 'has left the game. ' +

@@ -85,16 +85,13 @@ export class LeaveConfirmModal extends BasicInteractionModal {
      * @param {jQuery} $modal -
      *  [jQuery]{@link http://api.jquery.com/Types/#jQuery}
      *  Bootstrap modal element to be handled.
-     * @param {io.Socket} socket -
-     *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
      * @param {Function} confirm_cb - action to perform when leaving game.
      */
-    constructor($modal, socket, confirm_cb) {
+    constructor($modal, confirm_cb) {
         super($modal, {
             backdrop: 'static',
             keyboard: false
         });
-        this._socket = socket;
         this._confirm_cb = confirm_cb;
     }
 
@@ -163,29 +160,28 @@ export class GameOverModal extends BasicInteractionModal {
         this._player_wants_regame = false;
     }
 
-    open(victory) {
+    open(opponent, victory) {
         this._$head_container.show();
         this._heading.set_text(victory ? 'You <strong>win</strong>!' :
                                 'You have been <strong>defeated</strong>!');
         this._msg.set_text('Do you want a regame?');
-        this._$btn_left.off().one('click', () => this._regame_yes_handler());
-        this._$btn_right.off().one('click', () => this._regame_no_handler());
+        this._$btn_left.off().one('click', () =>
+            this._regame_yes_handler(opponent)
+        );
+        this._$btn_right.off().one('click', () =>
+            this._regame_no_handler(opponent)
+        );
         this._$btn_left.text('Yes').show();
         this._$btn_right.text('No').show();
         this._opp_wants_regame = false;
         this._player_wants_regame = false;
 
-        swap_in_socket_handlers(this._socket, socket => {
-            this._register_opponent_regame_handler(socket);
-            this._register_opponent_abort_handler(socket);
+        swap_in_socket_handlers(this._socket, () => {
+            this._register_opponent_regame_handler(opponent);
+            this._register_opponent_abort_handler(opponent);
         });
 
         super._open();
-    }
-
-    close() {
-        this._socket.off('wants regame');
-        super._close();
     }
 
     set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
@@ -193,22 +189,22 @@ export class GameOverModal extends BasicInteractionModal {
         this._no_regame_cb = no_regame_cb;
     }
 
-    _regame_no_handler() {
-        this._socket.emit('abort');
-        this.close();
+    _regame_no_handler(opponent) {
+        opponent.tell_abort();
+        super._close();
         this._no_regame_cb();
     }
 
     _regame_no_ok_handler() {
-        this.close();
+        super._close();
         this._no_regame_cb();
     }
 
-    _regame_yes_handler() {
-        this._socket.emit('wants regame');
+    _regame_yes_handler(opponent) {
+        opponent.tell_regame();
 
         if(this._opp_wants_regame) {
-            this.close();
+            super._close();
             this._yes_regame_cb();
         } else {
             this._msg.set_text(
@@ -222,10 +218,10 @@ export class GameOverModal extends BasicInteractionModal {
         }
     }
 
-    _register_opponent_regame_handler(socket) {
-        socket.on('wants regame', () => {
+    _register_opponent_regame_handler(opponent) {
+        opponent.set_regame_handler(() => {
             if(this._player_wants_regame) {
-                this.close();
+                super._close();
                 this._yes_regame_cb();
             } else {
                 this._msg.set_text(
@@ -237,8 +233,8 @@ export class GameOverModal extends BasicInteractionModal {
         });
     }
 
-    _register_opponent_abort_handler(socket) {
-        socket.on('opponent aborted', () => {
+    _register_opponent_abort_handler(opponent) {
+        opponent.set_abort_handler(() => {
             this._msg.set_text(
                 '<strong>' + text.opponent_name.text + '</strong> ' +
                 "doesn't want a regame."
