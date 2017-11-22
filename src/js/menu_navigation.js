@@ -17,14 +17,19 @@ let player_is_host;
 /** Interface for interacting with the opponent
  *  @see {@link module:classes/opponent} */
 let opponent = null;
+/** [ship_placement]{@link module:ship_placement.DnDShipPlacement} object */
+let dnd_ship_placement;
 
 /**
  * Initialize module.
  *
+ * @param {Class} ship_placement - drag & drop
+ *  [ship_placement]{@link module:ship_placement.DnDShipPlacement} object
  * @param {io.Socket} socket -
- *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
+ *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection
  */
-export function init(socket) {
+export function init(ship_placement, socket) {
+    dnd_ship_placement = ship_placement;
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);
 }
@@ -68,7 +73,7 @@ function init_modal_handlers(socket) {
                 battle.clear_grids();
                 ui.grids.player.show(true);
                 ui.grids.$container.fadeIn(() =>
-                    ship_placement.activate()
+                    dnd_ship_placement.activate()
                 );
             });
             ui.text.game_msg.fade_swap(ui.msg.finish_placement);
@@ -149,17 +154,17 @@ function init_menu_button_handlers(socket) {
 
 
     ui.menu_buttons.randomize.click(() => {
-        ship_placement.randomize();
+        dnd_ship_placement.randomize();
     });
 
     ui.menu_buttons.ready.click(() => {
-        if(!ship_placement.is_valid()) {
+        if(!dnd_ship_placement.is_valid()) {
             ui.menu_buttons.ready.invalid();
             ui.text.game_msg.fade_swap(ui.msg.invalid_placement);
             return;
         }
 
-        ship_placement.deactivate();
+        dnd_ship_placement.deactivate();
         ui.menu_buttons.ready.clickable(false);
 
         opponent.tell_ready(other_ready => {
@@ -266,8 +271,8 @@ function go_to_lobby(socket, fadeout_cb) {
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
     swap_in_menu_buttons('host', 'open_hosts');
     animate_toggle_dual_grid(false, fadeout_cb, () => {
-        if(!ship_placement.is_active())
-            ship_placement.activate();
+        if(!dnd_ship_placement.is_active())
+            dnd_ship_placement.activate();
     });
     swap_in_socket_handlers(socket, null);
 }
