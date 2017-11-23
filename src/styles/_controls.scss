@@ -1,11 +1,6 @@
 #main-menu {
   > p:first-child {
     vertical-align: middle;
-    height: 2.8em; // fixed on small screens, so buttons below stay in place
-
-    @include media-breakpoint-up(md) {
-      height: auto;
-    }
   }
 
   input {
