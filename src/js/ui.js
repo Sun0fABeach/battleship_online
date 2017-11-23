@@ -23,7 +23,8 @@ export const msg = {
     'Choose a host.',
     host_or_join:
     'Choose <strong>Host</strong> to host a game, ' +
-    'or <strong>Join</strong> to join a hosted game.',
+    '<strong>Join</strong> to join a hosted game, ' +
+    'or <strong>vs AI</strong> to play against the Computer.',
     wait_for_join:
     'Waiting for an opponent to join ...',
     opponent_joined:
@@ -91,6 +92,7 @@ function init_menu_buttons() {
     menu_buttons.enter = new MenuButton('enter');
     menu_buttons.host = new MenuButton('host');
     menu_buttons.open_hosts = new MenuButton('open-hosts');
+    menu_buttons.vs_ai = new MenuButton('vs-ai');
     menu_buttons.randomize = new MenuButton('randomize');
     menu_buttons.ready = new MenuButton('ready');
     menu_buttons.abort = new MenuButton('abort');

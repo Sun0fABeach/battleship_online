@@ -53,7 +53,7 @@ function init_modal_handlers(socket) {
         },
         () => {
             ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-            host_list_close_update_ctrl_pane('host', 'open_hosts');
+            host_list_close_update_ctrl_pane('host', 'open_hosts', 'vs_ai');
             swap_in_socket_handlers(socket, null);
         }
     );
@@ -96,7 +96,7 @@ function init_menu_button_handlers(socket) {
             socket.emit('name register', player_name, (success) => {
                 if(success) {
                     ui.input.$name.fadeOut();
-                    swap_in_menu_buttons('host', 'open_hosts');
+                    swap_in_menu_buttons('host', 'open_hosts', 'vs_ai');
                     ui.text.player_name.fade_swap(player_name, true);
                     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
                 } else {
@@ -152,6 +152,9 @@ function init_menu_button_handlers(socket) {
         ui.text.game_msg.fade_swap(ui.msg.choose_host);
     });
 
+    ui.menu_buttons.vs_ai.click(() => {
+        // TODO
+    });
 
     ui.menu_buttons.randomize.click(() => {
         dnd_ship_placement.randomize();
@@ -269,7 +272,7 @@ function go_to_lobby(socket, fadeout_cb) {
     opponent = null;
     ui.text.opponent_name.fade_swap('Opponent');
     ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-    swap_in_menu_buttons('host', 'open_hosts');
+    swap_in_menu_buttons('host', 'open_hosts', 'vs_ai');
     animate_toggle_dual_grid(false, fadeout_cb, () => {
         if(!dnd_ship_placement.is_active())
             dnd_ship_placement.activate();
