@@ -73,6 +73,9 @@ export function clear_grids() {
     highlight_actor(null);
 }
 
+/**
+ * Remove shot markers and revealed ships from opponent grid.
+ */
 function clear_opponent_grid() {
     ui.grids.opponent
     .tiles
@@ -82,6 +85,9 @@ function clear_opponent_grid() {
     ui.grids.opponent.table.off('click');
 }
 
+/**
+ * Remove shot markers and from player grid and unregister ship objects.
+ */
 function clear_player_grid() {
     ui.grids.player
     .unregister_ships()
@@ -89,10 +95,25 @@ function clear_player_grid() {
     .children().remove();
 }
 
+/**
+ * Set/unset cursor style for the opponent grid.
+ *
+ * @param {Boolean} active - True if specific style is requested, false for
+ *                           default cursor
+ * @param {String} type - Cursor style to be applied. Can be left empty if
+ *                        *active* is set to false
+ */
 function set_grid_cursor(active, type) {
     ui.grids.opponent.table.css('cursor', active ? type : '');
 }
 
+/**
+ * Allow the player to take on shot at the opponent's grid.
+ *
+ * @param {Opponent} opponent -
+ *                      The [opponent]{@link module:classes/opponent.Opponent}
+ * @param {Boolean} first_shot - Whether it is the first shot the player takes
+ */
 function let_player_shoot(opponent, first_shot=false) {
     set_grid_cursor(true, 'crosshair');
     highlight_actor('player');
@@ -114,6 +135,17 @@ function let_player_shoot(opponent, first_shot=false) {
     });
 }
 
+/**
+ * Evaluate shot result, display it and decide how to continue.
+ *
+ * @param {Opponent} opponent -
+ *                      The [opponent]{@link module:classes/opponent.Opponent}
+ * @param {Object} shot_result - Information on the effect of shot
+ * @param {jQuery} $tile - Grid tile that has been clicked as
+ *                 [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ * @param {Boolean} first_shot - Whether is was the first shot the player took
+ *
+ */
 function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     set_shot_shadow($tile.children('i'), false);
 
@@ -145,6 +177,13 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     }
 }
 
+/**
+ * Allow the opponent to take on shot.
+ *
+ * @param {Opponent} opponent -
+ *                      The [opponent]{@link module:classes/opponent.Opponent}
+ * @param {Boolean} first_shot - Whether it is the first shot the opponent takes
+ */
 function let_opponent_shoot(opponent, first_shot=false) {
     highlight_actor('opponent');
     set_grid_cursor(true, 'not-allowed');
@@ -154,6 +193,18 @@ function let_opponent_shoot(opponent, first_shot=false) {
     );
 }
 
+/**
+ * Evaluate opponent's shot, display it, inform him about the results and
+ * decide how to continue.
+ *
+ * @param {Opponent} opponent -
+ *                      The [opponent]{@link module:classes/opponent.Opponent}
+ * @param {Array} coord_pair - Shot coordinates
+ * @param {Function} inform_result_cb - Callback that will inform the opponent
+ *                                      about the shot result
+ * @param {Boolean} first_shot - Whether is was the first shot the opponent took
+ *
+ */
 function handle_opponent_shot(
     opponent, coord_pair, inform_result_cb, first_shot
 ) {
@@ -185,6 +236,14 @@ function handle_opponent_shot(
     inform_result_cb(shot_result);
 }
 
+/**
+ * Evaluate opponent's shot, display it, inform him about the results and
+ * decide how to continue.
+ *
+ * @param {Opponent} opponent -
+ *                      The [opponent]{@link module:classes/opponent.Opponent}
+ * @param {Boolean} victory - Whether the player won the game
+ */
 function game_over_handler(opponent, victory) {
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
     if(ui.modals.leave_confirm.is_open())
@@ -197,6 +256,11 @@ function game_over_handler(opponent, victory) {
     }
 }
 
+/**
+ * Show how many ships the player sunk as the game message.
+ *
+ * @param {Boolean} first_shot - Whether it was the first shot taken.
+ */
 function display_sunk_ship_count(first_shot) {
     let num_sunk = ship_count.total - ship_count.intact.opponent;
     const msg = 'Score: <strong>' +
@@ -205,6 +269,11 @@ function display_sunk_ship_count(first_shot) {
     ui.text.game_msg.set_text(msg);
 }
 
+/**
+ * Mark a grid tile with a hit/miss shot result.
+ *
+ * @param {Object} shot_data - Information on the effect of shot
+ */
 function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
         mark_shot(shot_data);
@@ -221,6 +290,12 @@ function display_shot(shot_data) {
 /* counter to register shots yet to be displayed due to sliding grid */
 let pending_shots = 0;
 
+/**
+ * Mark a grid tile with a hit/miss shot result on mobile devices. This means
+ * sliding the player's grid up/down if necessary.
+ *
+ * @param {Object} shot_data - Information on the effect of shot
+ */
 function display_shot_mobile(shot_data) {
     if(shot_data.grid === 'player') {
         const mark_to = ui.grids.player.slid_up || pending_shots ? 200 : 0;
@@ -255,6 +330,11 @@ function display_shot_mobile(shot_data) {
     }
 }
 
+/**
+ * Put a shot marker on the associated tile.
+ *
+ * @param {Object} shot_data - Information on the effect of shot
+ */
 function mark_shot(shot_data) {
     const marker_classes = shot_data.hit ? 'fa fa-times' : 'fa fa-bullseye';
     let $marker;
@@ -283,6 +363,10 @@ function mark_shot(shot_data) {
     );
 }
 
+/**
+ * Mark the most recent shot the player or opponent took.
+ * @function
+ */
 const indicate_recent_shot = function() {
     const prev_shot_marker = {
         player: null,
@@ -298,6 +382,14 @@ const indicate_recent_shot = function() {
     };
 }();
 
+/**
+ * Add or remove a CSS shadow on a tile.
+ *
+ * @param {jQuery} $element - Grid tile that has received a shot as
+ *                 [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ * @param {Boolean} active - Whether to add or remove the shot shadow
+ * @param {Boolean} color - CSS color of the shadow
+ */
 function set_shot_shadow($element, active, color) {
     if(active)
         $element.css('box-shadow', '0 0 0.6rem 0.2rem ' + color + ' inset');
@@ -305,11 +397,22 @@ function set_shot_shadow($element, active, color) {
         $element.css('box-shadow', '');
 }
 
+/**
+ * Reveal a ship of the opponent b/c it was sunk.
+ *
+ * @param {Array} ship_coords - Coordinates of the ship.
+ */
 function reveal_ship(ship_coords) {
     for(const coord_pair of ship_coords)
         ui.grids.opponent.coords_to_tile(coord_pair).addClass('ship');
 }
 
+/**
+ * Highlight which player has to take a shot next.
+ *
+ * @param {String} actor - Which side to highlight (can be either 'player' or
+ *                         'opponent')
+ */
 function highlight_actor(actor) {
     if(!actor) {
         ui.grids.opponent.highlight(false);
@@ -328,6 +431,8 @@ function highlight_actor(actor) {
     }
 }
 
+// there is no highlighting on small devices, so make sure to dis/enable
+// highlighting on mobile/desktop devices and remember the highlighting state
 $(window).resize(function() {
     if(battle_active) {
         if(adjacent_grid_mode()) {
