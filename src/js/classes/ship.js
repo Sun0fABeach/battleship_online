@@ -59,12 +59,13 @@ export default class Ship {
     receive_shot(shot_coords) {
         let shot_hit = false;
 
-        this._intact.forEach((coord_pair, index) => {
+        this._intact.find((coord_pair, index) => {
             if(this._equal_coords(shot_coords, coord_pair)) {
                 this._intact.splice(index, 1);
                 shot_hit = true;
-                return; // TODO does return even work? rather use find?
+                return true;
             }
+            return false;
         });
 
         return {

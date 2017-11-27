@@ -194,7 +194,7 @@ export class DnDShipPlacement extends ShipPlacement {
 
         super();
 
-        DnDShipPlacement.instance = this; // TODO: test singleton pattern
+        DnDShipPlacement.instance = this;
 
         /** Whether ship placement is active
             @private */
