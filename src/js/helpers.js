@@ -1,6 +1,8 @@
 /** Module containing miscellaneous utility functions.
     @module helpers */
 
+import { error_screen, update_player_count } from './ui';
+
 /**
  * Return whether the grids are in adjacent position (medium to big screens).
  *
@@ -37,15 +39,15 @@ export function swap_in_socket_handlers(socket, setter_cb) {
         setter_cb(socket);
 }
 
-function error_screen(error) {
-    $('body').empty().append(
-        $('<h1>').text(error).css('text-align', 'center')
-    );
-}
-
-function update_player_count(num_players) {
-    const p = num_players === 1 ? ' player ' : ' players ';
-    $('#player-count').text(num_players + p + 'online');
+/**
+ * Return whether the given coordinate pairs are equal.
+ *
+ * @param {Array} a - coordinate pair
+ * @param {Array} b - coordinate pair
+ * @return {Boolean} True if coordinate pairs are equal, false otherwise.
+ */
+export function equal_coords(a, b) {
+    return a[0] === b[0] && a[1] === b[1];
 }
 
 /**

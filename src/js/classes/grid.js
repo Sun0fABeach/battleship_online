@@ -70,6 +70,28 @@ export class Grid {
         return map;
     }
 
+    /**
+     * For each coordinate surrounding the given coordinate, perform an action.
+     *
+     * @param {Number} x - x coordinate.
+     * @param {Number} y - y coordinate.
+     * @param {Array} adjacent_offsets - list of coordinate pairs determining
+     *                for which of the adjacent coordinates the action should
+     *                be performed.
+     * @param {Function} action - Callback to call for each surrounding
+     *                            coordinate.
+     */
+    surrounding_coords_do(x, y, adjacent_offsets, action) {
+        const adjacent_coords = adjacent_offsets.map(
+            ([x_off, y_off]) => [x + x_off, y + y_off]
+        );
+        for(const coord_pair of adjacent_coords) {
+            const $tile = this.coords_to_tile(coord_pair);
+            if($tile) // exclude off-grid coords
+                action(coord_pair, $tile);
+        }
+    }
+
     _init_mapping($rows) {
         const mapping = {};
 

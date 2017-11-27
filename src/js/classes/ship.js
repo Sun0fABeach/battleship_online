@@ -1,6 +1,9 @@
 /** Module containing the Ship class.
     @module classes/ship */
 
+import { equal_coords } from '../helpers';
+
+
 /** Ship class. */
 export default class Ship {
     /**
@@ -39,7 +42,7 @@ export default class Ship {
 
     remove_coords(to_remove) {
         this.coords.forEach((coord_pair, index) => {
-            if(this._equal_coords(coord_pair, to_remove)) {
+            if(equal_coords(coord_pair, to_remove)) {
                 this.coords.splice(index, 1);
                 return;
             }
@@ -48,7 +51,7 @@ export default class Ship {
 
     has_coords(searched) {
         return this.coords.some(
-            coord_pair => this._equal_coords(coord_pair, searched)
+            coord_pair => equal_coords(coord_pair, searched)
         );
     }
 
@@ -60,7 +63,7 @@ export default class Ship {
         let shot_hit = false;
 
         this._intact.find((coord_pair, index) => {
-            if(this._equal_coords(shot_coords, coord_pair)) {
+            if(equal_coords(shot_coords, coord_pair)) {
                 this._intact.splice(index, 1);
                 shot_hit = true;
                 return true;
@@ -142,9 +145,5 @@ export default class Ship {
         if(this.length === 1)
             return 'x';
         return this.coords[0][0] === this.coords[1][0] ? 'y' : 'x';
-    }
-
-    _equal_coords(a, b) {
-        return a[0] === b[0] && a[1] === b[1];
     }
 }

@@ -9,18 +9,14 @@ import Ship from './ship';
 import { grids } from '../ui';
 import { chance_in_percent, array_choice } from '../helpers';
 
-/* TODO:
-*   exact calculation of draggable size for styling?
-*/
+// TODO: exact calculation of draggable size for styling?
 
 /** Fleet configuration as array of ship sizes */
 // const fleet_config = [2]; // for debugging
 const fleet_config = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
 fleet_config.sort().reverse(); // just in case config not sorted in desc order
 
-/** Coordinate offsets usable to determine surrounding tiles.
-  * @see surrounding_coords_do
-  */
+/** Coordinate offsets usable to determine surrounding tiles. */
 const surrounding_offsets = [
     [-1, -1], [0, -1], [1, -1],
     [-1, 0],           [1, 0],
@@ -83,7 +79,8 @@ export class ShipPlacement {
             for(const [ship_x, ship_y] of ship_coords) {
                 coords_map[ship_y][ship_x] = null;
                 /* jshint ignore:start */
-                this._surrounding_coords_do(ship_x, ship_y,
+                grids.player.surrounding_coords_do(
+                    ship_x, ship_y, surrounding_offsets,
                     (coord_pair, $tile) => {
                         coords_map[coord_pair[1]][coord_pair[0]] = null;
                     }
@@ -160,25 +157,6 @@ export class ShipPlacement {
                 slices.push(section);
         }
         return slices;
-    }
-
-    /**
-     * For each coordinate surrounding the given coordinate, perform an action.
-     *
-     * @param {Number} x - x coordinate.
-     * @param {Number} y - y coordinate.
-     * @param {Function} action - Callback to call for each surrounding
-     *                            coordinate.
-     */
-    _surrounding_coords_do(x, y, action) {
-        const surrounding_coords = surrounding_offsets.map(
-            ([x_off, y_off]) => [x + x_off, y + y_off]
-        );
-        for(const coord_pair of surrounding_coords) {
-            const $tile = grids.player.coords_to_tile(coord_pair);
-            if($tile) // exclude off-grid coords
-                action(coord_pair, $tile);
-        }
     }
 }
 
@@ -521,7 +499,8 @@ export class DnDShipPlacement extends ShipPlacement {
         for(const ship of this._ships) {
             for(const [ship_x, ship_y] of ship.coords) {
                 /* jshint ignore:start */
-                this._surrounding_coords_do(ship_x, ship_y,
+                grids.player.surrounding_coords_do(
+                    ship_x, ship_y, surrounding_offsets,
                     (coord_pair, $tile) => {
                         if(ship.has_coords(coord_pair))
                             return;

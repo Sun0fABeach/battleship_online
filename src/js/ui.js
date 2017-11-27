@@ -1,5 +1,6 @@
 /**
- * Provides access to objects representing UI elements.
+ * Provides access to objects representing UI elements, plus some misc ui
+ * functions.
  * @module ui
  */
 
@@ -109,4 +110,25 @@ function init_grids() {
 
 function init_input() {
     input.$name = $('input[name=player-name]');
+}
+
+/**
+ * Displays an error screen (for app-breaking errors).
+ *
+ * @param {String} error - error message to be displayed
+ */
+export function error_screen(error) {
+    $('body').empty().append(
+        $('<h1>').text(error).css('text-align', 'center')
+    );
+}
+
+/**
+ * Updates the player count display.
+ *
+ * @param {Number} num_players - number of players currently online
+ */
+export function update_player_count(num_players) {
+    const p = num_players === 1 ? ' player ' : ' players ';
+    $('#player-count').text(num_players + p + 'online');
 }

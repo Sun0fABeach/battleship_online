@@ -3,7 +3,7 @@
 */
 
 import { ShipPlacement } from './ship_placement';
-import { array_choice, remove_from_array } from '../helpers';
+import { equal_coords, array_choice, remove_from_array } from '../helpers';
 import { grids } from '../ui';
 
 /** Opponent base class. Super classes that don't overwrite any of the given
@@ -123,17 +123,13 @@ export class AIOpponent extends Opponent {
                     [-1, 0],        [1, 0],
                             [0, 1]
                 ];
-                const [x, y] = this._hit_ship_coords;
-                // TODO: dryness with _surrounding_coords_do
-                const sensible_coords = sensible_offsets.map(
-                    ([x_off, y_off]) => [x + x_off, y + y_off]
+                grids.player.surrounding_coords_do(
+                    ...this._hit_ship_coords, sensible_offsets,
+                    (coord_pair, $tile) => {
+                        if($tile.children('i').length === 0)
+                            shot_options.push(coord_pair);
+                    }
                 );
-                for(const coord_pair of sensible_coords) {
-                    const $tile = grids.player.coords_to_tile(coord_pair);
-                    // exclude off-grid & already shot at coords
-                    if($tile && $tile.children('i').length === 0)
-                        shot_options.push(coord_pair);
-                }
             }
 
             if(shot_options.length === 0)
@@ -141,7 +137,7 @@ export class AIOpponent extends Opponent {
 
             const shot_coords = array_choice(shot_options);
             this._player_coords_list.find((coord_pair, idx, list) => {
-                if(this._equal_coords(coord_pair, shot_coords)) {
+                if(equal_coords(coord_pair, shot_coords)) {
                     list.splice(idx, 1);
                     return true;
                 }
@@ -156,9 +152,5 @@ export class AIOpponent extends Opponent {
                 }
             });
         }, 1000); // TODO: timeout variation?
-    }
-
-    _equal_coords(a, b) { // TODO: dryness ...
-        return a[0] === b[0] && a[1] === b[1];
     }
 }
