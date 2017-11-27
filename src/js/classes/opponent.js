@@ -6,14 +6,29 @@ import { ShipPlacement } from './ship_placement';
 import { array_choice, remove_from_array } from '../helpers';
 import { grids } from '../ui';
 
+/** Opponent base class. Super classes that don't overwrite any of the given
+ *  methods will let them have no effect.
+ *  @abstract */
+class Opponent {
+    tell_abort() {}
+    set_abort_handler() {}
+    tell_ready() {}
+    set_ready_handler() {}
+    tell_regame() {}
+    set_regame_handler() {}
+    let_shoot() {}
+    receive_shot() {}
+}
+
 /** Interface for interacting with a human opponent via socket. */
-export class HumanOpponent {
+export class HumanOpponent extends Opponent {
     /**
      * Create a HumanOpponent instance.
      * @param {io.Socket} socket -
      *  [Socket.io]{@link https://socket.io/docs/client-api/#socket} connection.
      */
     constructor(socket) {
+        super();
         this._socket = socket;
     }
 
@@ -58,11 +73,12 @@ export class HumanOpponent {
 }
 
 /** Interface for interacting with an AI opponent. */
-export class AIOpponent { // TODO: proper subclassing, interfacing ?
+export class AIOpponent extends Opponent {
     /**
      * Create an AIOpponent instance.
      */
     constructor() {
+        super();
         this._setup_instance();
     }
 
@@ -74,12 +90,6 @@ export class AIOpponent { // TODO: proper subclassing, interfacing ?
             (list, coord_pair) => list.concat(coord_pair), []
         );
     }
-
-    /* dummied - out methods */
-    tell_abort() {}
-    set_abort_handler() {}
-    set_ready_handler() {}
-    set_regame_handler() {}
 
     tell_ready(action) {
         action(true, true); // ai always rdy and player always begins
