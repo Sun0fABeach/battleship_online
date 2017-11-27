@@ -3,8 +3,8 @@
  * @module init
  */
 
+import { DnDShipPlacement } from './classes/ship_placement';
 import * as menu_navigation from './menu_navigation';
-import { DnDShipPlacement } from './ship_placement';
 import * as battle from './battle';
 import * as ui from './ui';
 import { swap_in_socket_handlers } from './helpers';

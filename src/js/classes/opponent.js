@@ -2,7 +2,7 @@
     @module classes/opponent
 */
 
-import { ShipPlacement } from '../ship_placement';
+import { ShipPlacement } from './ship_placement';
 import { array_choice, remove_from_array } from '../helpers';
 import { grids } from '../ui';
 
