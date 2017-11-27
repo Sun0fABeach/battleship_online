@@ -5,6 +5,8 @@
  * @module ship_placement
  */
 
+ // TODO: move module to classes
+
 import Ship from './classes/ship';
 import { grids } from './ui';
 import { chance_in_percent, array_choice } from './helpers';

@@ -3,8 +3,7 @@
  * @module menu_navigation
  */
 
-import { Opponent } from './classes/opponent';
-import * as ship_placement from './ship_placement';
+import { HumanOpponent, AIOpponent } from './classes/opponent';
 import * as battle from './battle';
 import * as ui from './ui';
 import {
@@ -38,7 +37,7 @@ function init_modal_handlers(socket) {
 
     ui.modals.host_list.set_completion_handlers(
         (host_name) => {
-            opponent = new Opponent(socket);
+            opponent = new HumanOpponent(socket);
             player_is_host = false;
             animate_toggle_dual_grid(true);
             ui.text.opponent_name.fade_swap(host_name, true);
@@ -153,7 +152,12 @@ function init_menu_button_handlers(socket) {
     });
 
     ui.menu_buttons.vs_ai.click(() => {
-        // TODO
+        opponent = new AIOpponent();
+        player_is_host = true;
+        animate_toggle_dual_grid(true);
+        ui.text.opponent_name.fade_swap('Computer', true);
+        ui.text.game_msg.fade_swap(ui.msg.finish_placement);
+        swap_in_menu_buttons('randomize', 'ready', 'abort');
     });
 
     ui.menu_buttons.randomize.click(() => {
@@ -170,9 +174,9 @@ function init_menu_button_handlers(socket) {
         dnd_ship_placement.deactivate();
         ui.menu_buttons.ready.clickable(false);
 
-        opponent.tell_ready(other_ready => {
+        opponent.tell_ready((other_ready, player_begins) => {
             if(other_ready) {
-                start_battle(socket, false);
+                start_battle(socket, player_begins);
             } else {
                 swap_in_menu_buttons('abort');
                 const msg = ui.msg.placement_wait;
@@ -197,7 +201,10 @@ function init_menu_button_handlers(socket) {
         ui.modals.leave_confirm
         .set_message(msg)
         .set_confirmation_handler(() => {
-            socket.emit('abort');
+            // true, even if opponent is null. that is necessary, b/c in that
+            // case, we just tell the server that we are no longer hosting.
+            if(!(opponent instanceof AIOpponent))
+                socket.emit('abort');
             go_to_lobby(socket);
         })
         .open();
@@ -308,6 +315,7 @@ function start_battle(socket, player_begins) {
     swap_in_socket_handlers(socket, () =>
         register_abort_handler(socket, true)
     );
+
     // activate after swapping socket handlers so battle doesn't get its own
     // handlers overwritten
     battle.activate(opponent, player_begins);
@@ -315,7 +323,7 @@ function start_battle(socket, player_begins) {
 
 function register_opponent_join_handler(socket) {
     socket.on('opponent entered', (opponent_name) => {
-        opponent = new Opponent(socket);
+        opponent = new HumanOpponent(socket);
         swap_in_menu_buttons('randomize', 'ready', 'abort');
         ui.text.opponent_name.fade_swap(opponent_name, true);
         const msg = ui.msg.opponent_joined;

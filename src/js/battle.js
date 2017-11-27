@@ -313,7 +313,7 @@ function display_shot_mobile(shot_data) {
                             ui.grids.player.slideUp();
                     }, 800);
                 }
-            }, mark_to);
+            }, mark_to); // TODO mark_to a little short?
         });
     } else {
         /* corner case: immediately having shot, player slid grid down.

@@ -3,6 +3,7 @@
 */
 
 import Text from './text';
+import { AIOpponent } from './opponent';
 import { text } from '../ui';
 import { swap_in_socket_handlers } from '../helpers';
 
@@ -203,7 +204,7 @@ export class GameOverModal extends BasicInteractionModal {
     _regame_yes_handler(opponent) {
         opponent.tell_regame();
 
-        if(this._opp_wants_regame) {
+        if(this._opp_wants_regame || opponent instanceof AIOpponent) {
             super._close();
             this._yes_regame_cb();
         } else {

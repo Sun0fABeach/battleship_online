@@ -81,3 +81,15 @@ export function array_choice(arr) {
 export function chance_in_percent(percent) {
     return Math.random() < percent/100;
 }
+
+/**
+ * Remove an element from an array.
+ *
+ * @param {Array} arr - Array to remove element from.
+ * @param {Any} element - Element to remove.
+ * @return {Any} Removed element or *null* if element not found in array.
+ */
+export function remove_from_array(arr, element) {
+    const idx = arr.indexOf(element);
+    return idx >= 0 ? arr.splice(idx, 1)[0] : null;
+}

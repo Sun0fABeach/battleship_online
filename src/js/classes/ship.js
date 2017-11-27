@@ -63,7 +63,7 @@ export default class Ship {
             if(this._equal_coords(shot_coords, coord_pair)) {
                 this._intact.splice(index, 1);
                 shot_hit = true;
-                return;
+                return; // TODO does return even work? rather use find?
             }
         });
 
