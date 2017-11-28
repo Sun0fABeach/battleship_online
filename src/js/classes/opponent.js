@@ -89,6 +89,7 @@ export class AIOpponent extends Opponent {
         this._player_coords_list = grids.player.coords_map().reduce(
             (list, coord_pair) => list.concat(coord_pair), []
         );
+        this._hit_coords = [];
     }
 
     tell_ready(action) {
@@ -115,27 +116,7 @@ export class AIOpponent extends Opponent {
 
     let_shoot(shot_handler) {
         setTimeout(() => {
-            let shot_options = [];
-
-            if(this._hit_ship_coords) {
-                const sensible_offsets = [
-                            [0, -1],
-                    [-1, 0],        [1, 0],
-                            [0, 1]
-                ];
-                grids.player.surrounding_coords_do(
-                    ...this._hit_ship_coords, sensible_offsets,
-                    (coord_pair, $tile) => {
-                        if($tile.children('i').length === 0)
-                            shot_options.push(coord_pair);
-                    }
-                );
-            }
-
-            if(shot_options.length === 0)
-                shot_options = this._player_coords_list;
-
-            const shot_coords = array_choice(shot_options);
+            const shot_coords = array_choice(this._shot_options());
             this._player_coords_list.find((coord_pair, idx, list) => {
                 if(equal_coords(coord_pair, shot_coords)) {
                     list.splice(idx, 1);
@@ -146,11 +127,41 @@ export class AIOpponent extends Opponent {
             shot_handler(shot_coords, shot_result => {
                 if(shot_result.hit) {
                     if(shot_result.sunken_ship)
-                        this._hit_ship_coords = null;
+                        this._hit_coords = [];
                     else
-                        this._hit_ship_coords = shot_coords;
+                        this._hit_coords.push(shot_coords);
                 }
             });
-        }, 1000); // TODO: timeout variation?
+        }, 1000);
+    }
+
+    _shot_options() {
+        if(this._hit_coords.length === 0)
+            return this._player_coords_list;
+
+        const sensible_offsets = [
+                    [0, -1],
+            [-1, 0],        [1, 0],
+                    [0, 1]
+        ];
+
+        while(true) {
+            const shot_options = [];
+            const hit_pair = this._hit_coords[this._hit_coords.length - 1];
+            /* jshint ignore:start */
+            grids.player.surrounding_coords_do(...hit_pair, sensible_offsets,
+                (coord_pair, $tile) => {
+                    if($tile.children('i').length === 0)
+                        shot_options.push(coord_pair);
+                }
+            );
+            /* jshint ignore:end */
+            if(shot_options.length > 0) {
+                return shot_options;
+            } else {
+                // dead end on one side of the ship, so backtrack hit coords
+                this._hit_coords.pop();
+            }
+        }
     }
 }
