@@ -298,7 +298,9 @@ let pending_shots = 0;
  */
 function display_shot_mobile(shot_data) {
     if(shot_data.grid === 'player') {
-        const mark_to = ui.grids.player.slid_up || pending_shots ? 200 : 0;
+        const mark_to =
+        ui.grids.player.slid_up || ui.grids.player.sliding || pending_shots ?
+        200 : 0;
         ++pending_shots;
 
         ui.grids.player.slideDown(() => {
@@ -313,7 +315,7 @@ function display_shot_mobile(shot_data) {
                             ui.grids.player.slideUp();
                     }, 800);
                 }
-            }, mark_to); // TODO mark_to a little short?
+            }, mark_to);
         });
     } else {
         /* corner case: immediately having shot, player slid grid down.

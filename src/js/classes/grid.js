@@ -119,6 +119,11 @@ export class OwnGrid extends Grid {
         super($container);
         this._ships = [];
         this._slid_up = false; // state saved to handle window resizing
+        this._sliding = false;
+    }
+
+    get sliding() {
+        return this._sliding;
     }
 
     get slid_up() {
@@ -169,17 +174,35 @@ export class OwnGrid extends Grid {
     }
 
     slideToggle(callback) {
-        this._$table_wrapper.slideToggle(callback);
+        this._sliding = true;
         this._slid_up = !this._slid_up;
+
+        this._$table_wrapper.slideToggle(() => {
+            this._sliding = false;
+            if(callback)
+                callback();
+        });
     }
 
     slideUp(callback) {
-        this._$table_wrapper.slideUp(callback);
+        this._sliding = true;
         this._slid_up = true;
+
+        this._$table_wrapper.slideUp(() => {
+            this._sliding = false;
+            if(callback)
+                callback();
+        });
     }
 
     slideDown(callback) {
-        this._$table_wrapper.slideDown(callback);
+        this._sliding = true;
         this._slid_up = false;
+
+        this._$table_wrapper.slideDown(() => {
+            this._sliding = false;
+            if(callback)
+                callback();
+        });
     }
 }
