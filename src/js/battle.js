@@ -27,9 +27,9 @@ export function init() {
 /**
  * Activate battle.
  *
- * @param {Opponent} opponent - interface for interacting with the
+ * @param {!Opponent} opponent - interface for interacting with the
  *                              [opponent]{@link module:classes/opponent}
- * @param {Boolean} player_begins - whether the player takes the first shot.
+ * @param {!Boolean} player_begins - whether the player takes the first shot.
  */
 export function activate(opponent, player_begins) {
     if(battle_active)
@@ -98,10 +98,10 @@ function clear_player_grid() {
 /**
  * Set/unset cursor style for the opponent grid.
  *
- * @param {Boolean} active - True if specific style is requested, false for
- *                           default cursor
- * @param {String} type - Cursor style to be applied. Can be left empty if
- *                        *active* is set to false
+ * @param {!Boolean} active - True if specific style is requested, false for
+ *                            default cursor
+ * @param {String} [type=undefined] - Cursor style to be applied. Can be left
+ *                                    empty if *active* is set to false
  */
 function set_grid_cursor(active, type) {
     ui.grids.opponent.table.css('cursor', active ? type : '');
@@ -110,9 +110,10 @@ function set_grid_cursor(active, type) {
 /**
  * Allow the player to take on shot at the opponent's grid.
  *
- * @param {Opponent} opponent -
+ * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
- * @param {Boolean} first_shot - Whether it is the first shot the player takes
+ * @param {Boolean} [first_shot=false] - Whether it is the first shot the
+ *                                       player takes
  */
 function let_player_shoot(opponent, first_shot=false) {
     set_grid_cursor(true, 'crosshair');
@@ -138,12 +139,12 @@ function let_player_shoot(opponent, first_shot=false) {
 /**
  * Evaluate shot result, display it and decide how to continue.
  *
- * @param {Opponent} opponent -
+ * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
- * @param {Object} shot_result - Information on the effect of shot
- * @param {jQuery} $tile - Grid tile that has been clicked as
+ * @param {!Object} shot_result - Information on the effect of shot
+ * @param {!jQuery} $tile - Grid tile that has been clicked as
  *                 [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
- * @param {Boolean} first_shot - Whether is was the first shot the player took
+ * @param {!Boolean} first_shot - Whether is was the first shot the player took
  *
  */
 function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
@@ -180,9 +181,10 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
 /**
  * Allow the opponent to take on shot.
  *
- * @param {Opponent} opponent -
+ * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
- * @param {Boolean} first_shot - Whether it is the first shot the opponent takes
+ * @param {Boolean} [first_shot=false] - Whether it is the first shot the
+ *                                       opponent takes
  */
 function let_opponent_shoot(opponent, first_shot=false) {
     highlight_actor('opponent');
@@ -197,12 +199,12 @@ function let_opponent_shoot(opponent, first_shot=false) {
  * Evaluate opponent's shot, display it, inform him about the results and
  * decide how to continue.
  *
- * @param {Opponent} opponent -
+ * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
- * @param {Array} coord_pair - Shot coordinates
- * @param {Function} inform_result_cb - Callback that will inform the opponent
- *                                      about the shot result
- * @param {Boolean} first_shot - Whether is was the first shot the opponent took
+ * @param {!Array} coord_pair - Shot coordinates
+ * @param {!Function} inform_result_cb - Callback that will inform the opponent
+ *                                       about the shot result
+ * @param {!Boolean} first_shot - Whether is was the first of the opponent
  *
  */
 function handle_opponent_shot(
@@ -240,9 +242,9 @@ function handle_opponent_shot(
  * Evaluate opponent's shot, display it, inform him about the results and
  * decide how to continue.
  *
- * @param {Opponent} opponent -
+ * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
- * @param {Boolean} victory - Whether the player won the game
+ * @param {!Boolean} victory - Whether the player won the game
  */
 function game_over_handler(opponent, victory) {
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
@@ -259,7 +261,7 @@ function game_over_handler(opponent, victory) {
 /**
  * Show how many ships the player sunk as the game message.
  *
- * @param {Boolean} first_shot - Whether it was the first shot taken.
+ * @param {!Boolean} first_shot - Whether it was the first shot taken.
  */
 function display_sunk_ship_count(first_shot) {
     let num_sunk = ship_count.total - ship_count.intact.opponent;
@@ -272,7 +274,7 @@ function display_sunk_ship_count(first_shot) {
 /**
  * Mark a grid tile with a hit/miss shot result.
  *
- * @param {Object} shot_data - Information on the effect of shot
+ * @param {!Object} shot_data - Information on the effect of shot
  */
 function display_shot(shot_data) {
     if(adjacent_grid_mode()) {
@@ -294,7 +296,7 @@ let pending_shots = 0;
  * Mark a grid tile with a hit/miss shot result on mobile devices. This means
  * sliding the player's grid up/down if necessary.
  *
- * @param {Object} shot_data - Information on the effect of shot
+ * @param {!Object} shot_data - Information on the effect of shot
  */
 function display_shot_mobile(shot_data) {
     if(shot_data.grid === 'player') {
@@ -335,7 +337,7 @@ function display_shot_mobile(shot_data) {
 /**
  * Put a shot marker on the associated tile.
  *
- * @param {Object} shot_data - Information on the effect of shot
+ * @param {!Object} shot_data - Information on the effect of shot
  */
 function mark_shot(shot_data) {
     const marker_classes = shot_data.hit ? 'fa fa-times' : 'fa fa-bullseye';
@@ -387,10 +389,10 @@ const indicate_recent_shot = function() {
 /**
  * Add or remove a CSS shadow on a tile.
  *
- * @param {jQuery} $element - Grid tile that has received a shot as
- *                 [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
- * @param {Boolean} active - Whether to add or remove the shot shadow
- * @param {Boolean} color - CSS color of the shadow
+ * @param {!jQuery} $element - Grid tile that has received a shot as
+ *                  [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ * @param {!Boolean} active - Whether to add or remove the shot shadow
+ * @param {!String} color - CSS color of the shadow
  */
 function set_shot_shadow($element, active, color) {
     if(active)
@@ -402,7 +404,7 @@ function set_shot_shadow($element, active, color) {
 /**
  * Reveal a ship of the opponent b/c it was sunk.
  *
- * @param {Array} ship_coords - Coordinates of the ship.
+ * @param {!Array} ship_coords - Coordinates of the ship.
  */
 function reveal_ship(ship_coords) {
     for(const coord_pair of ship_coords)
@@ -412,8 +414,8 @@ function reveal_ship(ship_coords) {
 /**
  * Highlight which player has to take a shot next.
  *
- * @param {String} actor - Which side to highlight (can be either 'player' or
- *                         'opponent')
+ * @param {!String} actor - Which side to highlight (can be either 'player' or
+ *                          'opponent')
  */
 function highlight_actor(actor) {
     if(!actor) {
