@@ -6,6 +6,7 @@ import { ShipPlacement } from './ship_placement';
 import { equal_coords, array_choice, remove_from_array } from '../helpers';
 import { grids } from '../ui';
 
+
 /** Opponent base class. Super classes that don't overwrite any of the given
  *  methods will let them have no effect.
  *  @abstract */
@@ -19,6 +20,7 @@ class Opponent {
     let_shoot() {}
     receive_shot() {}
 }
+
 
 /** Interface for interacting with a human opponent via socket. */
 export class HumanOpponent extends Opponent {
@@ -72,6 +74,7 @@ export class HumanOpponent extends Opponent {
     }
 }
 
+
 /** Interface for interacting with an AI opponent. */
 export class AIOpponent extends Opponent {
     /**
@@ -82,6 +85,7 @@ export class AIOpponent extends Opponent {
         this._setup_instance();
     }
 
+    /** Setup random ship placement and initialize ship objects. */
     _setup_instance() {
         this._ship_placement = new ShipPlacement();
         this._intact_ships = Array.from(this._ship_placement.ships);
@@ -92,14 +96,28 @@ export class AIOpponent extends Opponent {
         this._hit_coords = [];
     }
 
+    /**
+     *  Tell AI that player is ready to start the game. The AI always replies
+     *  that it is ready and that the player shall take the first shot.
+     *
+     *  @param {Function} action - Reply callback.
+     */
     tell_ready(action) {
-        action(true, true); // ai always rdy and player always begins
+        action(true, true);
     }
 
+    /** Reinitialize random ship placement and ship objects. */
     tell_regame() {
         this._setup_instance();
     }
 
+    /**
+     *  Receive player shot and inform him on the result.
+     *
+     *  @param {Array} coords - Shot coordinates.
+     *  @param {Function} result_handler - Reply callback used to inform the
+     *                                     player on the shot result.
+     */
     receive_shot(coords, result_handler) {
         let shot_result;
         const hit_ship = this._intact_ships.find(ship => {
@@ -114,6 +132,14 @@ export class AIOpponent extends Opponent {
         result_handler(shot_result);
     }
 
+    /**
+     *  Let the AI take a shot.
+     *
+     *  @param {Function} shot_handler - Reply callback used to tell the player
+     *                    the shot coordinates. Also provides a callback
+     *                    argument that needs to be called to inform the AI on
+     *                    the shot result.
+     */
     let_shoot(shot_handler) {
         setTimeout(() => {
             const shot_coords = array_choice(this._shot_options());
@@ -135,6 +161,12 @@ export class AIOpponent extends Opponent {
         }, 1000);
     }
 
+    /**
+     *  Provide a list of coordinates that are sensible options for the next
+     *  shot. If a shit has recently been hit, but not sunk, the options will
+     *  contain coordinates in the vicinity of this ship. Otherwise, the options
+     *  will be any coordinates that have not been shot at so far.
+     */
     _shot_options() {
         if(this._hit_coords.length === 0)
             return this._player_coords_list;
