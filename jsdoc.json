@@ -4,6 +4,9 @@
   },
   "opts": {
     "recurse": true,
-    "destination": "doc"
+    "destination": "doc",
+    "private": true,
+    "package": "package.json",
+    "verbose": true
   }
 }
