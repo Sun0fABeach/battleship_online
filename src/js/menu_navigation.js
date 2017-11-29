@@ -3,7 +3,10 @@
  * @module menu_navigation
  */
 
-import { HumanOpponent, AIOpponent } from './classes/opponent';
+import {
+    HumanOpponent,
+    AIOpponent,
+    AIOpponentNormal } from './classes/opponent';
 import * as battle from './battle';
 import * as ui from './ui';
 import {
@@ -152,7 +155,7 @@ function init_menu_button_handlers(socket) {
     });
 
     ui.menu_buttons.vs_ai.click(() => {
-        opponent = new AIOpponent();
+        opponent = new AIOpponentNormal();
         player_is_host = true;
         animate_toggle_dual_grid(true);
         ui.text.opponent_name.fade_swap('Computer', true);
