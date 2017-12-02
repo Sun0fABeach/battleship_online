@@ -22,7 +22,7 @@
     }
   }
 
-  button {
+  #button-container > * {
     margin: 0.25rem auto 0;
 
     @include media-breakpoint-up(md) {
@@ -31,13 +31,24 @@
 
     display: none;
 
-    &[name="enter"] {
+    &#enter {
       display: block;
     }
 
-    &[name="slide"] {
+    &#slide {
       @include media-breakpoint-up(md) {
         display: none !important; // show via script only has effect on phones
+      }
+    }
+
+    &#vs-ai {
+      @include media-breakpoint-down(xs) {
+        > button:first-of-type > div {
+          margin-right: -55px; // re-center text b/c dropdown arrow screws with centering
+        }
+        > button:last-of-type {
+          padding: 0 24px; // widen dropdown arrow on mobile for more touch surface
+        }
       }
     }
   }

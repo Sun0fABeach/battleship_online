@@ -5,7 +5,7 @@
  */
 
 import { Grid, OwnGrid } from './classes/grid';
-import MenuButton from './classes/menu_button';
+import { MenuButton, MenuDropdownButton } from './classes/menu_button';
 import Text from './classes/text';
 import {
     HostModal,
@@ -93,7 +93,7 @@ function init_menu_buttons() {
     menu_buttons.enter = new MenuButton('enter');
     menu_buttons.host = new MenuButton('host');
     menu_buttons.open_hosts = new MenuButton('open-hosts');
-    menu_buttons.vs_ai = new MenuButton('vs-ai');
+    menu_buttons.vs_ai = new MenuDropdownButton('vs-ai');
     menu_buttons.randomize = new MenuButton('randomize');
     menu_buttons.ready = new MenuButton('ready');
     menu_buttons.abort = new MenuButton('abort');

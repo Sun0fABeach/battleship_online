@@ -6,6 +6,7 @@
 import {
     HumanOpponent,
     AIOpponent,
+    AIOpponentEasy,
     AIOpponentNormal } from './classes/opponent';
 import * as battle from './battle';
 import * as ui from './ui';
@@ -34,6 +35,7 @@ export function init(ship_placement, socket) {
     dnd_ship_placement = ship_placement;
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);
+    ui.menu_buttons.vs_ai.set_selection(1); // normal difficulty as default
 }
 
 function init_modal_handlers(socket) {
@@ -154,11 +156,21 @@ function init_menu_button_handlers(socket) {
         ui.text.game_msg.fade_swap(ui.msg.choose_host);
     });
 
-    ui.menu_buttons.vs_ai.click(() => {
-        opponent = new AIOpponentNormal();
+    ui.menu_buttons.vs_ai.set_selection_handler(selection_text =>
+        ui.menu_buttons.vs_ai.text(
+            'vs AI (' + selection_text.toLowerCase() + ')'
+        )
+    );
+
+    ui.menu_buttons.vs_ai.click(difficulty => {
+        difficulty = difficulty.toLowerCase();
+        opponent = difficulty === 'easy' ?
+                   new AIOpponentEasy() : new AIOpponentNormal();
         player_is_host = true;
         animate_toggle_dual_grid(true);
-        ui.text.opponent_name.fade_swap('Computer', true);
+        ui.text.opponent_name.fade_swap(
+            'Computer (' + difficulty + ')', true
+        );
         ui.text.game_msg.fade_swap(ui.msg.finish_placement);
         swap_in_menu_buttons('randomize', 'ready', 'abort');
     });
