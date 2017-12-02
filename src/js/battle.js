@@ -118,8 +118,8 @@ function clear_player_grid() {
  *
  * @param {!Boolean} active - True if specific style is requested, false for
  *                            default cursor
- * @param {String} [type=undefined] - Cursor style to be applied. Can be left
- *                                    empty if *active* is set to false
+ * @param {String} [type] - Cursor style to be applied. Can be left
+ *                          empty if *active* is set to false
  */
 function set_grid_cursor(active, type) {
     ui.grids.opponent.table.css('cursor', active ? type : '');
@@ -159,10 +159,9 @@ function let_player_shoot(opponent, first_shot=false) {
  * @typedef ShotResult
  * @type {Object}
  * @property {Boolean} hit - whether the shot is a hit
- * @property {Array} [sunken_ship=undefined] - Coordinates of the ship
- *                                             that has been sunk by the shot.
- * @property {Boolean} [defeat=undefined] - True if the enemy fleet has been
- *                                          defeated.
+ * @property {Array} [sunken_ship] - Coordinates of the ship
+ *                                   that has been sunk by the shot.
+ * @property {Boolean} [defeat] - True if the enemy fleet has been defeated.
  */
 
 /**

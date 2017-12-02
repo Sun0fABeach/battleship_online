@@ -14,8 +14,20 @@ class MenuButtonBase {
         this._clickable = true;
     }
 
+    /**
+     *  Trigger a click on the button or register an event handler for a future
+     *  click. To be implemented by subclasses.
+     *  @abstract
+     *
+     *  @param {Function} [action] - callback to register for button clicks
+     */
     click(action) {}
 
+    /**
+     *  Return whether this button is visible.
+     *
+     *  @returns {Boolean} Whether the button is visible
+     */
     is_visible() {
         /* first check style attr used by jquery hide/show. this is necessary
            b/c the slide button css stays on display: none on larger screens,
@@ -27,15 +39,43 @@ class MenuButtonBase {
             return this._$element.css('display') !== 'none';
     }
 
+    /**
+     *  Show the button and trigger callback, if one is given.
+     *  To be implemented by subclasses.
+     *  @abstract
+     *
+     *  @param {Function} [completion_cb] - callback to trigger once
+     *                                      show is complete
+     */
     show(completion_cb) {}
 
+    /**
+     *  Hide the button and trigger callback, if one is given.
+     *  To be implemented by subclasses.
+     *
+     *  @param {Function} [completion_cb] - callback to trigger once
+     *                                      hide is complete
+     */
     hide(completion_cb) {
         this.clickable(false);  // prohibit clicks on fadeout
         this._$element.fadeOut(completion_cb);
     }
 
+    /**
+     *  Query or set the text of the button. To be implemented by subclasses.
+     *  @abstract
+     *
+     *  @param {String} [new_text] - Text to set for the button
+     *  @returns {(String|undefined)} the current button text, if *new_text*
+     *                                was left empty
+     */
     text(new_text) {}
 
+    /**
+     * Set whether the button should perform an action on click, or not.
+     *
+     * @param {!Boolean} active - Whether button should be clickable
+     */
     clickable(active) {
         this._clickable = active;
     }
@@ -47,8 +87,7 @@ export class MenuButton extends MenuButtonBase {
      * Create a MenuButton instance.
      * @param {!String} btn_name - Name of the button as defined via HTML name
      *                              attribute
-     * @param {Function} [action=undefined] - Callback to trigger on
-     *                                        button click
+     * @param {Function} [action] - Callback to trigger on button click
      */
     constructor(btn_name, action) {
         super('#main-menu #button-container > button#' + btn_name, action);
@@ -58,6 +97,12 @@ export class MenuButton extends MenuButtonBase {
         .click(this._click_cb);
     }
 
+    /**
+     *  Trigger a click on the button or register an event handler for a future
+     *  click.
+     *
+     *  @param {Function} [action] - callback to register for button clicks
+     */
     click(action) {
         if(action)
             this._register_click_cb(action);
@@ -65,11 +110,24 @@ export class MenuButton extends MenuButtonBase {
             this._$element.click();
     }
 
+    /**
+     *  Show the button and trigger callback, if one is given.
+     *
+     *  @param {Function} [completion_cb] - callback to trigger once
+     *                                      show is complete
+     */
     show(completion_cb) {
         this.clickable(true);
         this._$element.fadeIn(completion_cb);
     }
 
+    /**
+     *  Query or set the text of the button.
+     *
+     *  @param {String} [new_text] - Text to set for the button
+     *  @returns {(String|undefined)} the current button text, if *new_text*
+     *                                was left empty
+     */
     text(new_text) {
         if(new_text)
             this._$element.text(new_text);
@@ -77,19 +135,36 @@ export class MenuButton extends MenuButtonBase {
             return this._$element.text();
     }
 
+    /**
+     * Signals that something is invalid, preventing the click action to be
+     * performed.
+     */
     invalid() {
         this._$element.effect('shake');
         this._$element.addClass('btn-danger');
     }
 
+    /**
+     * Signals that some state is valid, allowing the click action to be
+     * successfully performed.
+     */
     valid() {
         this._$element.addClass('btn-success');
     }
 
+    /**
+     * Signals normal button state.
+     */
     normal() {
         this._$element.removeClass('btn-success btn-danger');
     }
 
+    /**
+     * Register a callback to be triggered on button click.
+     * @private
+     *
+     * @param {Function} [action] - Callback to trigger on button click
+     */
     _register_click_cb(action) {
         this._$element.click((event) => {
             event.preventDefault();   // even if no action is to be performed
@@ -100,14 +175,21 @@ export class MenuButton extends MenuButtonBase {
     }
 }
 
+
+/**
+ * Callback type for MenuDropdownButton actions.
+ * @callback MenuDropdownButtonAction
+ * @param {!String} selection_text - Text of the current dropdown selection
+ */
+
 /** A DOM menu button that has a dropdown connected to it. */
 export class MenuDropdownButton extends MenuButtonBase {
     /**
      * Create a MenuButton instance.
      * @param {!String} btn_name - Name of the button as defined via HTML name
      *                              attribute
-     * @param {Function} [action=undefined] - Callback to trigger on
-     *                                        button click
+     * @param {MenuDropdownButtonAction} [action] - Callback to trigger on
+     *                                              button click
      */
     constructor(btn_name, action) {
         super('#main-menu #button-container > .btn-group#' + btn_name, action);
@@ -122,20 +204,42 @@ export class MenuDropdownButton extends MenuButtonBase {
         });
     }
 
+    /**
+     * Register a callback to be triggered on every dropdown selection.
+     *
+     * @param {Function} handler - callback to trigger on dropdown selection
+     */
     set_selection_handler(handler) {
         this._$selection_cb = handler;
     }
 
+    /**
+     * Do a dropdown selection.
+     *
+     * @param {!Number} idx - index of dropdown selection to set
+     */
     set_selection(idx) {
         this._$selection = this._$dropdown_options.eq(idx);
         if(this._$selection_cb)
             this._$selection_cb(this.selection_text());
     }
 
+    /**
+     * Return the text of the current selection.
+     *
+     * @returns {String} the text of the current selection, or an empty string
+     *                   if no selection has been done
+     */
     selection_text() {
         return this._$selection ? this._$selection.text() : '';
     }
 
+    /**
+     *  Trigger a click on the button or register an event handler for a future
+     *  click.
+     *
+     *  @param {Function} [action] - callback to register for button clicks
+     */
     click(action) {
         if(action)
             this._register_click_cb(action);
@@ -143,6 +247,12 @@ export class MenuDropdownButton extends MenuButtonBase {
             this._$action_btn.click();
     }
 
+    /**
+     *  Show the button and trigger callback, if one is given.
+     *
+     *  @param {Function} [completion_cb] - callback to trigger once
+     *                                      show is complete
+     */
     show(completion_cb) {
         this._$element.fadeIn({
             start: () => {
@@ -158,6 +268,13 @@ export class MenuDropdownButton extends MenuButtonBase {
         });
     }
 
+    /**
+     *  Query or set the text of the button.
+     *
+     *  @param {String} [new_text] - Text to set for the button
+     *  @returns {(String|undefined)} the current button text, if *new_text*
+     *                                was left empty
+     */
     text(new_text) {
         if(new_text)
             this._$action_btn.children('div').text(new_text);
@@ -165,6 +282,13 @@ export class MenuDropdownButton extends MenuButtonBase {
             return this._$action_btn.children('div').text();
     }
 
+    /**
+     * Register a callback to be triggered on button click.
+     * @private
+     *
+     * @param {MenuDropdownButtonAction} [action] - Callback to trigger on
+     *                                              button click
+     */
     _register_click_cb(action) {
         this._$action_btn.click((event) => {
             event.preventDefault();   // even if no action is to be performed
