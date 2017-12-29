@@ -5,6 +5,12 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
 
 
+const html_minify_options = {
+    collapseWhitespace: true,
+    minifyCSS: true,
+    removeComments: true
+};
+
 module.exports = merge(common, {
     output: {
         filename: '[name].[chunkhash].js',
@@ -35,21 +41,19 @@ module.exports = merge(common, {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
-            minify: {
-                collapseWhitespace: true,
-                minifyCSS: true,
-                removeComments: true
-            }
+            minify: html_minify_options
         }),
         new HtmlWebpackPlugin({
             filename: 'imprint.html',
             template: './src/imprint.html',
             inject: false,
-            minify: {
-                collapseWhitespace: true,
-                minifyCSS: true,
-                removeComments: true
-            }
+            minify: html_minify_options
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'partials/help.html',
+            template: './src/partials/help.html',
+            inject: false,
+            minify: html_minify_options
         }),
         new UglifyJSPlugin({
             // sourceMap: true

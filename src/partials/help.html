@@ -1,0 +1,75 @@
+<div>
+  <h1>Battleship Online</h1>
+  <p>
+    Play the classic guessing game
+    <a href="https://en.wikipedia.org/wiki/Battleship_(game)" target="_blank">
+      <em>Battleship</em>
+    </a>
+    against other players or the computer.
+  </p>
+
+  <h3>Choosing a name</h3>
+  <p>
+    To be able to play, you have to enter your nickname. This name has to be unique, which means
+    that it is currently not used by another logged in player.
+  </p>
+
+  <h3>Setting up a game</h3>
+  <p>
+    After you have entered your name, you have the option to <em>Host</em> or <em>Join</em> a
+    game, or to play against the computer. If you choose <em>Host</em>, your name will appear in the
+    host list and other players can join your game. If you choose <em>Join</em>, the host list will
+    open, enabling you to join games that other players have hosted. To play against the computer,
+    select <em>vs AI</em>. Here, you have the option to play on easy or normal difficulty.
+  </p>
+
+  <h3>Battle preparations</h3>
+  <p>
+    Once you are connected with another player or an AI opponent, you will be asked to finish
+    your ship placement and to press <em>Ready</em>.
+  </p>
+  <h5>Placing your ships</h5>
+  <p>
+    To rotate a ship, click/tap on it, to move it around use drag and drop. Ships are not allowed
+    to overlap, or to be placed directly next to each other. Invalid ship placements are signaled
+    using color codes. As long as your grid contains tiles in these colors, the game is
+    not allowed to start:
+  </p>
+  <table id="placement-colors"><tbody>
+    <tr>
+      <td><span id="color-overlap"></span></td>
+      <td>ships are overlapping</td>
+    </tr>
+    <tr>
+      <td><span id="color-adjacent"></span></td>
+      <td>ships are placed directly next to each other</td>
+    </tr>
+  </tbody></table>
+  <p>
+    If you don't want to manually place your ships, you can generate a new random ship placement
+    by pressing <em>Randomize</em>. This placement will always be valid.
+  </p>
+
+  <h3>Combat</h3>
+  <p>
+    Once both players have pressed <em>Ready</em>, the battle commences. The player who pressed
+    <em>Ready</em> first will be the first one to shoot. If you play against the computer, you will
+    always take the first shot. You can shoot by simply clicking/tapping
+    a tile in the grid. If you miss a shot, the opponent gets to shoot next. If you hit a ship,
+    you are allowed to fire another shot until you miss. If you sink a ship of the opponent, that
+    ship will be revealed to you. The player who manages to sink all of the opponent's ships first
+    wins the game.
+  </p>
+
+  <h3>Rematch</h3>
+  <p>
+    After each battle, both players will be asked if they want to play another match against each
+    other. If both choose <em>Yes</em>, they will be able to change their ship placements and start
+    another battle. The computer will always want another regame and will always change its ship
+    placements before the next battle.
+  </p>
+
+  <div class="text-center text-md-left">
+    <button type="button" class="btn btn-dark mt-3">Close</button>
+  </div>
+</div>

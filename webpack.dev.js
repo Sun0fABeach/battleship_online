@@ -38,5 +38,10 @@ module.exports = merge(common, {
             template: './src/imprint.html',
             inject: false
         }),
+        new HtmlWebpackPlugin({
+            filename: 'partials/help.html',
+            template: './src/partials/help.html',
+            inject: false
+        }),
     ]
 });
