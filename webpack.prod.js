@@ -44,8 +44,8 @@ module.exports = merge(common, {
             minify: html_minify_options
         }),
         new HtmlWebpackPlugin({
-            filename: 'imprint.html',
-            template: './src/imprint.html',
+            filename: 'partials/imprint.html',
+            template: './src/partials/imprint.html',
             inject: false,
             minify: html_minify_options
         }),

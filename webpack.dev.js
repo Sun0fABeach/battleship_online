@@ -34,8 +34,8 @@ module.exports = merge(common, {
             template: './src/index.html'
         }),
         new HtmlWebpackPlugin({
-            filename: 'imprint.html',
-            template: './src/imprint.html',
+            filename: 'partials/imprint.html',
+            template: './src/partials/imprint.html',
             inject: false
         }),
         new HtmlWebpackPlugin({
