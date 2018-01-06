@@ -72,7 +72,7 @@ export function init(socket) {
     init_menu_buttons();
     init_grids();
     init_input();
-    footer = $('footer');
+    init_footer();
 }
 
 
@@ -110,6 +110,11 @@ function init_grids() {
 
 function init_input() {
     input.$name = $('input[name=player-name]');
+}
+
+function init_footer() {
+    footer = $('footer');
+    footer.find('#copyright-year').text(new Date().getFullYear());
 }
 
 /**
