@@ -313,27 +313,34 @@ function end_battle_back_to_lobby(socket) {
 }
 
 function start_battle(socket, player_begins) {
-    swap_in_menu_buttons('slide', 'give_up');
-
-    if(player_begins) {
-        ui.text.game_msg.fade_swap(
-            ui.msg.battle_start + ' ' + ui.msg.player_begins
-        );
-    } else {
-        const msg = ui.msg.opponent_begins;
-        ui.text.game_msg.fade_swap(
-            ui.msg.battle_start + ' ' +
-            msg[0] + ui.text.opponent_name.text + msg[1]
-        );
-    }
-
-    swap_in_socket_handlers(socket, () =>
-        register_abort_handler(socket, true)
+    $('body').animate(
+        { scrollTop: 0 },
+        { complete: action_after_scroll }
     );
 
-    // activate after swapping socket handlers so battle doesn't get its own
-    // handlers overwritten
-    battle.activate(opponent, player_begins);
+    function action_after_scroll() {
+        swap_in_menu_buttons('slide', 'give_up');
+
+        if(player_begins) {
+            ui.text.game_msg.fade_swap(
+                ui.msg.battle_start + ' ' + ui.msg.player_begins
+            );
+        } else {
+            const msg = ui.msg.opponent_begins;
+            ui.text.game_msg.fade_swap(
+                ui.msg.battle_start + ' ' +
+                msg[0] + ui.text.opponent_name.text + msg[1]
+            );
+        }
+
+        swap_in_socket_handlers(socket, () =>
+            register_abort_handler(socket, true)
+        );
+
+        // activate after swapping socket handlers so battle doesn't get its
+        // own handlers overwritten
+        battle.activate(opponent, player_begins);
+    }
 }
 
 function register_opponent_join_handler(socket) {
