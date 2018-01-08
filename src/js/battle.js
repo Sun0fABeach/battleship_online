@@ -7,6 +7,7 @@ import Ship from './classes/ship';
 import * as ui from './ui';
 import { adjacent_grid_mode } from './helpers';
 
+
 /** Whether the battle is currently active.
  *  @type {Boolean}
  *  @private
@@ -192,7 +193,7 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     display_shot({
         grid: 'opponent',
         hit: shot_result.hit,
-        ship_to_reveal: shot_result.sunken_ship,
+        sunken_ship_coords: shot_result.sunken_ship,
         $tile: $tile
     });
 
@@ -259,6 +260,7 @@ function handle_opponent_shot(
     display_shot({
         grid: 'player',
         hit: shot_result.hit,
+        sunken_ship_coords: shot_result.sunken_ship,
         $tile: $tile
     });
 
@@ -386,7 +388,7 @@ function display_shot_mobile(shot_data) {
 }
 
 /**
- * Put a shot marker on the associated tile.
+ * Put a shot marker on the associated tile and perform all due animations.
  * @private
  *
  * @param {!ShotData} shot_data - Information on the effect of shot
@@ -411,8 +413,11 @@ function mark_shot(shot_data) {
             start: () => {
                 $marker.css('background-color', marker_color);
                 indicate_recent_shot($marker, marker_color, shot_data.grid);
-                if(shot_data.ship_to_reveal)
-                    reveal_ship(shot_data.ship_to_reveal);
+
+                if(shot_data.sunken_ship_coords)
+                    blow_ship_up(shot_data.sunken_ship_coords, shot_data.grid);
+                else if(shot_data.hit)
+                    animate_explosion(shot_data.$tile);
             },
             duration: 600
         }
@@ -456,14 +461,51 @@ function set_shot_shadow($element, active, color) {
 }
 
 /**
- * Reveal a ship of the opponent b/c it was sunk.
+ * Animate a hit on a tile using a spritesheet.
+ * @private
+ *
+ * @property {!jQuery} $tile - Grid tile that has received the shot as a
+ *                   [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ */
+function animate_explosion($tile) {
+    const $sprite_container = $('<div>')
+        .addClass('sprite-container explosion')
+        .appendTo($tile);
+    const offset = $sprite_container.outerWidth();
+    const delay = 50;
+    const num_sprites = 16;
+    const spritesheet_row_length = 4;
+
+
+    for(let i = 1; i < num_sprites; ++i) {
+      setTimeout(() => {
+        $sprite_container.css(
+          'background-position',
+          -(i%spritesheet_row_length * offset) + 'px ' +
+          -(Math.floor(i/spritesheet_row_length) * offset) + 'px'
+        );
+      }, i * delay);
+    }
+
+    setTimeout(() => $sprite_container.remove(), num_sprites * delay);
+}
+
+/**
+ * Blow up a ship b/c it was sunk. If it was a ship of the opponent, also
+ * reveal it.
  * @private
  *
  * @param {!Array} ship_coords - Coordinates of the ship.
  */
-function reveal_ship(ship_coords) {
-    for(const coord_pair of ship_coords)
-        ui.grids.opponent.coords_to_tile(coord_pair).addClass('ship');
+function blow_ship_up(ship_coords, grid_type) {
+    const reveal_ship = grid_type === 'opponent';
+
+    for(const coord_pair of ship_coords) {
+        const $tile = ui.grids[grid_type].coords_to_tile(coord_pair);
+        animate_explosion($tile);
+        if(reveal_ship)
+            $tile.addClass('ship');
+    }
 }
 
 /**

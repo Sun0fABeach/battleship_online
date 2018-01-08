@@ -28,9 +28,9 @@ $(document).ready(function() {
         $('#loading-screen > h2').text('Done');
         $('#loading-screen').slideUp(1500);
 
-        /* add dummy element containing font-awesome symbol to trigger font
-           download asynchronously (font needed for shot symbols later) */
-        $('<i>').addClass('fa fa-times').appendTo('body').css({
+        /* add dummy element containing font-awesome symbol and spritesheet to
+           trigger downloads asynchronously (these assets are needed later) */
+        $('<i>').addClass('fa fa-times explosion').appendTo('body').css({
             position: 'absolute',
             top: 0,
             visibility: 'hidden',

@@ -57,6 +57,14 @@ module.exports = {
                 options: {
                     outputPath: 'assets/fonts/'
                 }
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url-loader',
+                options: {
+                    outputPath: 'assets/',
+                    limit: 10000
+                }
             }
         ]
     },
