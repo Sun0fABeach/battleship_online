@@ -5,7 +5,7 @@
 
 import Ship from './classes/ship';
 import * as ui from './ui';
-import { adjacent_grid_mode } from './helpers';
+import { adjacent_grid_mode, random_in_range } from './helpers';
 
 
 /** Whether the battle is currently active.
@@ -198,7 +198,7 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     });
 
     if(shot_result.defeat) {
-        game_over_handler(opponent, true);
+        handle_game_over(opponent, true);
     } else {
         ui.menu_buttons.give_up.clickable(true); // re-enable
         if(shot_result.hit)
@@ -266,7 +266,7 @@ function handle_opponent_shot(
 
     if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
         shot_result.defeat = true;
-        game_over_handler(opponent, false);
+        handle_game_over(opponent, false);
     } else {
         if(shot_result.hit)
             let_opponent_shoot(opponent);
@@ -278,23 +278,39 @@ function handle_opponent_shot(
 }
 
 /**
- * Evaluate opponent's shot, display it, inform him about the results and
- * decide how to continue.
+ * Display game over animation and ask the player for a regame.
  * @private
  *
  * @param {!Opponent} opponent -
  *                      The [opponent]{@link module:classes/opponent.Opponent}
  * @param {!Boolean} victory - Whether the player won the game
  */
-function game_over_handler(opponent, victory) {
+function handle_game_over(opponent, victory) {
     ui.menu_buttons.give_up.clickable(false); //don't allow abort during timeout
+
+    const fleet_explosion_delay = 800;
+    const fleet_explosion_duration = 2000;
+    const modal_delay = fleet_explosion_delay + fleet_explosion_duration + 700;
+
+    // TODO: handle opponent leaving during animation
+    setTimeout(() =>
+        blow_fleet_up(
+            ui.grids[victory ? 'opponent' : 'player'],
+            fleet_explosion_duration
+        ),
+        fleet_explosion_delay
+    );
+
     if(ui.modals.leave_confirm.is_open())
         ui.modals.leave_confirm.close(() => delayed_open(victory));
     else
         delayed_open(victory);
 
     function delayed_open(victory) {
-        setTimeout(() => ui.modals.game_over.open(opponent, victory), 700);
+        setTimeout(() =>
+            ui.modals.game_over.open(opponent, victory),
+            modal_delay
+        );
     }
 }
 
@@ -315,8 +331,8 @@ function display_sunk_ship_count(first_shot) {
 /**
  * @typedef ShotData
  * @type {Object}
- * @property {Boolean} hit - whether the shot is a hit
- * @property {String} grid - the grid that received the shot (can be either
+ * @property {!Boolean} hit - whether the shot is a hit
+ * @property {!String} grid - the grid that received the shot (can be either
  *                           'player' or 'opponent')
  * @property {!jQuery} $tile - Grid tile that has received the shot as a
  *                   [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
@@ -475,18 +491,17 @@ function animate_explosion($tile) {
     const delay = 50;
     const num_sprites = 16;
     const spritesheet_row_length = 4;
-
+    // total animation duration: num_sprites * delay = 800ms
 
     for(let i = 1; i < num_sprites; ++i) {
-      setTimeout(() => {
-        $sprite_container.css(
-          'background-position',
-          -(i%spritesheet_row_length * offset) + 'px ' +
-          -(Math.floor(i/spritesheet_row_length) * offset) + 'px'
-        );
-      }, i * delay);
+        setTimeout(() => {
+            $sprite_container.css(
+                'background-position',
+                -(i%spritesheet_row_length * offset) + 'px ' +
+                -(Math.floor(i/spritesheet_row_length) * offset) + 'px'
+            );
+        }, i * delay);
     }
-
     setTimeout(() => $sprite_container.remove(), num_sprites * delay);
 }
 
@@ -496,6 +511,8 @@ function animate_explosion($tile) {
  * @private
  *
  * @param {!Array} ship_coords - Coordinates of the ship.
+ * @property {!String} grid_type - the grid that received the shot (can be
+ *                                 either 'player' or 'opponent')
  */
 function blow_ship_up(ship_coords, grid_type) {
     const reveal_ship = grid_type === 'opponent';
@@ -506,6 +523,24 @@ function blow_ship_up(ship_coords, grid_type) {
         if(reveal_ship)
             $tile.addClass('ship');
     }
+}
+
+/**
+ * Animate destruction of entire fleet.
+ * @private
+ *
+ * @param {!Grid} grid - [Grid]{@link module:classes/grid.Grid} to animate.
+ * @param {!Number} duration - Duration of the animation in ms.
+ */
+function blow_fleet_up(grid, duration) {
+    grid.table.effect('shake', {times: 8}, duration);
+
+    grid.tiles.filter('.ship').each(function() {
+        setTimeout(() =>
+            animate_explosion($(this)),
+            random_in_range(0, duration)
+        );
+    });
 }
 
 /**
