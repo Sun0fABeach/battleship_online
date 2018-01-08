@@ -307,10 +307,11 @@ function handle_game_over(opponent, victory) {
         delayed_open(victory);
 
     function delayed_open(victory) {
-        setTimeout(() =>
-            ui.modals.game_over.open(opponent, victory),
-            modal_delay
-        );
+        setTimeout(() => {
+            // don't open if opponent left during fleet explosion animation
+            if(ui.grids.$both.hasClass('dual-view'))
+                ui.modals.game_over.open(opponent, victory);
+        }, modal_delay);
     }
 }
 
