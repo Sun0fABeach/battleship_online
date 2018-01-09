@@ -59,5 +59,9 @@
         }
       }
     }
+
+    p:last-of-type { // larger margin to browser support section
+      margin-bottom: 2em;
+    }
   }
 }

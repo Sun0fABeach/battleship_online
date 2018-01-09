@@ -90,7 +90,7 @@ function setup_screen() {
 
     const $close_btn = $('<button>')
         .attr('type', 'button')
-        .addClass('btn btn-dark mt-3')
+        .addClass('btn btn-dark mt-4')
         .text('Close')
         .click(() => close_screen($screen));
 
