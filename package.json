@@ -12,6 +12,7 @@
     "serve": "webpack-dev-server --open --config webpack.dev.js",
     "start": "node server.js",
     "doc": "./node_modules/.bin/jsdoc -c jsdoc.json",
+    "deploy": "git push heroku master",
     "heroku-postbuild": "npm run build"
   },
   "author": "Markus Appel",
