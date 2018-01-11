@@ -333,10 +333,12 @@ function display_sunk_ship_count(first_shot) {
  * @typedef ShotData
  * @type {Object}
  * @property {!Boolean} hit - whether the shot is a hit
- * @property {!String} grid - the grid that received the shot (can be either
- *                           'player' or 'opponent')
  * @property {!jQuery} $tile - Grid tile that has received the shot as a
  *                   [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ * @property {!String} grid - the grid that received the shot (can be either
+ *                           'player' or 'opponent')
+ * @property {Array} [sunken_ship_coords] - Coordinates of the ship, if it was
+ *                                          sunk.
  */
 
 /**
@@ -408,17 +410,23 @@ function display_shot_mobile(shot_data) {
  * Put a shot marker on the associated tile and perform all due animations.
  * @private
  *
- * @param {!ShotData} shot_data - Information on the effect of shot
+ * @property {!Boolean} is_hit - whether the shot is a hit
+ * @property {!jQuery} $tile - Grid tile that has received the shot as a
+ *                   [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
+ * @property {Array} [sunken_ship_coords] - Coordinates of the ship, if it was
+ *                                          sunk.
+ * @property {!String} grid - the grid that received the shot (can be either
+ *                           'player' or 'opponent')
  */
-function mark_shot(shot_data) {
-    const marker_classes = shot_data.hit ? 'fa fa-times' : 'fa fa-bullseye';
+function mark_shot({hit: is_hit, $tile, sunken_ship_coords, grid}) {
+    const marker_classes = is_hit ? 'fa fa-times' : 'fa fa-bullseye';
     let $marker;
 
-    if(shot_data.grid === 'player') {
+    if(grid === 'player') {
         $marker = $('<i>').addClass(marker_classes);
-        shot_data.$tile.append($marker);
+        $tile.append($marker);
     } else { // marker element already present from shot indication
-        $marker = shot_data.$tile.children('i');
+        $marker = $tile.children('i');
         $marker.addClass(marker_classes);
     }
 
@@ -429,12 +437,12 @@ function mark_shot(shot_data) {
         {
             start: () => {
                 $marker.css('background-color', marker_color);
-                indicate_recent_shot($marker, marker_color, shot_data.grid);
+                indicate_recent_shot($marker, marker_color, grid);
 
-                if(shot_data.sunken_ship_coords)
-                    blow_ship_up(shot_data.sunken_ship_coords, shot_data.grid);
-                else if(shot_data.hit)
-                    animate_explosion(shot_data.$tile);
+                if(sunken_ship_coords)
+                    blow_ship_up(sunken_ship_coords, grid);
+                else if(is_hit)
+                    animate_explosion($tile);
             },
             duration: 600
         }
