@@ -549,7 +549,7 @@ function blow_ship_up(ship_coords, grid_type) {
  * @param {!Number} duration - Duration of the animation in ms.
  */
 function blow_fleet_up(grid, duration) {
-    grid.table.effect('shake', {times: 8}, duration);
+    grid.table.effect('shake', {times: 8, distance: 10}, duration);
 
     grid.tiles.filter('.ship').each(function() {
         setTimeout(() =>
