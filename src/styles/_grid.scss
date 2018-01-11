@@ -87,6 +87,7 @@
     table td {
       position: relative;
       background-color: map-get($colors, table-cell);
+      overflow: hidden;
 
       .fa {
         position: absolute;
@@ -122,20 +123,6 @@
           }
         }
       }
-
-      .sprite-container {
-        position: absolute;
-        left: -2em;
-        right: -2em;
-        top: -2em;
-        bottom: -2em;
-        z-index: 9999;
-        cursor: default;
-        /* prevent sprite-container from blocking clicks on adjacent tiles */
-        pointer-events: none;
-        /* spritesheet is 4x4, so a height of 400% only displays the top row */
-        background-size: auto 400%;
-      }
     }
 
     .ship {
@@ -167,7 +154,16 @@
   }
 }
 
-/* define top-level to enable initial spritesheet download enforcement in init.js */
+/* defined top-level b/c they are appended to body (but will appear in the grid) */
+.sprite-container {
+  position: absolute;
+  z-index: 9999;
+  cursor: default;
+  /* prevent sprite-container from blocking clicks on adjacent tiles */
+  pointer-events: none;
+  /* spritesheet is 4x4, so a height of 400% only displays the top row */
+  background-size: auto 400%;
+}
 .explosion {
   background-image: url(../assets/explosion.png);
 }

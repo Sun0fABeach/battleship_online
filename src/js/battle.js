@@ -485,9 +485,7 @@ function set_shot_shadow($element, active, color) {
  *                   [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
  */
 function animate_explosion($tile) {
-    const $sprite_container = $('<div>')
-        .addClass('sprite-container explosion')
-        .appendTo($tile);
+    const $sprite_container = insert_sprite_container($tile);
     const offset = $sprite_container.outerWidth();
     const delay = 50;
     const num_sprites = 16;
@@ -504,6 +502,23 @@ function animate_explosion($tile) {
         }, i * delay);
     }
     setTimeout(() => $sprite_container.remove(), num_sprites * delay);
+
+    /* appends it to body and positions it globally */
+    function insert_sprite_container($tile) {
+        const tile_pos = $tile.offset();
+        const em_size = parseFloat($('.game-grid').css('font-size'));
+        const protrusion = 2 * em_size;
+
+        return $('<div>')
+            .addClass('sprite-container explosion')
+            .appendTo('body')
+            .offset({
+                left: tile_pos.left - protrusion,
+                top: tile_pos.top - protrusion
+            })
+            .outerWidth($tile.outerWidth() + 2*protrusion)
+            .outerHeight($tile.outerHeight() + 2*protrusion);
+    }
 }
 
 /**
