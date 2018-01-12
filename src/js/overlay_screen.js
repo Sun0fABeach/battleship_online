@@ -44,9 +44,11 @@ const content_data = {
  */
 export function init() {
     for(const category in content_data) {
+        /* jshint ignore:start */
         $('footer #open-' + category).click(event =>
             display_screen(event, content_data[category])
         );
+        /* jshint ignore:end */
     }
 }
 
