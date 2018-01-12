@@ -557,7 +557,10 @@ function blow_ship_up(ship_coords, grid_type) {
  * @param {!Number} duration - Duration of the animation in ms.
  */
 function blow_fleet_up(grid, duration) {
-    grid.table.effect('shake', {times: 8, distance: 10}, duration);
+    /* shake both grids if they are on top of each other to prevent the bottom
+       grid from becoming visible when the top one shakes */
+    const to_shake = adjacent_grid_mode() ? grid.table : ui.grids.$both;
+    to_shake.effect('shake', {times: 8, distance: 10}, duration);
 
     grid.tiles.filter('.ship').each(function() {
         setTimeout(() =>
