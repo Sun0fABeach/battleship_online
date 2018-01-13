@@ -4,6 +4,7 @@
  */
 
 import Ship from './classes/ship';
+import BattleStats from './classes/battle_stats';
 import * as ui from './ui';
 import { adjacent_grid_mode, random_in_range } from './helpers';
 
@@ -14,24 +15,12 @@ import { adjacent_grid_mode, random_in_range } from './helpers';
  */
 let battle_active;
 
-/**
- * @typedef ShipCount
- * @type {Object}
- * @property {Number} total - Total number of ships (same for either side).
- * @property {Object} intact - Number of intact ships for each player.
- */
-
-/** Total and intact ship numbers for each player
- *  @type {ShipCount}
+/** The [statistics]{@link module:classes/battle_stats} for the current battle.
+ *  @type {BattleStats}
  *  @private
  */
-const ship_count = {
-    total: 0,
-    intact: {
-        player: 0,
-        opponent: 0
-    }
-};
+let battle_stats;
+
 
 /**
  * Initialize module.
@@ -55,8 +44,7 @@ export function activate(opponent, player_begins) {
         ui.modals.leave_confirm.close();
 
     battle_active = true;
-    ship_count.total = ui.grids.player.num_ships;
-    ship_count.intact.player = ship_count.intact.opponent = ship_count.total;
+    battle_stats = new BattleStats(ui.grids.player.num_ships);
 
     if(player_begins) {
         if(adjacent_grid_mode())            // set without actually sliding up
@@ -184,10 +172,10 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
         return;        // (rare networking corner case)
 
     if(shot_result.sunken_ship) {
-        --ship_count.intact.opponent;
-        display_sunk_ship_count(first_shot);
+        battle_stats.record_sunk_ship('player');
+        display_sunk_ship_count();
     } else if(first_shot) { // switch to displaying score on first shot
-        display_sunk_ship_count(true);
+        display_sunk_ship_count();
     }
 
     display_shot({
@@ -251,7 +239,7 @@ function handle_opponent_shot(
     if(!battle_active) // might have been aborted before shot arrived
         return;
     if(first_shot)
-        display_sunk_ship_count(true);
+        display_sunk_ship_count();
 
     const $tile = ui.grids.player.coords_to_tile(coord_pair);
     const ship = ui.grids.player.get_ship($tile);
@@ -264,10 +252,15 @@ function handle_opponent_shot(
         $tile: $tile
     });
 
-    if(shot_result.sunken_ship && --ship_count.intact.player === 0) {
-        shot_result.defeat = true;
-        handle_game_over(opponent, false);
-    } else {
+    if(shot_result.sunken_ship) {
+        battle_stats.record_sunk_ship('opponent');
+        if(battle_stats.ships_to_sink('opponent') === 0) {
+            shot_result.defeat = true;
+            handle_game_over(opponent, false);
+        }
+    }
+
+    if(!shot_result.defeat) {
         if(shot_result.hit)
             let_opponent_shoot(opponent);
         else
@@ -318,13 +311,11 @@ function handle_game_over(opponent, victory) {
 /**
  * Show how many ships the player sunk as the game message.
  * @private
- *
- * @param {!Boolean} first_shot - Whether it was the first shot taken.
  */
-function display_sunk_ship_count(first_shot) {
-    let num_sunk = ship_count.total - ship_count.intact.opponent;
+function display_sunk_ship_count() {
     const msg = 'Score: <strong>' +
-                num_sunk + '/' + ship_count.total +
+                battle_stats.ships_sunk('player') + '/' +
+                battle_stats.ships_total +
                 '</strong> ships';
     ui.text.game_msg.set_text(msg);
 }
