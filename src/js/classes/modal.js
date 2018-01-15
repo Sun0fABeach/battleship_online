@@ -45,8 +45,9 @@ class BasicInteractionModal extends Modal {
         this._heading = new Text(
             this._$head_container.children('.modal-title')
         );
+        this._$body_container = this._$modal.find('.modal-body');
         this._msg = new Text(
-            this._$modal.find('.modal-body').children().eq(0)
+            this._$body_container.children().eq(0)
         );
         this._$btn_left = $modal.find('button[name="left"]');
         this._$btn_right = $modal.find('button[name="right"]');
@@ -159,13 +160,15 @@ export class GameOverModal extends BasicInteractionModal {
         this._no_regame_cb = no_regame_cb;
         this._opp_wants_regame = false;
         this._player_wants_regame = false;
+        this._class = 'game-over-modal';
     }
 
-    open(opponent, victory) {
+    open(opponent, battle_stats, victory) {
+        this._$modal.addClass(this._class);
+
         this._$head_container.show();
         this._heading.set_text(victory ? 'You <strong>win</strong>!' :
                                 'You have been <strong>defeated</strong>!');
-        this._msg.set_text('Do you want a regame?');
         this._$btn_left.off().one('click', () =>
             this._regame_yes_handler(opponent)
         );
@@ -177,12 +180,20 @@ export class GameOverModal extends BasicInteractionModal {
         this._opp_wants_regame = false;
         this._player_wants_regame = false;
 
+        this._prepare_content(battle_stats);
+        this._$info_msg = this._$body_container.find('p');
+
         swap_in_socket_handlers(this._socket, () => {
             this._register_opponent_regame_handler(opponent);
             this._register_opponent_abort_handler(opponent);
         });
 
         super._open();
+    }
+
+    close() {
+        this._$modal.removeClass(this._class);
+        super.close();
     }
 
     set_regame_decision_handlers(yes_regame_cb, no_regame_cb) {
@@ -208,7 +219,7 @@ export class GameOverModal extends BasicInteractionModal {
             super._close();
             this._yes_regame_cb();
         } else {
-            this._msg.set_text(
+            this._$info_msg.html(
                 'Waiting for answer of <strong>' +
                 text.opponent_name.text +
                 '</strong> ...'
@@ -225,7 +236,7 @@ export class GameOverModal extends BasicInteractionModal {
                 super._close();
                 this._yes_regame_cb();
             } else {
-                this._msg.set_text(
+                this._$info_msg.html(
                     '<strong>' + text.opponent_name.text + '</strong> ' +
                     " wants a regame!"
                 );
@@ -236,7 +247,7 @@ export class GameOverModal extends BasicInteractionModal {
 
     _register_opponent_abort_handler(opponent) {
         opponent.set_abort_handler(() => {
-            this._msg.set_text(
+            this._$info_msg.html(
                 '<strong>' + text.opponent_name.text + '</strong> ' +
                 "doesn't want a regame."
             );
@@ -246,6 +257,62 @@ export class GameOverModal extends BasicInteractionModal {
             .one('click', () => this._regame_no_ok_handler())
             .text('OK');
         });
+    }
+
+    _prepare_content(battle_stats) {
+        let content = `
+            <button type="button" name="stats"
+                class="btn btn-sm btn-outline-secondary mt-1">
+                    Show Statistics
+            </button>
+            <div>
+                <table class="mx-auto mt-4 w-75
+                            border border-left-0 border-right-0">`;
+        /* table-wrapping div required to make sliding work */
+
+        ['player', 'opponent'].forEach(side =>
+            content = content.concat(`
+                <thead><tr>
+                    <th colspan="2">${text[side + '_name'].text}</th>
+                </tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Total shots</td>
+                        <td>${battle_stats.total_shots(side)}</td>
+                    </tr>
+                    <tr>
+                        <td>Hits</td>
+                        <td>${battle_stats.hits(side)}</td>
+                    </tr>
+                    <tr>
+                        <td>Misses</td>
+                        <td>${battle_stats.misses(side)}</td>
+                    </tr>
+                    <tr>
+                        <td>Ships sunk</td>
+                        <td>
+                            ${battle_stats.ships_sunk(side) + '/' +
+                                battle_stats.ships_total}
+                        </td>
+                    </tr>
+                </tbody>
+            `)
+        );
+
+        content = content.concat(`
+                </table>
+            </div>
+            <p class="mt-3 mb-0">Do you want a regame?</p>
+        `);
+
+        this._msg.set_text(content);
+        const $table_wrapper = this._$body_container.find('table').parent();
+        $table_wrapper.hide();
+        this._$body_container.find('button[name=stats]')
+            .one('click', function() {
+                $(this).addClass('disabled');
+                $table_wrapper.slideDown();
+            });
     }
 }
 

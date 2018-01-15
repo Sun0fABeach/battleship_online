@@ -59,6 +59,16 @@ export default class BattleStats {
     }
 
     /**
+     * Return number of shots the given side fired.
+     *
+     * @param {!String} side - Either 'player' or 'opponent'.
+     * @returns {Number} The number of shots the given side fired.
+     */
+    total_shots(side) {
+        return this.hits(side) + this.misses(side);
+    }
+
+    /**
      * Record a sunk ship for the given side.
      *
      * @param {!String} side - Either 'player' or 'opponent'.

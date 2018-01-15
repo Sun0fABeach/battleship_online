@@ -30,3 +30,32 @@
     }
   }
 }
+
+#basic-interaction-modal {
+  &.game-over-modal {
+    .modal-body > div > div {
+      > table { // for top-level table styles, see added bootstrap classes in html
+        > thead {
+          &:first-of-type th {
+            padding-top: 1em; // separation from table's border-top
+          }
+          th {
+            padding-bottom: 0.4em; // separation from tbody
+          }
+        }
+        > tbody {
+          td:first-of-type { // left column
+            text-align: left;
+            padding-right: 2em;
+          }
+          td:last-of-type { // right column
+            text-align: right;
+          }
+        }
+        tr:last-of-type td {
+          padding-bottom: 1em; // separation from next thead or table's border-bottom
+        }
+      }
+    }
+  }
+}

@@ -171,12 +171,10 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
     if(!battle_active) // battle might have been aborted before result arrives
         return;        // (rare networking corner case)
 
-    if(shot_result.sunken_ship) {
-        battle_stats.record_sunk_ship('player');
+    record_shot(shot_result, 'player');
+
+    if(shot_result.sunken_ship || first_shot)
         display_sunk_ship_count();
-    } else if(first_shot) { // switch to displaying score on first shot
-        display_sunk_ship_count();
-    }
 
     display_shot({
         grid: 'opponent',
@@ -238,12 +236,15 @@ function handle_opponent_shot(
 ) {
     if(!battle_active) // might have been aborted before shot arrived
         return;
+
     if(first_shot)
         display_sunk_ship_count();
 
     const $tile = ui.grids.player.coords_to_tile(coord_pair);
     const ship = ui.grids.player.get_ship($tile);
     const shot_result = ship ? ship.receive_shot(coord_pair) : {hit: false};
+
+    record_shot(shot_result, 'opponent');
 
     display_shot({
         grid: 'player',
@@ -252,15 +253,10 @@ function handle_opponent_shot(
         $tile: $tile
     });
 
-    if(shot_result.sunken_ship) {
-        battle_stats.record_sunk_ship('opponent');
-        if(battle_stats.ships_to_sink('opponent') === 0) {
-            shot_result.defeat = true;
-            handle_game_over(opponent, false);
-        }
-    }
-
-    if(!shot_result.defeat) {
+    if(battle_stats.ships_to_sink('opponent') === 0) {
+        shot_result.defeat = true;
+        handle_game_over(opponent, false);
+    } else {
         if(shot_result.hit)
             let_opponent_shoot(opponent);
         else
@@ -268,6 +264,25 @@ function handle_opponent_shot(
     }
 
     report_result_cb(shot_result);
+}
+
+/**
+ * Record the shot result to the
+ * [statistics]{@link module:classes/battle_stats}.
+ * @private
+ *
+ * @param {!ShotResult} shot_result - Information on the effect of shot
+ * @param {!String} shooter - The side who's shot shall be recorded (either
+ *                              'player' or 'opponent')
+ */
+function record_shot(shot_result, shooter) {
+    if(shot_result.hit) {
+        battle_stats.record_hit(shooter);
+        if(shot_result.sunken_ship)
+            battle_stats.record_sunk_ship(shooter);
+    } else {
+        battle_stats.record_miss(shooter);
+    }
 }
 
 /**
@@ -285,7 +300,6 @@ function handle_game_over(opponent, victory) {
     const fleet_explosion_duration = 2000;
     const modal_delay = fleet_explosion_delay + fleet_explosion_duration + 700;
 
-    // TODO: handle opponent leaving during animation
     setTimeout(() =>
         blow_fleet_up(
             ui.grids[victory ? 'opponent' : 'player'],
@@ -303,7 +317,7 @@ function handle_game_over(opponent, victory) {
         setTimeout(() => {
             // don't open if opponent left during fleet explosion animation
             if(ui.grids.$both.hasClass('dual-view'))
-                ui.modals.game_over.open(opponent, victory);
+                ui.modals.game_over.open(opponent, battle_stats, victory);
         }, modal_delay);
     }
 }
