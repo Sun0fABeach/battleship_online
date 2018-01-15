@@ -45,10 +45,7 @@ class BasicInteractionModal extends Modal {
         this._heading = new Text(
             this._$head_container.children('.modal-title')
         );
-        this._$body_container = this._$modal.find('.modal-body');
-        this._msg = new Text(
-            this._$body_container.children().eq(0)
-        );
+        this._$main_content = this._$modal.find('.modal-body').children().eq(0);
         this._$btn_left = $modal.find('button[name="left"]');
         this._$btn_right = $modal.find('button[name="right"]');
     }
@@ -68,7 +65,7 @@ export class AcknowledgeModal extends BasicInteractionModal {
 
     open(msg) {
         this._$head_container.hide();
-        this._msg.set_text(msg);
+        this._$main_content.html(msg);
         this._$btn_left.hide();
         this._$btn_right
         .off()
@@ -126,7 +123,7 @@ export class LeaveConfirmModal extends BasicInteractionModal {
     }
 
     set_message(new_msg) {
-        this._msg.set_text(new_msg);
+        this._$main_content.html(new_msg);
         return this;
     }
 
@@ -181,7 +178,7 @@ export class GameOverModal extends BasicInteractionModal {
         this._player_wants_regame = false;
 
         this._prepare_content(battle_stats);
-        this._$info_msg = this._$body_container.find('p');
+        this._$info_msg = this._$main_content.find('p');
 
         swap_in_socket_handlers(this._socket, () => {
             this._register_opponent_regame_handler(opponent);
@@ -305,10 +302,10 @@ export class GameOverModal extends BasicInteractionModal {
             <p class="mt-3 mb-0">Do you want a regame?</p>
         `);
 
-        this._msg.set_text(content);
-        const $table_wrapper = this._$body_container.find('table').parent();
+        this._$main_content.html(content);
+        const $table_wrapper = this._$main_content.find('table').parent();
         $table_wrapper.hide();
-        this._$body_container.find('button[name=stats]')
+        this._$main_content.find('button[name=stats]')
             .one('click', function() {
                 $(this).addClass('disabled');
                 $table_wrapper.slideDown();
