@@ -32,7 +32,8 @@ module.exports = merge(common, {
                                     ]
                                 }
                             }]
-                        ]
+                        ],
+                        babelrc: false // .babelrc only there for mocha atm
                     }
                 }
             }

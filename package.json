@@ -8,6 +8,7 @@
     "url": "git@bitbucket.org:Sun0fABeach/battleship_online.git"
   },
   "scripts": {
+    "test": "mocha --require babel-core/register --recursive src/js/test",
     "build": "webpack --config webpack.prod.js",
     "serve": "webpack-dev-server --open --config webpack.dev.js",
     "start": "node server.js",
@@ -18,9 +19,12 @@
   "author": "Markus Appel",
   "license": "ISC",
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "jsdoc": "^3.5.5",
     "jshint": "^2.9.5",
     "jshint-loader": "^0.8.4",
+    "mocha": "^5.0.0",
     "webpack-dev-server": "^2.9.4",
     "webpack-visualizer-plugin": "^0.1.11"
   },

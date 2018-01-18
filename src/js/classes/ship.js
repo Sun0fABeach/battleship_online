@@ -8,7 +8,7 @@ import { equal_coords } from '../helpers';
 export default class Ship {
     /**
      * Create a Ship instance.
-     * @param {Array} coords - the ship's coordinates.
+     * @param {!Array} coords - the ship's coordinates (array of size-2 arrays).
      */
     constructor(coords) {
         this.coords = coords;
