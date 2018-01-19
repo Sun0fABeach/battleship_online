@@ -3,6 +3,11 @@
 
 import { equal_coords } from '../helpers';
 
+/* TODO: dox that describe:
+ * - copy by reference of coords @ constructor
+ * - add/remove coords as temporary state
+ * - prepare for battle
+ */
 
 /** Ship class. */
 export default class Ship {
@@ -82,7 +87,7 @@ export default class Ship {
         this.coords.sort((a, b) => a[sort_key] - b[sort_key]);
     }
 
-    rotate(grid) {
+    rotate(grid_height) {
         if(this.length === 1)
             return false;
 
@@ -111,7 +116,7 @@ export default class Ship {
                 break;
             }
             // side: bottom or right
-            adjustment = this.coords[this.length-1][dimension] - grid.height + 1;
+            adjustment = this.coords[this.length-1][dimension] - grid_height + 1;
             if(adjustment > 0)
                 for(const pair of this.coords)
                     pair[dimension] -= adjustment;
@@ -126,7 +131,7 @@ export default class Ship {
         if(this.coords.length !== this.length)
             return false;
 
-        const [same, different] = this.alignment === 'x' ? [1, 0] : [0 , 1];
+        const [same, different] = this.alignment === 'x' ? [1, 0] : [0, 1];
 
         const constant = this.coords[0][same];
         if(this.coords.some(pair => pair[same] !== constant))

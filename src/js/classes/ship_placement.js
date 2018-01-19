@@ -341,7 +341,7 @@ export class DnDShipPlacement extends ShipPlacement {
 
             // register rotation handler first
             $draggable.one('mouseup', function() {
-                if(ship.rotate(grids.player)) {
+                if(ship.rotate(grids.player.height)) {
                     that._draw_grid();
                     that._span_draggable_movable($draggable);
                 }
