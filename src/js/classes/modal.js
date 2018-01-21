@@ -52,7 +52,7 @@ class BasicInteractionModal extends Modal {
 }
 
 /** Modal that informs the user about something. */
-export class AcknowledgeModal extends BasicInteractionModal {
+class AcknowledgeModal extends BasicInteractionModal {
     /**
      * Create a AcknowledgeModal instance.
      * @param {jQuery} $modal -
@@ -78,7 +78,7 @@ export class AcknowledgeModal extends BasicInteractionModal {
 }
 
 /** Modal that asks the user if she really wants to leave. */
-export class LeaveConfirmModal extends BasicInteractionModal {
+class LeaveConfirmModal extends BasicInteractionModal {
     /**
      * Create a LeaveConfirmModal instance.
      * @param {jQuery} $modal -
@@ -134,7 +134,7 @@ export class LeaveConfirmModal extends BasicInteractionModal {
 }
 
 /** Modal that asks the user for a regame. */
-export class GameOverModal extends BasicInteractionModal {
+class GameOverModal extends BasicInteractionModal {
     /**
      * Create a GameOverModal instance.
      * @param {jQuery} $modal -
@@ -314,7 +314,7 @@ export class GameOverModal extends BasicInteractionModal {
 }
 
 /** Modal that lists the current hosts and lets the user join them. */
-export class HostModal extends Modal {
+class HostModal extends Modal {
     /**
      * Create a HostModal instance.
      * @param {jQuery} $modal -
@@ -517,3 +517,6 @@ export class HostModal extends Modal {
         $entry.removeClass('d-flex').addClass('d-none');
     }
 }
+
+
+export { AcknowledgeModal, LeaveConfirmModal, GameOverModal, HostModal };

@@ -15,7 +15,8 @@ import { adjacent_grid_mode, random_in_range } from './helpers';
  */
 let battle_active;
 
-/** The [statistics]{@link module:classes/battle_stats} for the current battle.
+/** The [statistics]{@link module:classes/battle_stats~BattleStats} for the
+ *  current battle.
  *  @type {BattleStats}
  *  @private
  */
@@ -33,7 +34,7 @@ export function init() {
  * Activate battle.
  *
  * @param {!Opponent} opponent - interface for interacting with the
- *                              [opponent]{@link module:classes/opponent}
+ *                           [opponent]{@link module:classes/opponent~Opponent}
  * @param {!Boolean} player_begins - whether the player takes the first shot.
  */
 export function activate(opponent, player_begins) {
@@ -119,7 +120,7 @@ function set_grid_cursor(active, type) {
  * @private
  *
  * @param {!Opponent} opponent -
- *                      The [opponent]{@link module:classes/opponent.Opponent}
+ *                      The [opponent]{@link module:classes/opponent~Opponent}
  * @param {Boolean} [first_shot=false] - Whether it is the first shot the
  *                                       player takes
  */
@@ -158,7 +159,7 @@ function let_player_shoot(opponent, first_shot=false) {
  * @private
  *
  * @param {!Opponent} opponent -
- *                      The [opponent]{@link module:classes/opponent.Opponent}
+ *                      The [opponent]{@link module:classes/opponent~Opponent}
  * @param {!ShotResult} shot_result - Information on the effect of shot
  * @param {!jQuery} $tile - Grid tile that has been clicked as
  *                 [jQuery]{@link http://api.jquery.com/Types/#jQuery} object
@@ -205,7 +206,7 @@ function handle_player_shot_result(opponent, shot_result, $tile, first_shot) {
  * @private
  *
  * @param {!Opponent} opponent -
- *                      The [opponent]{@link module:classes/opponent.Opponent}
+ *                      The [opponent]{@link module:classes/opponent~Opponent}
  * @param {Boolean} [first_shot=false] - Whether it is the first shot the
  *                                       opponent takes
  */
@@ -224,7 +225,7 @@ function let_opponent_shoot(opponent, first_shot=false) {
  * @private
  *
  * @param {!Opponent} opponent -
- *                      The [opponent]{@link module:classes/opponent.Opponent}
+ *                      The [opponent]{@link module:classes/opponent~Opponent}
  * @param {!Array} coord_pair - Shot coordinates
  * @param {!ReportResult} report_result_cb - Callback that will inform the
  *                                           opponent about the shot result
@@ -268,7 +269,7 @@ function handle_opponent_shot(
 
 /**
  * Record the shot result to the
- * [statistics]{@link module:classes/battle_stats}.
+ * [statistics]{@link module:classes/battle_stats~BattleStats}.
  * @private
  *
  * @param {!ShotResult} shot_result - Information on the effect of shot
@@ -290,7 +291,7 @@ function record_shot(shot_result, shooter) {
  * @private
  *
  * @param {!Opponent} opponent -
- *                      The [opponent]{@link module:classes/opponent.Opponent}
+ *                      The [opponent]{@link module:classes/opponent~Opponent}
  * @param {!Boolean} victory - Whether the player won the game
  */
 function handle_game_over(opponent, victory) {
@@ -560,7 +561,7 @@ function blow_ship_up(ship_coords, grid_type) {
  * Animate destruction of entire fleet.
  * @private
  *
- * @param {!Grid} grid - [Grid]{@link module:classes/grid.Grid} to animate.
+ * @param {!Grid} grid - [Grid]{@link module:classes/grid~Grid} to animate.
  * @param {!Number} duration - Duration of the animation in ms.
  */
 function blow_fleet_up(grid, duration) {

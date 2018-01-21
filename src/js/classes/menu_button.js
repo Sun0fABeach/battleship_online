@@ -82,7 +82,7 @@ class MenuButtonBase {
 }
 
 /** A single DOM menu button. */
-export class MenuButton extends MenuButtonBase {
+class MenuButton extends MenuButtonBase {
     /**
      * Create a MenuButton instance.
      * @param {!String} btn_name - Name of the button as defined via HTML name
@@ -183,7 +183,7 @@ export class MenuButton extends MenuButtonBase {
  */
 
 /** A DOM menu button that has a dropdown connected to it. */
-export class MenuDropdownButton extends MenuButtonBase {
+class MenuDropdownButton extends MenuButtonBase {
     /**
      * Create a MenuButton instance.
      * @param {!String} btn_name - Name of the button as defined via HTML name
@@ -298,3 +298,6 @@ export class MenuDropdownButton extends MenuButtonBase {
         });
     }
 }
+
+
+export { MenuButton, MenuDropdownButton };

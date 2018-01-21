@@ -3,7 +3,7 @@
 */
 
 /** Class representing a DOM game grid. */
-export class Grid {
+class Grid {
     /**
      * Create a Grid instance.
      * @param {jQuery} $container -
@@ -108,7 +108,7 @@ export class Grid {
 }
 
 /** Class representing the players DOM game grid, containing his fleet. */
-export class OwnGrid extends Grid {
+class OwnGrid extends Grid {
     /**
      * Create a OwnGrid instance.
      * @param {jQuery} $container -
@@ -206,3 +206,6 @@ export class OwnGrid extends Grid {
         });
     }
 }
+
+
+export { Grid, OwnGrid };

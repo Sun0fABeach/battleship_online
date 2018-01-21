@@ -2,7 +2,7 @@
     @module classes/text */
 
 /** Class representing a modifiable DOM text element. */
-export default class Text {
+class Text {
     /**
      * Create a Text instance.
      * @param {jQuery} $container -
@@ -43,3 +43,7 @@ export default class Text {
         return this;
     }
 }
+
+
+export { Text };
+export default Text;

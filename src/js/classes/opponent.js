@@ -31,7 +31,7 @@ class Opponent {
 
 /** Interface for interacting with a human opponent via socket.
  *  @extends Opponent */
-export class HumanOpponent extends Opponent {
+class HumanOpponent extends Opponent {
     /**
      * Create a HumanOpponent instance.
      *
@@ -87,7 +87,7 @@ export class HumanOpponent extends Opponent {
 /** Interface for interacting with an AI opponent.
  *  @abstract
  *  @extends Opponent */
-export class AIOpponent extends Opponent {
+class AIOpponent extends Opponent {
     /**
      * Create an AIOpponent instance.
      */
@@ -223,7 +223,7 @@ export class AIOpponent extends Opponent {
 
 /** AI opponent on easy difficulty.
  *  @extends AIOpponent */
-export class AIOpponentEasy extends AIOpponent {
+class AIOpponentEasy extends AIOpponent {
     /**
      * Return offsets to be used for calculating the next shot position when a
      * ship has previously been hit, but not sunk yet. In this case, it is any
@@ -254,7 +254,7 @@ export class AIOpponentEasy extends AIOpponent {
 
 /** AI opponent on normal difficulty.
  *  @extends AIOpponent */
-export class AIOpponentNormal extends AIOpponent {
+class AIOpponentNormal extends AIOpponent {
     /**
      * Create an AIOpponentNormal instance.
      */
@@ -351,6 +351,10 @@ export class AIOpponentNormal extends AIOpponent {
         return surrounding_coords;
     }
 }
+
+
+export { HumanOpponent, AIOpponent, AIOpponentEasy, AIOpponentNormal };
+
 
 /* Ideas for hard AI:
  * - when ship is hit and not sunk yet, filter out shot option coords that have

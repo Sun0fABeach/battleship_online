@@ -4,7 +4,7 @@
 import { equal_coords } from '../helpers';
 
 /** Ship class. */
-export default class Ship {
+class Ship {
     /**
      * Create a Ship instance.
      *
@@ -18,8 +18,8 @@ export default class Ship {
 
     /**
      * The coordinates of the ship. If set, the
-     * [length]{@link module:classes/ship#length} and
-     * [alignment]{@link module:classes/ship#alignment}
+     * [length]{@link module:classes/ship~Ship#length} and
+     * [alignment]{@link module:classes/ship~Ship#alignment}
      * properties will be adjusted accordingly.
      *
      * @type {Array}
@@ -68,9 +68,9 @@ export default class Ship {
 
     /**
      * Add a coordinate pair to the ship's coordinates. Note that this will not
-     * adjust the [length]{@link module:classes/ship#length} and
-     * [alignment]{@link module:classes/ship#alignment} properties, because it
-     * is supposed to be an addition done while the ship is being dragged,
+     * adjust the [length]{@link module:classes/ship~Ship#length} and
+     * [alignment]{@link module:classes/ship~Ship#alignment} properties, because
+     * it is supposed to be an addition done while the ship is being dragged,
      * moving to a new tile. During this drag, length and alignment don't
      * change.
      *
@@ -82,9 +82,9 @@ export default class Ship {
 
     /**
      * Remove a coordinate pair from the ship's coordinates. Note that this
-     * will not adjust the [length]{@link module:classes/ship#length} and
-     * [alignment]{@link module:classes/ship#alignment} properties, because it
-     * is supposed to be a removal done while the ship is being dragged and
+     * will not adjust the [length]{@link module:classes/ship~Ship#length} and
+     * [alignment]{@link module:classes/ship~Ship#alignment} properties, because
+     * it is supposed to be a removal done while the ship is being dragged and
      * leaving a tile. During this drag, length and alignment don't change.
      *
      * @param {!Array} - Coordinate pair to remove.
@@ -112,7 +112,7 @@ export default class Ship {
 
     /**
      * Has to be called once before a
-     * [receive_shot]{@link module:classes/ship#receive_shot} can be
+     * [receive_shot]{@link module:classes/ship~Ship#receive_shot} can be
      * successfully called.
      */
     prepare_for_battle() {
@@ -155,8 +155,8 @@ export default class Ship {
      * Sort the ship's coordinates so they are arranged left-to-right in
      * case of horizontal alignment, or top-to-bottom if the ship is aligned
      * vertically. This may be necessary after coordinate pairs have been
-     * [added]{@link module:classes/ship#add_coords} or
-     * [removed]{@link module:classes/ship#remove_coords} during dragging.
+     * [added]{@link module:classes/ship~Ship#add_coords} or
+     * [removed]{@link module:classes/ship~Ship#remove_coords} during dragging.
      */
     sort_coords() {
         const sort_key = this.alignment === 'x' ? 0 : 1;
@@ -208,9 +208,9 @@ export default class Ship {
 
     /**
      * Returns whether the ship's state is valid, meaning its coordinates are
-     * [sorted]{@link module:classes/ship#sort_coords} and have the original
-     * length. This test might be necessary, because dragging will add and
-     * remove coordinate pairs without respecting order.
+     * [sorted]{@link module:classes/ship~Ship#sort_coords} and have the
+     * original length. This test might be necessary, because dragging will add
+     * and remove coordinate pairs without respecting order.
      *
      * @returns {Boolean} whether the ship is in valid state.
      */
@@ -241,3 +241,7 @@ export default class Ship {
         return this.coords[0][0] === this.coords[1][0] ? 'y' : 'x';
     }
 }
+
+
+export { Ship };
+export default Ship;

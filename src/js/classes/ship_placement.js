@@ -2,7 +2,7 @@
  * Ship placement logic, using jQuery UI
  * [drag]{@link https://api.jqueryui.com/draggable/} &
  * [drop]{@link https://api.jqueryui.com/droppable/}
- * @module ship_placement
+ * @module classes/ship_placement
  */
 
 import Ship from './ship';
@@ -24,7 +24,7 @@ const surrounding_offsets = [
 ];
 
 /** Basic ship placement class. Able to set random coordinates. */
-export class ShipPlacement {
+class ShipPlacement {
     /**
      * Create a ShipPlacement instance.
      */
@@ -42,7 +42,7 @@ export class ShipPlacement {
     }
 
     /**
-     * List of all placed [ships]{@link module:classes/ship}.
+     * List of all placed [ships]{@link module:classes/ship~Ship}.
      */
     get ships() {
         return this._ships;
@@ -162,7 +162,7 @@ export class ShipPlacement {
 
 
 /** Ship placement class that enables drag & drop on the player grid. */
-export class DnDShipPlacement extends ShipPlacement {
+class DnDShipPlacement extends ShipPlacement {
     /**
      * Create a DnDShipPlacement instance.
      */
@@ -264,7 +264,7 @@ export class DnDShipPlacement extends ShipPlacement {
 
     /**
      * Deactivate ship placement. This will remove all draggables and register
-     * the placed [ships]{@link module:classes/ship} with the grid.
+     * the placed [ships]{@link module:classes/ship~Ship} with the grid.
      */
     deactivate() {
         if(!this.is_active())
@@ -455,8 +455,8 @@ export class DnDShipPlacement extends ShipPlacement {
      * Clear all ships and placement markers from the player's grid, then
      * (re)draw them.
      *
-     * @param {Ship} highlighted_ship - [ship]{@link module:classes/ship} that
-     *                                  is currently being dragged
+     * @param {Ship} highlighted_ship - [ship]{@link module:classes/ship~Ship}
+     *                                  that is currently being dragged
      */
     _draw_grid(highlighted_ship) {
         this._clear_grid();
@@ -474,8 +474,8 @@ export class DnDShipPlacement extends ShipPlacement {
     /**
      * Draw all ships on the player's grid.
      *
-     * @param {Ship} highlighted_ship - [ship]{@link module:classes/ship} that
-     *                                  is currently being dragged
+     * @param {Ship} highlighted_ship - [ship]{@link module:classes/ship~Ship}
+     *                                  that is currently being dragged
      */
     _draw_ships(highlighted_ship) {
         for(const ship of this._ships) {
@@ -513,3 +513,6 @@ export class DnDShipPlacement extends ShipPlacement {
         }
     }
 }
+
+
+export { ShipPlacement, DnDShipPlacement };

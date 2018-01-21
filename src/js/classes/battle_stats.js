@@ -2,7 +2,7 @@
     @module classes/battle_stats */
 
 /** Battle statistics class. */
-export default class BattleStats {
+class BattleStats {
     /**
      * Create a BattleStats instance.
      * @param {!Number} num_ships - total number of ships in a fleet.
@@ -106,3 +106,7 @@ export default class BattleStats {
         return this._record.ships_total;
     }
 }
+
+
+export { BattleStats };
+export default BattleStats;
