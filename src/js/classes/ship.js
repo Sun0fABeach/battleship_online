@@ -207,10 +207,11 @@ class Ship {
     }
 
     /**
-     * Returns whether the ship's state is valid, meaning its coordinates are
-     * [sorted]{@link module:classes/ship~Ship#sort_coords} and have the
-     * original length. This test might be necessary, because dragging will add
-     * and remove coordinate pairs without respecting order.
+     * Returns whether the ship's state is valid, meaning its coordinates have
+     * the original length and proper alignment. Note that this doesn't mean
+     * that they are [sorted]{@link module:classes/ship~Ship#sort_coords}. This
+     * test might be necessary, because dragging will add and remove coordinate
+     * pairs without respecting order.
      *
      * @returns {Boolean} whether the ship is in valid state.
      */

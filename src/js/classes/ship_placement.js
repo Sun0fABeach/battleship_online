@@ -209,15 +209,19 @@ class DnDShipPlacement extends ShipPlacement {
                     const ship = ui.draggable.data('ship');
                     // avoid copy by reference here by using Array.from()
                     ship.add_coords(Array.from($(this).data('coords')));
-                    if(ship.in_valid_state())
+                    if(ship.in_valid_state()) {
+                        ui.draggable.data('moved', true);
                         that._draw_grid(ship);
+                    }
                 }
             },
             out: function(event, ui) {
                 const ship = ui.draggable.data('ship');
                 ship.remove_coords($(this).data('coords'));
-                if(ship.in_valid_state())
+                if(ship.in_valid_state()) {
+                    ui.draggable.data('moved', true);
                     that._draw_grid(ship);
+                }
             }
         };
 
@@ -324,13 +328,14 @@ class DnDShipPlacement extends ShipPlacement {
             .draggable(this._drag_config)
             .on('mousedown', _draggable_mousedown_handler)
             .data('ship', ship)
+            .data('moved', false)
             .css('position', 'absolute')
             .insertAfter(grids.player.table);
 
             this._span_draggable_movable($draggable);
         }
 
-        const that = this;
+        const self = this;
 
         /**
          * Event handler for mouse interaction with draggables.
@@ -338,34 +343,25 @@ class DnDShipPlacement extends ShipPlacement {
         function _draggable_mousedown_handler() {
             const $draggable = $(this); // jshint ignore:line
             const ship = $draggable.data('ship');
+            self._draw_grid(ship);
+            _set_dragging_cursor(true);
 
-            // register rotation handler first
             $draggable.one('mouseup', function() {
-                if(ship.rotate(grids.player.height)) {
-                    that._draw_grid();
-                    that._span_draggable_movable($draggable);
-                }
-                clearTimeout(drag_start);
-            });
-
-            // after set amount of ms: don't rotate, but start dragging instead
-            const drag_start = setTimeout(() => {
-                $draggable.off('mouseup'); // remove rotation handler
-
-                that._draw_grid(ship);
-                _set_dragging_cursor(true);
-
-                $('body').one('mouseup', function() {
+                if($draggable.data('moved')) {
                     /* coords might be mixed up due to over & out
-                       mechanics @ droppables */
+                      mechanics @ droppables */
                     ship.sort_coords();
-                    // dropped ship needs to be on top of others
-                    $draggable.css('z-index', ++that._z_index_val);
-                    that._draw_grid();
-                    _set_dragging_cursor(false);
-                });
-            }, 65);
+                    /* dropped ship needs to be on top of others. */
+                    $draggable.css('z-index', ++self._z_index_val);
+                } else if(ship.rotate(grids.player.height)) {
+                    self._span_draggable_movable($draggable);
+                }
+                $draggable.data('moved', false);
+                self._draw_grid();
+                _set_dragging_cursor(false);
+            });
         }
+
 
         /**
          * Enable/disable dragging cursor.
