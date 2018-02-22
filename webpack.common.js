@@ -70,7 +70,7 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(['dist/*']),
-        new CopyWebpackPlugin([{from: 'src/robots.txt'}]),
+        new CopyWebpackPlugin([{from: 'robots.txt'}]),
 
         // ensures vendor bundle hash doesn't change when app content changes
         // (to avoid unnecessary cache busting)
