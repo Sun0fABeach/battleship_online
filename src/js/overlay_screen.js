@@ -5,68 +5,44 @@
  */
 
 /**
- * @typedef CategoryData
+ * @typedef HTMLCache
  * @type {Object}
  *
- * @property {String} url - URL of html partial.
- * @property {String} container_class - Class to apply to category content
- *                                      container.
- * @property {String} html - Cached html content for the category.
+ * @property {String} imprint - HTML for imprint category.
+ * @property {String} help - HTML for help category.
  */
 
-/**
- * @typedef CategoryContent
- * @type {Object}
- *
- * @property {CategoryData} imprint - Data for imprint category.
- * @property {CategoryData} help - Data for help category.
- */
-
- /** Data for each overlay content category.
-  *  @type {CategoryContent}
+ /** HTML cache for each overlay content category.
+  *  @type {HTMLCache}
   *  @private
   */
-const content_data = {
-    imprint: {
-        url: '_imprint',
-        container_class: 'imprint',
-        html: null
-    },
-    help: {
-        url: '_help',
-        container_class: 'help',
-        html: null
-    }
+const html_cache = {
+    imprint: null,
+    help: null
 };
 
 /**
  * Initialize module.
  */
 export function init() {
-    for(const category in content_data) {
-        /* jshint ignore:start */
-        $('footer #open-' + category).click(event =>
-            display_screen(event, content_data[category])
-        );
-        /* jshint ignore:end */
-    }
+    $('footer .overlay-link').click(event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const category = $(event.target).attr('href').split('/').pop();
+        display_screen(category);
+    });
 }
 
 /**
  * Open the overlay screen.
  * @private
  *
- * @param {Event} event - DOM
- *  [Event]{@link https://developer.mozilla.org/en-US/docs/Web/API/Event} object
- * @param {CategoryData} category_data - Data for overlay content category
+ * @param {String} category - Overlay content category
  */
-function display_screen(event, category_data) {
-    event.preventDefault();
-    event.stopPropagation();
-
+function display_screen(category) {
     const $screen = setup_screen();
     open_box($screen);
-    show_content($screen, category_data);
+    show_content($screen, category);
 }
 
 /**
@@ -133,27 +109,26 @@ function open_box($screen) {
  *
  * @param {jQuery} $screen [jQuery]{@link http://api.jquery.com/Types/#jQuery}
  *                 DOM element (overlay screen container).
- * @param {CategoryData} category_data - Data for overlay content category
+ * @param {String} category - Overlay content category
  */
-function show_content($screen, category_data) {
+function show_content($screen, category) {
     const $content_container = $screen.children('div:first-child');
     const $category_content = $content_container.children('div:first-child');
 
-    if($category_content.hasClass(category_data.container_class)) {
+    if($category_content.hasClass(category)) {
         /* correct content is already in DOM */
         animate_show_content();
-
     } else {
         $category_content
         .removeClass()
-        .addClass(category_data.container_class);
+        .addClass(category);
 
-        if(category_data.html) {
-            $category_content.html(category_data.html);
+        if(html_cache[category]) {
+            $category_content.html(html_cache[category]);
             animate_show_content();
         } else {
-            $category_content.load(category_data.url, function(html) {
-                category_data.html = html;
+            $category_content.load('_' + category, html => {
+                html_cache[category] = html;
                 animate_show_content();
             });
         }
