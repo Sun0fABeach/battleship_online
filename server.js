@@ -1,15 +1,28 @@
 const IO_server = require('socket.io');
 const io_logic = require('./socketio');
+const http = require('http');
+const express = require('express');
+const path = require('path');
+const ejs = require('ejs');
+
 
 let io;
+const app = express();
+const server = http.Server(app);
+
+app.set('view engine', 'ejs');
+app.engine('ejs', ejs.renderFile);
+app.set('views', path.resolve(__dirname, 'views'));
+
+app.get(/^\/(_(help|imprint))$/, (req, res) => {
+    res.render(req.params[0]);
+});
+
 const myArgs = process.argv.slice(2);
 
 if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
-    io = IO_server(3000);
+    io = IO_server(3000); // webpack dev server does the static file serving
 } else {
-    const express = require('express');
-    const app = express();
-    const server = require('http').Server(app);
     const compression = require('compression');
     io = IO_server(server);
 
@@ -17,8 +30,7 @@ if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
         compression(),
         express.static('dist/', {maxAge: '1y'})
     );
-
-    app.listen(process.env.PORT || 8000);
 }
 
 io_logic.init(io);
+server.listen(process.env.PORT || 8000);

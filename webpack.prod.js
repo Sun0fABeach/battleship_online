@@ -44,18 +44,6 @@ module.exports = merge(common, {
             template: './src/index.html',
             minify: html_minify_options
         }),
-        new HtmlWebpackPlugin({
-            filename: 'partials/imprint.html',
-            template: './src/partials/imprint.html',
-            inject: false,
-            minify: html_minify_options
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'partials/help.html',
-            template: './src/partials/help.html',
-            inject: false,
-            minify: html_minify_options
-        }),
         new UglifyJSPlugin({
             // sourceMap: true
         }),

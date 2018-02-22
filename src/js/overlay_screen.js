@@ -28,12 +28,12 @@
   */
 const content_data = {
     imprint: {
-        url: 'partials/imprint.html',
+        url: '_imprint',
         container_class: 'imprint',
         html: null
     },
     help: {
-        url: 'partials/help.html',
+        url: '_help',
         container_class: 'help',
         html: null
     }

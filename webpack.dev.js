@@ -12,6 +12,10 @@ module.exports = merge(common, {
     devServer: {
         host: '0.0.0.0',
         contentBase: './dist',
+        proxy: [{
+            context: ['/_help', '/_imprint'],
+            target: 'http://localhost:8000'
+        }]
     },
     module: {
         rules: [
@@ -32,16 +36,6 @@ module.exports = merge(common, {
         new Visualizer(),
         new HtmlWebpackPlugin({
             template: './src/index.html'
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'partials/imprint.html',
-            template: './src/partials/imprint.html',
-            inject: false
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'partials/help.html',
-            template: './src/partials/help.html',
-            inject: false
-        }),
+        })
     ]
 });
