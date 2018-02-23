@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.engine('ejs', ejs.renderFile);
 app.set('views', path.resolve(__dirname, 'views'));
 
-app.get(/^\/(_(help|imprint))$/, (req, res) => {
+app.get(/^\/(_?(help|imprint))$/, (req, res) => {
     res.render(req.params[0]);
 });
 

@@ -13,7 +13,7 @@ module.exports = merge(common, {
         host: '0.0.0.0',
         contentBase: './dist',
         proxy: [{
-            context: ['/_help', '/_imprint'],
+            context: ['/_help', '/_imprint', '/help', '/imprint'],
             target: 'http://localhost:8000'
         }]
     },
