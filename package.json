@@ -10,7 +10,7 @@
   "scripts": {
     "test": "mocha --require babel-core/register --recursive src/js/test",
     "build": "webpack --config webpack.prod.js",
-    "serve": "webpack-dev-server --open --config webpack.dev.js",
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
     "start": "node server.js",
     "doc": "./node_modules/.bin/jsdoc -c jsdoc.json",
     "deploy": "git push heroku master",
