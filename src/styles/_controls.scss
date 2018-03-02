@@ -22,27 +22,28 @@
     }
   }
 
-  #button-container > * {
-    margin: 0.25rem auto 0;
+  #button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-    @include media-breakpoint-up(md) {
-      margin: 0 0.5rem 0;
-    }
+    > * {
+      display: none;
+      margin-top: 0.25rem;
 
-    display: none;
+      &#enter {
+        display: block;
+      }
 
-    &#enter {
-      display: block;
-    }
-
-    &#slide {
-      @include media-breakpoint-up(md) {
-        display: none !important; // show via script only has effect on phones
+      &#vs-ai {
+        > button:first-of-type {
+          flex-grow: 1;
+        }
       }
     }
 
-    &#vs-ai {
-      @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(xs) {
+      > #vs-ai {
         > button:first-of-type > div {
           margin-right: -55px; // re-center text b/c dropdown arrow screws with centering
         }
@@ -51,5 +52,50 @@
         }
       }
     }
+
+    @mixin trio_button_width($width) {
+      > #host, > #open-hosts, > #vs-ai, > #randomize, > #ready, > #abort {
+        width: $width;
+      }
+    }
+    @mixin single_button_width($width) {
+      > #enter, > #give-up{
+        width: $width;
+      }
+    }
+
+    @include media-breakpoint-up(sm) {
+      flex-direction: row;
+      justify-content: space-evenly;
+
+      > #slide {
+        width: 45%;
+      }
+      @include single_button_width(45%); // note that give-up is not a single button here
+      @include trio_button_width(30%);
+    }
+
+    @include media-breakpoint-up(md) {
+      > #slide {
+        display: none !important; // show via script only has effect on phones
+      }
+      @include single_button_width(35%);
+    }
+
+    @include media-breakpoint-up(lg) {
+      @include single_button_width(26%);
+      @include trio_button_width(25%);
+    }
+
+    @include media-breakpoint-up(xl) {
+      justify-content: center;
+
+      > * {
+        margin: 0 0.5rem;
+      }
+      @include single_button_width(17%);
+      @include trio_button_width(16%);
+    }
   }
+
 }
