@@ -4,9 +4,16 @@
  * @module ui
  */
 
-import { Grid, OwnGrid } from './classes/grid';
-import { MenuButton, MenuDropdownButton } from './classes/menu_button';
 import Text from './classes/text';
+import {
+    Grid,
+    OwnGrid
+} from './classes/grid';
+import {
+    MenuButton,
+    MenuDropdownButton,
+    MenuChatButton
+} from './classes/menu_button';
 import {
     HostModal,
     LeaveConfirmModal,
@@ -99,6 +106,7 @@ function init_menu_buttons() {
     menu_buttons.abort = new MenuButton('abort');
     menu_buttons.slide = new MenuButton('slide');
     menu_buttons.give_up = new MenuButton('give-up');
+    menu_buttons.chat = new MenuChatButton('chat-input');
 }
 
 function init_grids() {

@@ -50,7 +50,9 @@ function init_modal_handlers(socket) {
             ui.text.game_msg.fade_swap(
                 msg[0] + host_name + msg[1] + ' ' + ui.msg.finish_placement
             );
-            host_list_close_update_ctrl_pane('randomize', 'ready', 'abort');
+            host_list_close_update_ctrl_pane(
+                'randomize', 'ready', 'abort', 'chat'
+            );
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
@@ -81,7 +83,7 @@ function init_modal_handlers(socket) {
                 );
             });
             ui.text.game_msg.fade_swap(ui.msg.finish_placement);
-            swap_in_menu_buttons('randomize', 'ready', 'abort');
+            swap_in_menu_buttons('randomize', 'ready', 'abort', 'chat');
             swap_in_socket_handlers(socket, () =>
                 register_abort_handler(socket, false)
             );
@@ -172,7 +174,7 @@ function init_menu_button_handlers(socket) {
             'Computer (' + difficulty + ')', true
         );
         ui.text.game_msg.fade_swap(ui.msg.finish_placement);
-        swap_in_menu_buttons('randomize', 'ready', 'abort');
+        swap_in_menu_buttons('randomize', 'ready', 'abort', 'chat');
     });
 
     ui.menu_buttons.randomize.click(() => {
@@ -193,7 +195,7 @@ function init_menu_button_handlers(socket) {
             if(other_ready) {
                 start_battle(socket, player_begins);
             } else {
-                swap_in_menu_buttons('abort');
+                swap_in_menu_buttons('abort', 'chat');
                 const msg = ui.msg.placement_wait;
                 ui.text.game_msg.fade_swap(
                     msg[0] + ui.text.opponent_name.text + msg[1]
@@ -216,8 +218,9 @@ function init_menu_button_handlers(socket) {
         ui.modals.leave_confirm
         .set_message(msg)
         .set_confirmation_handler(() => {
-            // true, even if opponent is null. that is necessary, b/c in that
-            // case, we just tell the server that we are no longer hosting.
+            /* condition is true, even if opponent is null. writing it like
+             * that is necessary, b/c we neet to tell the server that we are no
+             * longer hosting. */
             if(!(opponent instanceof AIOpponent))
                 socket.emit('abort');
             go_to_lobby(socket);
@@ -234,6 +237,12 @@ function init_menu_button_handlers(socket) {
             end_battle_back_to_lobby(socket);
         })
         .open();
+    });
+
+
+    ui.menu_buttons.chat.click(message => {
+        if(message)
+            console.log(message);
     });
 
 
@@ -319,7 +328,7 @@ function start_battle(socket, player_begins) {
     );
 
     function action_after_scroll() {
-        swap_in_menu_buttons('slide', 'give_up');
+        swap_in_menu_buttons('slide', 'give_up', 'chat');
 
         if(player_begins) {
             ui.text.game_msg.fade_swap(
@@ -346,7 +355,7 @@ function start_battle(socket, player_begins) {
 function register_opponent_join_handler(socket) {
     socket.on('opponent entered', (opponent_name) => {
         opponent = new HumanOpponent(socket);
-        swap_in_menu_buttons('randomize', 'ready', 'abort');
+        swap_in_menu_buttons('randomize', 'ready', 'abort', 'chat');
         ui.text.opponent_name.fade_swap(opponent_name, true);
         const msg = ui.msg.opponent_joined;
         ui.text.game_msg.fade_swap(

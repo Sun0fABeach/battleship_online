@@ -53,13 +53,18 @@
       }
     }
 
-    @mixin trio_button_width($width) {
-      > #host, > #open-hosts, > #vs-ai, > #randomize, > #ready, > #abort {
+    @mixin single_button_width($width) {
+      > #enter {
         width: $width;
       }
     }
-    @mixin single_button_width($width) {
-      > #enter, > #give-up{
+    @mixin trio_button_width($width) {
+      > #host, > #open-hosts, > #vs-ai {
+        width: $width;
+      }
+    }
+    @mixin quad_button_width($width) {
+      > #randomize, > #ready, > #abort, > #chat-input {
         width: $width;
       }
     }
@@ -67,12 +72,15 @@
     @include media-breakpoint-up(sm) {
       flex-direction: row;
       justify-content: space-evenly;
+      flex-wrap: wrap;
 
-      > #slide {
-        width: 45%;
-      }
-      @include single_button_width(45%); // note that give-up is not a single button here
+      @include single_button_width(45%);
       @include trio_button_width(30%);
+      @include quad_button_width(45%); // two flex rows
+
+      > #slide, > #give-up { // two smaller buttons next to chat input
+        width: 23%;
+      }
     }
 
     @include media-breakpoint-up(md) {
@@ -80,21 +88,43 @@
         display: none !important; // show via script only has effect on phones
       }
       @include single_button_width(35%);
+      @include quad_button_width(42%); // two flex rows
+
+      > #give-up {
+        width: 35%;
+      }
     }
 
     @include media-breakpoint-up(lg) {
-      @include single_button_width(26%);
-      @include trio_button_width(25%);
-    }
-
-    @include media-breakpoint-up(xl) {
       justify-content: center;
 
       > * {
         margin: 0 0.5rem;
       }
+
+      @include single_button_width(26%);
+      @include trio_button_width(25%);
+      @include quad_button_width(18%);
+
+      > #give-up {
+        width: 20%;
+      }
+      > #chat-input { // overwrites quad button width
+        width: 32%;
+      }
+    }
+
+    @include media-breakpoint-up(xl) {
       @include single_button_width(17%);
       @include trio_button_width(16%);
+      @include quad_button_width(16%);
+
+      > #give-up {
+        width: 16%;
+      }
+      > #chat-input { // overwrites quad button width
+        width: 32%;
+      }
     }
   }
 

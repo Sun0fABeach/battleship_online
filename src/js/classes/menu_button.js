@@ -41,13 +41,25 @@ class MenuButtonBase {
 
     /**
      *  Show the button and trigger callback, if one is given.
-     *  To be implemented by subclasses.
-     *  @abstract
      *
      *  @param {Function} [completion_cb] - callback to trigger once
      *                                      show is complete
+     *  @param {String} [display_type] - css display type of button
      */
-    show(completion_cb) {}
+    show(completion_cb, display_type='block') {
+        this._$element.fadeIn({
+            start: () => {
+                this.clickable(true);
+                /* jQuery sets display: block when fading, so reset to original
+                   bootstrap value to prevent it from breaking the layout */
+                this._$element.css('display', display_type);
+            },
+            complete: () => {
+                if(completion_cb)
+                    completion_cb();
+            }
+        });
+    }
 
     /**
      *  Hide the button and trigger callback, if one is given.
@@ -79,6 +91,24 @@ class MenuButtonBase {
     clickable(active) {
         this._clickable = active;
     }
+
+    /**
+     * Register a callback to be triggered on button click.
+     * @private
+     *
+     * @param {!jQuery} $btn -
+     *          [jQuery]{@link http://api.jquery.com/Types/#jQuery}
+     *          DOM button to register callback for.
+     * @param {Function} action - Callback to trigger on button click
+     */
+    _register_click_cb($btn, action) {
+        $btn.click((event) => {
+            event.preventDefault();   // even if no action is to be performed
+            event.stopPropagation();  // we don't allow bubbling or defaults
+            if(this._clickable)
+                action();
+        });
+    }
 }
 
 /** A single DOM menu button. */
@@ -90,11 +120,10 @@ class MenuButton extends MenuButtonBase {
      * @param {Function} [action] - Callback to trigger on button click
      */
     constructor(btn_name, action) {
-        super('#main-menu #button-container > button#' + btn_name, action);
-        this._register_click_cb(action);
-        this._$element
-        .blur(() => this.normal())
-        .click(this._click_cb);
+        super('#button-container > button#' + btn_name);
+        if(action)
+            this._register_click_cb(action);
+        this._$element.blur(() => this.normal());
     }
 
     /**
@@ -108,17 +137,6 @@ class MenuButton extends MenuButtonBase {
             this._register_click_cb(action);
         else
             this._$element.click();
-    }
-
-    /**
-     *  Show the button and trigger callback, if one is given.
-     *
-     *  @param {Function} [completion_cb] - callback to trigger once
-     *                                      show is complete
-     */
-    show(completion_cb) {
-        this.clickable(true);
-        this._$element.fadeIn(completion_cb);
     }
 
     /**
@@ -166,12 +184,7 @@ class MenuButton extends MenuButtonBase {
      * @param {Function} [action] - Callback to trigger on button click
      */
     _register_click_cb(action) {
-        this._$element.click((event) => {
-            event.preventDefault();   // even if no action is to be performed
-            event.stopPropagation();  // we don't allow bubbling or defaults
-            if(this._clickable && action)
-                action();
-        });
+        super._register_click_cb(this._$element, action);
     }
 }
 
@@ -186,16 +199,15 @@ class MenuButton extends MenuButtonBase {
 class MenuDropdownButton extends MenuButtonBase {
     /**
      * Create a MenuButton instance.
-     * @param {!String} btn_name - Name of the button as defined via HTML name
-     *                              attribute
+     * @param {!String} group_id - Id of the button group
      * @param {MenuDropdownButtonAction} [action] - Callback to trigger on
      *                                              button click
      */
-    constructor(btn_name, action) {
-        super('#main-menu #button-container > .btn-group#' + btn_name, action);
+    constructor(group_id, action) {
+        super('#button-container > .btn-group#' + group_id, action);
         this._$action_btn = this._$element.children('button:first-of-type');
-        this._register_click_cb(action);
-        this._$action_btn.click(this._click_cb);
+        if(action)
+            this._register_click_cb(action);
 
         this._$dropdown_options = this._$element.find('.dropdown-item');
         const that = this;
@@ -254,18 +266,7 @@ class MenuDropdownButton extends MenuButtonBase {
      *                                      show is complete
      */
     show(completion_cb) {
-        this._$element.fadeIn({
-            start: () => {
-                this.clickable(true);
-                /* jQuery sets display: block when fading, so reset to original
-                   bootstrap value to prevent it from breaking the layout */
-                this._$element.css('display', 'inline-flex');
-            },
-            complete: () => {
-                if(completion_cb)
-                    completion_cb();
-            }
-        });
+        super.show(completion_cb, 'inline-flex');
     }
 
     /**
@@ -286,18 +287,78 @@ class MenuDropdownButton extends MenuButtonBase {
      * Register a callback to be triggered on button click.
      * @private
      *
-     * @param {MenuDropdownButtonAction} [action] - Callback to trigger on
-     *                                              button click
+     * @param {Function} action - Callback to trigger on button click
      */
     _register_click_cb(action) {
-        this._$action_btn.click((event) => {
-            event.preventDefault();   // even if no action is to be performed
-            event.stopPropagation();  // we don't allow bubbling or defaults
-            if(this._clickable && action)
-                action(this.selection_text());
-        });
+        super._register_click_cb(
+            this._$action_btn, () => action(this.selection_text())
+        );
     }
 }
 
 
-export { MenuButton, MenuDropdownButton };
+/**
+ * Callback type for MenuChatButtonAction actions.
+ * @callback MenuChatButtonAction
+ * @param {!String} message - Chat message to send
+ */
+
+/** An input group consisting of a text input and a send button. */
+class MenuChatButton extends MenuButtonBase {
+    /**
+     * Create a MenuChatButton instance.
+     * @param {!String} group_id - Id of the input group
+     * @param {MenuChatButtonAction} [action] - Callback to trigger on
+     *                                              message send
+     */
+    constructor(group_id, action) {
+        super('#button-container > .input-group#' + group_id, action);
+        this._$send_btn = this._$element.find('button');
+        this._$chat_input = this._$element.find('input');
+        if(action)
+            this._register_click_cb(action);
+    }
+
+    /**
+     *  Show the button and trigger callback, if one is given.
+     *
+     *  @param {Function} [completion_cb] - callback to trigger once
+     *                                      show is complete
+     */
+    show(completion_cb) {
+        super.show(completion_cb, 'flex');
+    }
+
+    /**
+     *  Trigger a click on the send button or register an event handler for a
+     *  future click.
+     *
+     *  @param {Function} [action] - callback to register for send button clicks
+     */
+    click(action) {
+        if(action)
+            this._register_click_cb(action);
+        else
+            this._$action_btn.click();
+    }
+
+    /**
+     * Register a callback to be triggered on message send.
+     * @private
+     *
+     * @param {Function} action - Callback to trigger on message send
+     */
+    _register_click_cb(action) {
+        const handler = () => {
+            action(this._$chat_input.val().trim());
+            this._$chat_input.val('');
+        }
+        super._register_click_cb(this._$send_btn, handler);
+        this._$chat_input.keyup(e => {
+            if(e.keyCode === 13) // enter
+                handler();
+        });
+    }
+}
+
+export { MenuButton, MenuDropdownButton, MenuChatButton };
