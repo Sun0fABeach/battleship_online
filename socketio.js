@@ -55,14 +55,14 @@ function transition_to_state(player, new_state) {
 const listener_registry = {
     /* name is registered and player can choose between hosting and joining */
     'in lobby': socket => {
-        socket.on('host', (answer_cb) => {
+        socket.on('host', answer_cb => {
             const player = players[socket.id];
             answer_cb(true); // no reason why hosting should fail as of now
             player.open_game();
             transition_to_state(player, 'opened game');
         });
 
-        socket.on('host watch', (answer_cb) => {
+        socket.on('host watch', answer_cb => {
             const player = players[socket.id];
             const hosts = [];
 
@@ -107,15 +107,15 @@ const listener_registry = {
     /* player is hosting a game and nobody joined yet */
     'opened game': socket => {
         set_abort_handler(socket, false);
-
         set_failure_handlers(socket, player => player.close_open_game());
     },
 
     /* players are connected and have to confirm their ship placements */
     'placing ships': socket => {
+        set_chat_handler(socket);
         set_abort_handler(socket);
 
-        socket.on('ready', (answer_cb) => {
+        socket.on('ready', answer_cb => {
             const player = players[socket.id];
 
             if(player.opponent.state === 'awaiting placement') {
@@ -143,6 +143,7 @@ const listener_registry = {
     /* player placed his ships, pressed ready and waits for opponent to
        acknowledge her ship placements */
     'awaiting placement': socket => {
+        set_chat_handler(socket);
         set_abort_handler(socket);
 
         set_failure_handlers(socket, player => {
@@ -158,6 +159,7 @@ const listener_registry = {
 
     /* player is in an active battle with an opponent */
     'in battle': socket => {
+        set_chat_handler(socket);
         set_abort_handler(socket);
 
         socket.on('shot', (coords, result_cb) => {
@@ -179,6 +181,7 @@ const listener_registry = {
 
     /* after game over, player has to decide if he wants a regame */
     'deciding on regame': socket => {
+        set_chat_handler(socket);
         set_abort_handler(socket);
 
         socket.on('wants regame', () => {
@@ -203,6 +206,7 @@ const listener_registry = {
 
     /* player asked for a regame, opponent has not given an answer yet */
     'wants regame': socket => {
+        set_chat_handler(socket);
         set_abort_handler(socket);
 
         set_failure_handlers(socket, player => {
@@ -211,6 +215,12 @@ const listener_registry = {
         });
     }
 };
+
+
+function set_chat_handler(socket) {
+    const player = players[socket.id];
+    socket.on('chat', (msg, ack_cb) => player.chat_message(msg, ack_cb));
+}
 
 function set_abort_handler(socket, paired=true) {
     socket.on('abort', () => {
@@ -333,6 +343,10 @@ class Player {
 
     shoot(coords, result_cb) {
         this._opponent.send('shot', coords, result_cb);
+    }
+
+    chat_message(msg, ack_cb) {
+        this._opponent.send('chat', msg, ack_cb);
     }
 
     send(...args) {

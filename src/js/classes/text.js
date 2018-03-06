@@ -13,6 +13,10 @@ class Text {
         this._$container = $container;
     }
 
+    get $element() {
+        return this._$container;
+    }
+
     get text() {
         return this._$container.text();
     }

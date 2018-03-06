@@ -3,17 +3,22 @@
  * @module menu_navigation
  */
 
+
 import {
     HumanOpponent,
     AIOpponent,
     AIOpponentEasy,
-    AIOpponentNormal } from './classes/opponent';
+    AIOpponentNormal
+} from './classes/opponent';
+
 import * as battle from './battle';
 import * as ui from './ui';
+
 import {
     adjacent_grid_mode,
     swap_in_socket_handlers
 } from './helpers';
+
 
 /** Whether the player is the host of a game. */
 let player_is_host;
@@ -41,7 +46,7 @@ export function init(ship_placement, socket) {
 function init_modal_handlers(socket) {
 
     ui.modals.host_list.set_completion_handlers(
-        (host_name) => {
+        host_name => {
             opponent = new HumanOpponent(socket);
             player_is_host = false;
             animate_toggle_dual_grid(true);
@@ -53,9 +58,10 @@ function init_modal_handlers(socket) {
             host_list_close_update_ctrl_pane(
                 'randomize', 'ready', 'abort', 'chat'
             );
-            swap_in_socket_handlers(socket, () =>
-                register_abort_handler(socket, false)
-            );
+            swap_in_socket_handlers(socket, () => {
+                register_chat_handler(socket);
+                register_abort_handler(socket, false);
+            });
         },
         () => {
             ui.text.game_msg.fade_swap(ui.msg.host_or_join);
@@ -84,9 +90,10 @@ function init_modal_handlers(socket) {
             });
             ui.text.game_msg.fade_swap(ui.msg.finish_placement);
             swap_in_menu_buttons('randomize', 'ready', 'abort', 'chat');
-            swap_in_socket_handlers(socket, () =>
-                register_abort_handler(socket, false)
-            );
+            swap_in_socket_handlers(socket, () => {
+                register_chat_handler(socket);
+                register_abort_handler(socket, false);
+            });
         },
         () => end_battle_back_to_lobby(socket)
     );
@@ -99,7 +106,7 @@ function init_menu_button_handlers(socket) {
             const player_name = get_player_name();
             ui.menu_buttons.enter.clickable(false);
 
-            socket.emit('name register', player_name, (success) => {
+            socket.emit('name register', player_name, success => {
                 if(success) {
                     ui.input.$name.fadeOut();
                     swap_in_menu_buttons('host', 'open_hosts', 'vs_ai');
@@ -205,6 +212,7 @@ function init_menu_button_handlers(socket) {
                     opponent.set_ready_handler(() =>
                         start_battle(socket, true)
                     );
+                    register_chat_handler(socket);
                     register_abort_handler(socket, false);
                 });
             }
@@ -241,8 +249,20 @@ function init_menu_button_handlers(socket) {
 
 
     ui.menu_buttons.chat.click(message => {
-        if(message)
-            console.log(message);
+        if(!message)
+            return;
+
+        if(opponent instanceof AIOpponent) {
+            if(adjacent_grid_mode()) {
+                ui.chat_bubbles.player.show(message);
+            }
+        } else {
+            if(adjacent_grid_mode()) {
+                socket.emit('chat', message, () => {
+                    ui.chat_bubbles.player.show(message);
+                });
+            }
+        }
     });
 
 
@@ -308,6 +328,7 @@ function go_to_lobby(socket, fadeout_cb) {
         if(!dnd_ship_placement.is_active())
             dnd_ship_placement.activate();
     });
+    Object.values(ui.chat_bubbles).forEach(bubble => bubble.hide());
     swap_in_socket_handlers(socket, null);
 }
 
@@ -342,9 +363,10 @@ function start_battle(socket, player_begins) {
             );
         }
 
-        swap_in_socket_handlers(socket, () =>
-            register_abort_handler(socket, true)
-        );
+        swap_in_socket_handlers(socket, () => {
+            register_chat_handler(socket);
+            register_abort_handler(socket, true);
+        });
 
         // activate after swapping socket handlers so battle doesn't get its
         // own handlers overwritten
@@ -352,8 +374,15 @@ function start_battle(socket, player_begins) {
     }
 }
 
+function register_chat_handler(socket) {
+    socket.on('chat', (message, ack_cb) => {
+        ui.chat_bubbles.opponent.show(message);
+        ack_cb();
+    });
+}
+
 function register_opponent_join_handler(socket) {
-    socket.on('opponent entered', (opponent_name) => {
+    socket.on('opponent entered', opponent_name => {
         opponent = new HumanOpponent(socket);
         swap_in_menu_buttons('randomize', 'ready', 'abort', 'chat');
         ui.text.opponent_name.fade_swap(opponent_name, true);
@@ -362,9 +391,10 @@ function register_opponent_join_handler(socket) {
             msg[0] + opponent_name + msg[1] + ' ' +
             ui.msg.finish_placement
         );
-        swap_in_socket_handlers(socket, () =>
-            register_abort_handler(socket, false)
-        );
+        swap_in_socket_handlers(socket, () => {
+            register_chat_handler(socket);
+            register_abort_handler(socket, false);
+        });
     });
 }
 

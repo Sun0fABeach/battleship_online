@@ -352,7 +352,7 @@ class MenuChatButton extends MenuButtonBase {
         const handler = () => {
             action(this._$chat_input.val().trim());
             this._$chat_input.val('');
-        }
+        };
         super._register_click_cb(this._$send_btn, handler);
         this._$chat_input.keyup(e => {
             if(e.keyCode === 13) // enter

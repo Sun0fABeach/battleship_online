@@ -1,0 +1,16 @@
+.popover {
+  border-color: black;
+  border-radius: 50%;
+  padding: 2.3em 2em 1.6em;
+  z-index: 1039; // to put it behind modal
+
+  > .arrow {
+    &::before {
+      border-bottom-color: black !important;
+    }
+  }
+
+  > .popover-body {
+    font-size: 1.3em;
+  }
+}

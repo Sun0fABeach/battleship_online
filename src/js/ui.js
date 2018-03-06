@@ -6,6 +6,10 @@
 
 import Text from './classes/text';
 import {
+    PlayerChatBubble,
+    OpponentChatBubble
+} from './classes/chat_bubble';
+import {
     Grid,
     OwnGrid
 } from './classes/grid';
@@ -55,6 +59,8 @@ export const msg = {
 
 /** [Text]{@link module:classes/text} objects */
 export const text = {};
+/** [ChatBubble]{@link module:classes/chat_bubble} objects */
+export const chat_bubbles = {};
 /** [Modal]{@link module:classes/modal} objects */
 export const modals = {};
 /** [MenuButton]{@link module:classes/menu_button} objects */
@@ -75,6 +81,7 @@ export let footer;
  */
 export function init(socket) {
     init_text_handlers();
+    init_chat_bubbles();
     init_modals(socket);
     init_menu_buttons();
     init_grids();
@@ -87,6 +94,11 @@ function init_text_handlers() {
     text.player_name = new Text($('#player-side > p:first-child'));
     text.opponent_name = new Text($('#opponent-side > p:first-child'));
     text.game_msg = new Text($('#main-menu > p:first-child > span'));
+}
+
+function init_chat_bubbles() {
+    chat_bubbles.player = new PlayerChatBubble(text.player_name.$element);
+    chat_bubbles.opponent = new OpponentChatBubble(text.opponent_name.$element);
 }
 
 function init_modals(socket) {
