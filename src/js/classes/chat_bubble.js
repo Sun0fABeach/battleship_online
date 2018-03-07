@@ -17,7 +17,7 @@ class ChatBubble {
                 </div>
                 <h3 class="popover-header">
                 </h3>
-                <div class="popover-body text-center font-weight-bold">
+                <div class="popover-body text-center">
                 </div>
                 <div class="text-center text-muted mx-2 mb-1">
                     (click to hide)
