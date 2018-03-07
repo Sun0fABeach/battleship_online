@@ -28,13 +28,16 @@ $(document).ready(function() {
         $('#loading-screen > h2').text('Done');
         $('#loading-screen').slideUp(1500);
 
-        /* add dummy element containing font-awesome symbol and spritesheet to
+        /* add dummy element containing fonts and spritesheets to
            trigger downloads asynchronously (these assets are needed later) */
-        $('<i>').addClass('fa fa-times explosion').appendTo('body').css({
+        const $dummy = $('<div>').appendTo('body').css({
             position: 'absolute',
             top: 0,
             visibility: 'hidden',
-            zIndex: -9999
+            zIndex: -9999,
         });
+        $dummy.append($('<i>').css('fontFamily', 'speechBubble'));
+        $dummy.append($('<i>').addClass('fa fa-times'));
+        $dummy.append($('<i>').addClass('explosion'));
     });
 });

@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'speechBubble';
+  src: url('../assets/sf_cartoonist_hand-webfont.woff2') format('woff2'),
+       url('../assets/sf_cartoonist_hand-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .popover {
   border-color: black;
   border-radius: 50%;
@@ -10,7 +18,8 @@
     }
   }
 
-  > .popover-body {
-    font-size: 1.3em;
+  > .popover-header, > .popover-body {
+    font-size: 1.5em;
+    font-family: speechBubble;
   }
 }
