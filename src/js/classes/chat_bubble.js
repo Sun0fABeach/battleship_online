@@ -53,17 +53,17 @@ class PlayerChatBubble extends ChatBubble {
     }
 
     show(message) {
+        this._hide_to = setTimeout(() => {
+            this.hide();
+            this._hide_to = null;
+        }, this._hide_delay);
+
         super.show(message, () => {
             if(this._hide_to) {
                 clearTimeout(this._hide_to);
                 this._hide_to = null;
             }
         });
-
-        this._hide_to = setTimeout(() => {
-            this.hide();
-            this._hide_to = null;
-        }, this._hide_delay);
     }
 }
 
