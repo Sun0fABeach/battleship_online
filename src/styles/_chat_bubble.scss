@@ -7,18 +7,31 @@
 
 .popover {
   border-color: black;
-  border-radius: 50%;
-  padding: 2.3em 2em 1.6em;
+  border-radius: 40%;
+  padding: 1.6em 2em;
   z-index: 1039; // to put it behind modal
 
   > .arrow {
     &::before {
+      border-top-color: black !important;
       border-bottom-color: black !important;
     }
   }
 
-  > .popover-header, > .popover-body {
-    font-size: 1.6em;
+  > %popover-text {
     font-family: speechBubble;
+    padding: 0;
+  }
+
+  > .popover-header {
+    @extend %popover-text;
+    border-bottom: none;
+    font-size: 1.8em;
+    background-color: initial;
+  }
+
+  > .popover-body {
+    @extend %popover-text;
+    font-size: 1.6em;
   }
 }

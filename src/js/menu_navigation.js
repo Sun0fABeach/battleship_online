@@ -252,21 +252,32 @@ function init_menu_button_handlers(socket) {
         if(!message)
             return;
 
-        if(opponent instanceof AIOpponent) {
-            if(adjacent_grid_mode()) {
-                ui.chat_bubbles.player.show(message);
-            }
-        } else {
-            if(adjacent_grid_mode()) {
-                socket.emit('chat', message, () => {
-                    ui.chat_bubbles.player.show(message);
-                });
-            }
+        if(opponent instanceof AIOpponent)
+            open_chat_bubble('player', message);
+        else
+            socket.emit('chat', message, () =>
+                open_chat_bubble('player', message)
+            );
+
+        if(!adjacent_grid_mode()) {
+            ui.menu_buttons.chat.set_placeholder('Message sent!');
+            ui.menu_buttons.chat.blur(); // so placeholder can be seen
         }
     });
 
 
     ui.menu_buttons.slide.click(() => ui.grids.player.slideToggle());
+}
+
+
+function open_chat_bubble(side, message) {
+    const type = side + (adjacent_grid_mode() ? '' : '_mobile');
+    ui.chat_bubbles[type].show(message);
+}
+
+
+function close_chat_bubbles() {
+    Object.values(ui.chat_bubbles).forEach(bubble => bubble.hide());
 }
 
 
@@ -328,7 +339,7 @@ function go_to_lobby(socket, fadeout_cb) {
         if(!dnd_ship_placement.is_active())
             dnd_ship_placement.activate();
     });
-    Object.values(ui.chat_bubbles).forEach(bubble => bubble.hide());
+    close_chat_bubbles();
     swap_in_socket_handlers(socket, null);
 }
 
@@ -376,7 +387,7 @@ function start_battle(socket, player_begins) {
 
 function register_chat_handler(socket) {
     socket.on('chat', (message, ack_cb) => {
-        ui.chat_bubbles.opponent.show(message);
+        open_chat_bubble('opponent', message);
         ack_cb();
     });
 }
@@ -423,6 +434,7 @@ function register_abort_handler(socket, in_battle) {
                 'Player ' + opp_name + 'has left the game. ' +
                 ui.msg.wait_for_join
             );
+            close_chat_bubbles();
             swap_in_menu_buttons('abort');
             swap_in_socket_handlers(socket, () =>
                 register_opponent_join_handler(socket)

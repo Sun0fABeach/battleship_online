@@ -326,6 +326,7 @@ class MenuChatButton extends MenuButtonBase {
      *                                      show is complete
      */
     show(completion_cb) {
+        this.set_placeholder();
         super.show(completion_cb, 'flex');
     }
 
@@ -340,6 +341,23 @@ class MenuChatButton extends MenuButtonBase {
             this._register_click_cb(action);
         else
             this._$action_btn.click();
+    }
+
+    /**
+     *  Set the placeholder of the text input field. Will be set to a default
+     *  if called with no argument.
+     *
+     *  @param {String} [text] - Placeholder text to set
+     */
+    set_placeholder(text=undefined) {
+        this._$chat_input.attr('placeholder', text ? text : 'Message');
+    }
+
+    /**
+     *  Lose focus of the text input field.
+     */
+    blur() {
+        this._$chat_input.blur();
     }
 
     /**

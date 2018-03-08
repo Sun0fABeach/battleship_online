@@ -7,7 +7,9 @@
 import Text from './classes/text';
 import {
     PlayerChatBubble,
-    OpponentChatBubble
+    OpponentChatBubble,
+    PlayerChatBubbleMobile,
+    OpponentChatBubbleMobile
 } from './classes/chat_bubble';
 import {
     Grid,
@@ -97,8 +99,10 @@ function init_text_handlers() {
 }
 
 function init_chat_bubbles() {
-    chat_bubbles.player = new PlayerChatBubble(text.player_name.$element);
-    chat_bubbles.opponent = new OpponentChatBubble(text.opponent_name.$element);
+    chat_bubbles.player = new PlayerChatBubble();
+    chat_bubbles.opponent = new OpponentChatBubble();
+    chat_bubbles.player_mobile = new PlayerChatBubbleMobile();
+    chat_bubbles.opponent_mobile = new OpponentChatBubbleMobile();
 }
 
 function init_modals(socket) {
