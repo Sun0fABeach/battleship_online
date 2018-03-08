@@ -95,3 +95,24 @@ export function remove_from_array(arr, element) {
     const idx = arr.indexOf(element);
     return idx >= 0 ? arr.splice(idx, 1)[0] : null;
 }
+
+
+/** Debounce interval timeout reference.
+ *  @see {@link module:helpers.debounce_interval} */
+let debounce_to = 0;
+
+/**
+ * Debounce an action to only execute it once in a given timeframe.
+ *
+ * @param {!Number} timeframe - Debounce interval.
+ * @param {!Function} action - Element to remove.
+ */
+export function debounce_interval(timeframe, action) {
+    if(debounce_to)
+        return;
+
+    debounce_to = setTimeout(() => {
+        action();
+        debounce_to = 0;
+    }, timeframe);
+}

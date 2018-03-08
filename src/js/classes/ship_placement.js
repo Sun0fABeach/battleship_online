@@ -7,7 +7,7 @@
 
 import Ship from './ship';
 import { grids } from '../ui';
-import { chance_in_percent, array_choice } from '../helpers';
+import { chance_in_percent, array_choice, debounce_interval } from '../helpers';
 
 // TODO: exact calculation of draggable size for styling?
 
@@ -232,22 +232,9 @@ class DnDShipPlacement extends ShipPlacement {
 
         /* note that this resize handler won't be registered more than once due
            to the singleton pattern */
-        $(window).resize(function() {
-            if(resize_debounce_timeout) {
-                resize_registered = true; // do resize when timeout fires
-            } else {
-                that._adjust_draggables();
-
-                resize_debounce_timeout = setTimeout(() => {
-                    if(resize_registered) {
-                        that._adjust_draggables();
-                        resize_registered = false;
-                    }
-                    clearTimeout(resize_debounce_timeout);
-                    resize_debounce_timeout = 0;
-                }, 100);
-            }
-        });
+        $(window).resize(() =>
+            debounce_interval(100, () => that._adjust_draggables())
+        );
     }
 
     /**
