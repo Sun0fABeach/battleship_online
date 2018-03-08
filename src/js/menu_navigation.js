@@ -265,13 +265,7 @@ function init_menu_button_handlers(socket) {
                 open_chat_bubble('player', message)
             );
         }
-
-        if(!adjacent_grid_mode()) {
-            ui.menu_buttons.chat.set_placeholder('Message sent!');
-            ui.menu_buttons.chat.blur(); // so placeholder can be seen
-        }
     });
-
 
     ui.menu_buttons.slide.click(() => ui.grids.player.slideToggle());
 }
@@ -445,6 +439,11 @@ function register_abort_handler(socket, in_battle) {
 function open_chat_bubble(side, message) {
     const type = side + (adjacent_grid_mode() ? '' : '_mobile');
     ui.chat_bubbles[type].show(message);
+
+    if(side === 'player') {
+        ui.menu_buttons.chat.set_placeholder('Message sent!');
+        ui.menu_buttons.chat.blur(); // so placeholder can be seen
+    }
 }
 
 function close_chat_bubbles() {

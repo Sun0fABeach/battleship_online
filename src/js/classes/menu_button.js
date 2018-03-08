@@ -315,6 +315,7 @@ class MenuChatButton extends MenuButtonBase {
         super('#button-container > .input-group#' + group_id, action);
         this._$send_btn = this._$element.find('button');
         this._$chat_input = this._$element.find('input');
+        this._$chat_input.focus(() => this.set_placeholder());
         if(action)
             this._register_click_cb(action);
     }
