@@ -252,12 +252,19 @@ function init_menu_button_handlers(socket) {
         if(!message)
             return;
 
-        if(opponent instanceof AIOpponent)
+        if(opponent instanceof AIOpponent) {
             open_chat_bubble('player', message);
-        else
+            setTimeout(() => {
+                open_chat_bubble(
+                    'opponent',
+                    'I am not programmed for conversation. I\'m sorry.'
+                );
+            }, 800);
+        } else {
             socket.emit('chat', message, () =>
                 open_chat_bubble('player', message)
             );
+        }
 
         if(!adjacent_grid_mode()) {
             ui.menu_buttons.chat.set_placeholder('Message sent!');
