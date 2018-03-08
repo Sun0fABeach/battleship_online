@@ -277,17 +277,6 @@ function init_menu_button_handlers(socket) {
 }
 
 
-function open_chat_bubble(side, message) {
-    const type = side + (adjacent_grid_mode() ? '' : '_mobile');
-    ui.chat_bubbles[type].show(message);
-}
-
-
-function close_chat_bubbles() {
-    Object.values(ui.chat_bubbles).forEach(bubble => bubble.hide());
-}
-
-
 function swap_in_menu_buttons(...to_show) {
     // fade out+in footer to have a smooth change of its vertical position
     ui.footer.fadeOut(() => ui.footer.fadeIn());
@@ -453,9 +442,41 @@ function register_abort_handler(socket, in_battle) {
     }
 }
 
+function open_chat_bubble(side, message) {
+    const type = side + (adjacent_grid_mode() ? '' : '_mobile');
+    ui.chat_bubbles[type].show(message);
+}
+
+function close_chat_bubbles() {
+    Object.values(ui.chat_bubbles).forEach(bubble => bubble.hide());
+}
+
+function switch_chat_bubbles(to_mobile) {
+    const [suffix_source, suffix_target] =
+        to_mobile ? ['', '_mobile'] : ['_mobile', ''];
+    ['player', 'opponent'].forEach(side => {
+        if(ui.chat_bubbles[side + suffix_source].is_open) {
+            ui.chat_bubbles[side + suffix_source].hide();
+            ui.chat_bubbles[side + suffix_target].show(
+                ui.chat_bubbles[side + suffix_source].message
+            );
+        }
+    });
+}
+
+let pre_resize_adj_grid_mode = adjacent_grid_mode();
+
 $(window).resize(function() {
-    if(adjacent_grid_mode())
+
+    if(adjacent_grid_mode()) {
+        if(!pre_resize_adj_grid_mode)
+            switch_chat_bubbles(false);
         ui.grids.player.show(true, false);
-    else
+        pre_resize_adj_grid_mode = true;
+    } else {
+        if(pre_resize_adj_grid_mode)
+            switch_chat_bubbles(true);
         ui.grids.player.show_from_state();
+        pre_resize_adj_grid_mode = false;
+    }
 });

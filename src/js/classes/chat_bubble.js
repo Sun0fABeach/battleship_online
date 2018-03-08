@@ -6,6 +6,10 @@ import { adjacent_grid_mode } from '../helpers';
 
 
 class ChatBubble {
+    constructor() {
+        this._is_open = false;
+    }
+
     show(message, click_cb=undefined) {
         this._message = message;
         const press_type = adjacent_grid_mode() ? 'click' : 'tap';
@@ -29,13 +33,7 @@ class ChatBubble {
             placement: this._placement
         });
 
-        this._$target.on('inserted.bs.popover', () => {
-            $('.popover.' + this._css_class).click(() => {
-                this.hide();
-                if(click_cb)
-                    click_cb();
-            });
-        });
+        this._register_event_handlers(click_cb);
 
         this._$target.popover('show');
         this._$target.css('cursor', 'pointer');
@@ -47,6 +45,28 @@ class ChatBubble {
 
     get message() {
         return this._message;
+    }
+
+    get is_open() {
+        return this._is_open;
+    }
+
+    _register_event_handlers(click_cb) {
+        this._$target.on('inserted.bs.popover', () => {
+            $('.popover.' + this._css_class).click(() => {
+                this.hide();
+                if(click_cb)
+                    click_cb();
+            });
+        });
+
+        this._$target.on('shown.bs.popover', () => {
+            this._is_open = true;
+        });
+
+        this._$target.on('hidden.bs.popover', () => {
+            this._is_open = false;
+        });
     }
 }
 
