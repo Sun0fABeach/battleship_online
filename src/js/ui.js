@@ -70,7 +70,7 @@ export const menu_buttons = {};
 /** [Grid]{@link module:classes/grid} objects */
 export const grids = {};
 /** [jQuery]{@link http://api.jquery.com/Types/#jQuery} text input objects */
-export const input = {};
+export const inputs = {};
 /** [jQuery]{@link http://api.jquery.com/Types/#jQuery} site footer object */
 export let footer;
 
@@ -87,7 +87,7 @@ export function init(socket) {
     init_modals(socket);
     init_menu_buttons();
     init_grids();
-    init_input();
+    init_inputs();
     init_footer();
 }
 
@@ -132,8 +132,8 @@ function init_grids() {
     grids.opponent = new Grid($('#opponent-side'));
 }
 
-function init_input() {
-    input.$name = $('input[name=player-name]');
+function init_inputs() {
+    inputs.$name = $('input[name=player-name]');
 }
 
 function init_footer() {

@@ -41,6 +41,16 @@ export function init(ship_placement, socket) {
     init_modal_handlers(socket);
     init_menu_button_handlers(socket);
     ui.menu_buttons.vs_ai.set_selection(1); // normal difficulty as default
+
+    ui.inputs.$name.keyup(e => {
+        if(e.keyCode === 13) // enter
+            register_name(socket);
+    });
+
+    $('#main-menu form').submit(e => {
+        e.preventDefault();
+        e.stopPropagation();
+    });
 }
 
 function init_modal_handlers(socket) {
@@ -100,43 +110,7 @@ function init_modal_handlers(socket) {
 }
 
 function init_menu_button_handlers(socket) {
-    ui.menu_buttons.enter.click(() => {
-
-        if(validate_player_name()) {
-            const player_name = get_player_name();
-            ui.menu_buttons.enter.clickable(false);
-
-            socket.emit('name register', player_name, success => {
-                if(success) {
-                    ui.input.$name.fadeOut();
-                    swap_in_menu_buttons('host', 'open_hosts', 'vs_ai');
-                    ui.text.player_name.fade_swap(player_name, true);
-                    ui.text.game_msg.fade_swap(ui.msg.host_or_join);
-                } else {
-                    ui.menu_buttons.enter.invalid();
-                    ui.menu_buttons.enter.clickable(true);
-                    ui.text.game_msg.fade_swap(ui.msg.name_taken);
-                }
-            });
-        } else {
-            ui.input.$name.focus();
-            ui.menu_buttons.enter.invalid();
-            ui.input.$name.one('input', () => ui.menu_buttons.enter.normal());
-            ui.text.game_msg.fade_swap(ui.msg.name_enter);
-        }
-    });
-
-    function validate_player_name() {
-        if(get_player_name() === '') {
-            ui.input.$name.val('');
-            return false;
-        }
-        return true;
-    }
-
-    function get_player_name() {
-        return ui.input.$name.val().trim();
-    }
+    ui.menu_buttons.enter.click(() => register_name(socket));
 
     ui.menu_buttons.host.click(() => {
         ui.menu_buttons.host.clickable(false);
@@ -270,6 +244,43 @@ function init_menu_button_handlers(socket) {
     ui.menu_buttons.slide.click(() => ui.grids.player.slideToggle());
 }
 
+
+function register_name(socket) {
+    if(validate_player_name()) {
+        const player_name = get_player_name();
+        ui.menu_buttons.enter.clickable(false);
+
+        socket.emit('name register', player_name, success => {
+            if(success) {
+                ui.inputs.$name.fadeOut();
+                swap_in_menu_buttons('host', 'open_hosts', 'vs_ai');
+                ui.text.player_name.fade_swap(player_name, true);
+                ui.text.game_msg.fade_swap(ui.msg.host_or_join);
+            } else {
+                ui.menu_buttons.enter.invalid();
+                ui.menu_buttons.enter.clickable(true);
+                ui.text.game_msg.fade_swap(ui.msg.name_taken);
+            }
+        });
+    } else {
+        ui.inputs.$name.focus();
+        ui.menu_buttons.enter.invalid();
+        ui.inputs.$name.one('input', () => ui.menu_buttons.enter.normal());
+        ui.text.game_msg.fade_swap(ui.msg.name_enter);
+    }
+
+    function validate_player_name() {
+        if(get_player_name() === '') {
+            ui.inputs.$name.val('');
+            return false;
+        }
+        return true;
+    }
+
+    function get_player_name() {
+        return ui.inputs.$name.val().trim();
+    }
+}
 
 function swap_in_menu_buttons(...to_show) {
     // fade out+in footer to have a smooth change of its vertical position

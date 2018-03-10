@@ -167,57 +167,57 @@
           <form>
             <input type="text" name="player-name" maxlength="12" autofocus
               class="form-control font-weight-bold mx-auto">
+          </form>
 
-            <div id="button-container"
-                class="mx-auto mx-md-5 mt-3 mt-sm-4 mt-xl-5">
-              <button type="submit" id="enter" class="btn btn-primary">
-                Enter
+          <div id="button-container"
+              class="mx-auto mx-md-5 mt-3 mt-sm-4 mt-xl-5">
+            <button type="submit" id="enter" class="btn btn-primary">
+              Enter
+            </button>
+            <button type="button" id="host" class="btn btn-primary">
+              Host
+            </button>
+            <button type="button" id="open-hosts" class="btn btn-primary">
+              Join
+            </button>
+            <div id="vs-ai" class="btn-group px-0">
+              <button type="button" class="btn btn-primary">
+                <div>vs AI ()</div>
               </button>
-              <button type="button" id="host" class="btn btn-primary">
-                Host
+              <button type="button" data-toggle="dropdown"
+                  class="btn btn-primary dropdown-toggle dropdown-toggle-split">
               </button>
-              <button type="button" id="open-hosts" class="btn btn-primary">
-                Join
-              </button>
-              <div id="vs-ai" class="btn-group px-0">
-                <button type="button" class="btn btn-primary">
-                  <div>vs AI ()</div>
-                </button>
-                <button type="button" data-toggle="dropdown"
-                    class="btn btn-primary dropdown-toggle dropdown-toggle-split">
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="#">Easy</a>
-                  <a class="dropdown-item" href="#">Normal</a>
-                </div>
-              </div>
-              <button type="button" id="ready" class="btn btn-primary">
-                Ready
-              </button>
-              <button type="button" id="abort" class="btn btn-primary">
-                Abort
-              </button>
-              <button type="button" id="randomize" class="btn btn-primary">
-                Randomize
-              </button>
-              <button type="button" id="slide" class="btn btn-primary">
-                Toggle Grid
-              </button>
-              <button type="button" id="give-up" class="btn btn-primary">
-                Give up
-              </button>
-              <div id="chat-input" class="input-group">
-                <input type="text" class="form-control" name="chat-message" maxlength="150">
-                <div class="input-group-btn">
-                  <button type="button" class="btn btn-primary">Send</button>
-                </div>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#">Easy</a>
+                <a class="dropdown-item" href="#">Normal</a>
               </div>
             </div>
-          </form>
+            <button type="button" id="ready" class="btn btn-primary">
+              Ready
+            </button>
+            <button type="button" id="abort" class="btn btn-primary">
+              Abort
+            </button>
+            <button type="button" id="randomize" class="btn btn-primary">
+              Randomize
+            </button>
+            <button type="button" id="slide" class="btn btn-primary">
+              Toggle Grid
+            </button>
+            <button type="button" id="give-up" class="btn btn-primary">
+              Give up
+            </button>
+            <form id="chat-input" class="input-group">
+              <input type="text" class="form-control" name="chat-message" maxlength="150">
+              <div class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Send</button>
+              </div>
+            </form>
+          </div> <!-- #button-container -->
         </div> <!-- #main-menu -->
 
-      </div> <!-- row -->
-    </div> <!-- container -->
+      </div> <!-- .row -->
+    </div> <!-- .container -->
 
     <footer class="mt-4 mt-sm-5 mb-3 text-muted d-flex flex-wrap justify-content-center">
       <span class="mx-3 mt-2">© 2017-<span id="copyright-year"></span> battleship-online.com</span>
