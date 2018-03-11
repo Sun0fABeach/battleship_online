@@ -333,7 +333,7 @@ class DnDShipPlacement extends ShipPlacement {
             self._draw_grid(ship);
             _set_dragging_cursor(true);
 
-            $draggable.one('mouseup', function() {
+            $('body').one('mouseup', function() {
                 if($draggable.data('moved')) {
                     /* coords might be mixed up due to over & out
                       mechanics @ droppables */
