@@ -3,6 +3,7 @@ const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common.js');
+const shared = require('./webpack.shared.js');
 
 
 const html_minify_options = {
@@ -21,21 +22,7 @@ module.exports = merge(common, {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            ['@babel/preset-env', {
-                                targets: {
-                                    browsers: [
-                                        'last 3 major versions', 'not ie > 0'
-                                    ]
-                                }
-                            }]
-                        ],
-                        babelrc: false // .babelrc only there for mocha atm
-                    }
-                }
+                use: shared.babel_loader_conf
             }
         ]
     },

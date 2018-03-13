@@ -112,6 +112,16 @@ class ChatBubbleDesktop extends ChatBubble {
         super();
         this._placement = 'bottom';
     }
+
+    /**
+     *  Open this chat bubble and display the given message.
+     *
+     *  @param {!String} message - Text to display inside the bubble
+     */
+    show(message) {
+        this._title = '';
+        super.show(message);
+    }
 }
 
 /**

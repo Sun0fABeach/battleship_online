@@ -3,6 +3,7 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const shared = require('./webpack.shared.js');
 
 
 module.exports = {
@@ -30,6 +31,10 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /node_modules\/bootstrap\/js\/src\/.*\.js$/,
+                use: shared.babel_loader_conf
+            },
             {
                 test: /\.css$/,
                 use: [
