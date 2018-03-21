@@ -448,12 +448,15 @@ function register_abort_handler(socket, in_battle) {
 }
 
 function open_chat_bubble(side, message) {
-    const type = side + (adjacent_grid_mode() ? '' : '_mobile');
+    const grids_adjacent = adjacent_grid_mode();
+    const type = side + (grids_adjacent ? '' : '_mobile');
     ui.chat_bubbles[type].show(message);
 
     if(side === 'player') {
         ui.menu_buttons.chat.set_placeholder('Message sent!');
-        ui.menu_buttons.chat.blur(); // so placeholder can be seen
+        if(!grids_adjacent)
+            ui.menu_buttons.chat.blur();
+            // so placeholder can be seen when sending via enter
     }
 }
 

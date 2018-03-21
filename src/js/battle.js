@@ -151,7 +151,7 @@ function let_player_shoot(opponent, first_shot=false) {
  * @property {Boolean} hit - whether the shot is a hit
  * @property {Array} [sunken_ship] - Coordinates of the ship
  *                                   that has been sunk by the shot.
- * @property {Boolean} [defeat] - True if the enemy fleet has been defeated.
+ * @property {Boolean} [defeat] - True if the fleet has been defeated.
  */
 
 /**
