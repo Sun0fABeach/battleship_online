@@ -70,7 +70,7 @@ function setup_screen() {
         .attr('type', 'button')
         .addClass('btn btn-dark mt-4')
         .text('Close')
-        .click(() => close_screen($screen));
+        .click(close_screen.bind(null, $screen));
 
     const $btn_container = $('<div>')
         .addClass('text-center text-md-left')

@@ -102,7 +102,7 @@ class MenuButtonBase {
      * @param {Function} action - Callback to trigger on button click
      */
     _register_click_cb($btn, action) {
-        $btn.click((event) => {
+        $btn.click(event => {
             event.preventDefault();   // even if no action is to be performed
             event.stopPropagation();  // we don't allow bubbling or defaults
             if(this._clickable)
@@ -123,7 +123,7 @@ class MenuButton extends MenuButtonBase {
         super('#button-container > button#' + btn_name);
         if(action)
             this._register_click_cb(action);
-        this._$element.blur(() => this.normal());
+        this._$element.blur(this.normal.bind(this));
     }
 
     /**
@@ -210,9 +210,9 @@ class MenuDropdownButton extends MenuButtonBase {
             this._register_click_cb(action);
 
         this._$dropdown_options = this._$element.find('.dropdown-item');
-        const that = this;
+        const self = this;
         this._$dropdown_options.click(function() {
-            that.set_selection($(this).index());
+            self.set_selection($(this).index());
         });
     }
 

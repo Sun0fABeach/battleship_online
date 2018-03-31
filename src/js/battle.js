@@ -310,11 +310,11 @@ function handle_game_over(opponent, victory) {
     );
 
     if(ui.modals.leave_confirm.is_open())
-        ui.modals.leave_confirm.close(() => delayed_open(victory));
+        ui.modals.leave_confirm.close(delayed_open);
     else
-        delayed_open(victory);
+        delayed_open();
 
-    function delayed_open(victory) {
+    function delayed_open() {
         setTimeout(() => {
             // don't open if opponent left during fleet explosion animation
             if(ui.grids.$both.hasClass('dual-view'))

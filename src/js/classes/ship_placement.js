@@ -184,7 +184,7 @@ class DnDShipPlacement extends ShipPlacement {
             @private */
         this._z_index_val = 0;
 
-        const that = this;
+        const self = this;
 
         this._drag_config = {
             containment: '#player-side table',
@@ -196,7 +196,7 @@ class DnDShipPlacement extends ShipPlacement {
                 'ui-draggable-dragging': 'dragging'
             },
             start: function(event, ui) {
-                that._drag_init_tile_count = $(this).data('ship').length;
+                self._drag_init_tile_count = $(this).data('ship').length;
             }
         };
 
@@ -205,13 +205,13 @@ class DnDShipPlacement extends ShipPlacement {
 
             over: function(event, ui) {
                 // ignore initial drag events
-                if(that._drag_init_tile_count-- <= 0) {
+                if(self._drag_init_tile_count-- <= 0) {
                     const ship = ui.draggable.data('ship');
                     // avoid copy by reference here by using Array.from()
                     ship.add_coords(Array.from($(this).data('coords')));
                     if(ship.in_valid_state()) {
                         ui.draggable.data('moved', true);
-                        that._draw_grid(ship);
+                        self._draw_grid(ship);
                     }
                 }
             },
@@ -220,7 +220,7 @@ class DnDShipPlacement extends ShipPlacement {
                 ship.remove_coords($(this).data('coords'));
                 if(ship.in_valid_state()) {
                     ui.draggable.data('moved', true);
-                    that._draw_grid(ship);
+                    self._draw_grid(ship);
                 }
             }
         };
@@ -233,7 +233,7 @@ class DnDShipPlacement extends ShipPlacement {
         /* note that this resize handler won't be registered more than once due
            to the singleton pattern */
         $(window).resize(() =>
-            debounce_interval(100, () => that._adjust_draggables())
+            debounce_interval(100, this._adjust_draggables.bind(this))
         );
     }
 
@@ -428,9 +428,9 @@ class DnDShipPlacement extends ShipPlacement {
      * (Re)draw all draggables.
      */
     _adjust_draggables() {
-        const that = this;
+        const self = this;
         grids.player.table.siblings('.draggable').each(function(i, draggable) {
-            that._span_draggable_movable($(draggable));
+            self._span_draggable_movable($(draggable));
         });
     }
 

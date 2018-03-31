@@ -69,7 +69,7 @@ class AcknowledgeModal extends BasicInteractionModal {
         this._$btn_left.hide();
         this._$btn_right
         .off()
-        .one('click', () => this._close())
+        .one('click', this._close.bind(this))
         .text('OK')
         .show();
 
@@ -116,9 +116,9 @@ class LeaveConfirmModal extends BasicInteractionModal {
         super._open();
     }
 
-    close(close_cb) {
+    close(close_cb=undefined) {
         if(close_cb)
-            this._$modal.one('hidden.bs.modal', () => close_cb());
+            this._$modal.one('hidden.bs.modal', close_cb);
         super._close();
     }
 
@@ -166,11 +166,11 @@ class GameOverModal extends BasicInteractionModal {
         this._$head_container.show();
         this._heading.set_text(victory ? 'You <strong>win</strong>!' :
                                 'You have been <strong>defeated</strong>!');
-        this._$btn_left.off().one('click', () =>
-            this._regame_yes_handler(opponent)
+        this._$btn_left.off().one('click',
+            this._regame_yes_handler.bind(this, opponent)
         );
-        this._$btn_right.off().one('click', () =>
-            this._regame_no_handler(opponent)
+        this._$btn_right.off().one('click',
+            this._regame_no_handler.bind(this, opponent)
         );
         this._$btn_left.text('Yes').show();
         this._$btn_right.text('No').show();
@@ -251,7 +251,7 @@ class GameOverModal extends BasicInteractionModal {
             this._$btn_left.hide();
             this._$btn_right
             .off()
-            .one('click', () => this._regame_no_ok_handler())
+            .one('click', this._regame_no_ok_handler.bind(this))
             .text('OK');
         });
     }
@@ -359,8 +359,8 @@ class HostModal extends Modal {
                             .addClass(this._join_btn_class)
                             .text('Join');
 
-        this._$host_search.on('input', () => this._handle_search());
-        this._$close.click(() => this._close());
+        this._$host_search.on('input', this._handle_search.bind(this));
+        this._$close.click(this._close.bind(this));
         this._join_inputs_enable(true);
     }
 
@@ -373,7 +373,7 @@ class HostModal extends Modal {
         this._set_default_state();
 
         super._open();
-        this._socket.emit('host watch', (hosts) => {
+        this._socket.emit('host watch', hosts => {
             this._$loading_text.remove();
             if(hosts) {
                 for(const host of hosts)
@@ -383,11 +383,11 @@ class HostModal extends Modal {
             }
         });
 
-        swap_in_socket_handlers(this._socket, (socket) => {
-            socket.on('add host', (host) => {
+        swap_in_socket_handlers(this._socket, socket => {
+            socket.on('add host', host => {
                 this._add_item(host);
             });
-            socket.on('remove host', (id) => {
+            socket.on('remove host', id => {
                 this._remove_item(id);
             });
         });
@@ -434,9 +434,9 @@ class HostModal extends Modal {
         this._join_inputs_enable(false);
         this._$close.off('click');
 
-        this._socket.emit('join', host.id, (success) => {
-            this._join_inputs_enable(true);
-            this._$close.click(() => this._close());
+        this._socket.emit('join', host.id, success => {
+            this._join_inputs_enable(true); // re-enable for next open
+            this._$close.click(this._close.bind(this));
 
             if(success) {
                 super._close();
@@ -460,11 +460,11 @@ class HostModal extends Modal {
 
     _join_inputs_enable(active) {
         if(active) {
-            const modal = this;
+            const self = this;
             this._$list_container.on('click', 'li:has(button)', function() {
-                modal._join_host($(this).data('host'));
+                self._join_host($(this).data('host'));
             });
-            this._$random_join.click(() => this._join_random_host());
+            this._$random_join.click(this._join_random_host.bind(this));
         } else {
             this._$list_container.off('click');
             this._$random_join.off('click');
