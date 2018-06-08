@@ -13,6 +13,7 @@ const html_minify_options = {
 };
 
 module.exports = merge(common, {
+    mode: 'production',
     output: {
         filename: '[name].[chunkhash].js',
     },
@@ -33,12 +34,6 @@ module.exports = merge(common, {
         }),
         new UglifyJSPlugin({
             // sourceMap: true
-        }),
-        // tells some node libs that it's production time via env variable
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify('production')
-            }
         })
     ]
 });

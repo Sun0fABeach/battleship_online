@@ -5,6 +5,7 @@ const Visualizer = require('webpack-visualizer-plugin');
 
 
 module.exports = merge(common, {
+    mode: 'development',
     output: {
         filename: '[name].js',
     },

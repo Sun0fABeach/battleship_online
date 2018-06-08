@@ -8,17 +8,7 @@ const shared = require('./webpack.shared.js');
 
 module.exports = {
     entry: {
-        app: './src/index.js',
-        vendor: [
-            'webpack-jquery-ui/draggable',
-            'webpack-jquery-ui/droppable',
-            'webpack-jquery-ui/shake-effect',
-            './src/vendor/jquery.ui.touch-punch',
-            './src/vendor/bootstrap/bootstrap',
-            './src/vendor/bootstrap/bootstrap.scss',
-            'font-awesome-webpack!./src/config/font-awesome.config.js',
-            'socket.io-client'
-        ],
+        app: './src/index.js'
     },
     // prevent jquery from being bundled twice
     resolve: {
@@ -73,21 +63,25 @@ module.exports = {
             }
         ]
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/](node_modules)|(src[\\/](custom_vendor|config))[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all'
+                },
+                commons: {
+                    name: 'commons',
+                    chunks: 'initial',
+                    minChunks: 2
+                }
+            }
+        }
+    },
     plugins: [
         new CleanWebpackPlugin(['dist/*']),
         new CopyWebpackPlugin([{from: 'robots.txt'}]),
-
-        // ensures vendor bundle hash doesn't change when app content changes
-        // (to avoid unnecessary cache busting)
-        new webpack.HashedModuleIdsPlugin(),
-
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor'
-        }),
-        // common chunks + webpack runtime
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'common'
-        }),
 
         new webpack.ProvidePlugin({
             $: 'jquery',
