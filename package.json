@@ -17,7 +17,7 @@
     "heroku-postbuild": "npm run build"
   },
   "author": "Markus Appel",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
