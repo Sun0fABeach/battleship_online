@@ -33,4 +33,7 @@ if(myArgs.length > 0 && (myArgs[0] === '-d' || myArgs[0] === '--debug')) {
 }
 
 io_logic.init(io);
-server.listen(process.env.PORT || 8000);
+
+const port = process.env.PORT || 8000;
+server.listen(port);
+console.log(`http://localhost:${port}`);
