@@ -27,13 +27,17 @@ module.exports = merge(common, {
             }
         ]
     },
+    optimization: {
+        minimizer: [
+            new UglifyJSPlugin({
+                // sourceMap: true,
+            })
+        ]
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
             minify: html_minify_options
-        }),
-        new UglifyJSPlugin({
-            // sourceMap: true
         })
     ]
 });
