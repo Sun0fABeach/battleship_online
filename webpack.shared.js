@@ -11,7 +11,6 @@ module.exports = {
                     }
                 }]
             ],
-            plugins: ['@babel/plugin-proposal-object-rest-spread'],
             babelrc: false // .babelrc only there for mocha atm
         }
     }

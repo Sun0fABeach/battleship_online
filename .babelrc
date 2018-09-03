@@ -1,3 +1,4 @@
+// this babelrc is only for mocha
 {
-  "presets": ["env"]
+  "presets": ["@babel/preset-env"]
 }
