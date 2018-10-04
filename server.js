@@ -11,7 +11,6 @@ const app = express();
 const server = http.Server(app);
 
 app.set('view engine', 'ejs');
-app.engine('ejs', ejs.renderFile);
 app.set('views', path.resolve(__dirname, 'views'));
 
 app.get(/^\/(_?(help|imprint))$/, (req, res) => {
