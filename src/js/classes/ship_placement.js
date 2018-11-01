@@ -13,7 +13,7 @@ import { chance_in_percent, array_choice, debounce_interval } from '../helpers';
 
 /** Fleet configuration as array of ship sizes */
 // const fleet_config = [2]; // for debugging
-const fleet_config = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
+const fleet_config = [5, 3, 3, 3, 2, 2, 2, 2, 1, 1];
 fleet_config.sort().reverse(); // just in case config not sorted in desc order
 
 /** Coordinate offsets usable to determine surrounding tiles. */
