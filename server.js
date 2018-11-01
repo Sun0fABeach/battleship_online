@@ -3,7 +3,6 @@ const io_logic = require('./socketio');
 const http = require('http');
 const express = require('express');
 const path = require('path');
-const ejs = require('ejs');
 
 
 let io;
