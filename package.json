@@ -63,6 +63,6 @@
     "webpack-merge": "^4.2.1"
   },
   "engines": {
-    "node": "10.5.0"
+    "node": "12.4.0"
   }
 }
