@@ -21,10 +21,8 @@
   }
 
   .imprint {
-    ul#owner-address {
-      list-style: none;
-      padding-left: 0;
-      margin-left: 1rem;
+    address {
+      padding-left: 1rem;
     }
 
     table#owner-contact {
