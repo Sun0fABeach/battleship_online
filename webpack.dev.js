@@ -18,21 +18,6 @@ module.exports = merge(common, {
             target: 'http://localhost:8000'
         }]
     },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                enforce: 'pre',
-                use: {
-                    loader: 'jshint-loader',
-                    options: {
-                        esversion: 6,
-                    }
-                }
-            },
-        ]
-    },
     plugins: [
         new Visualizer(),
         new HtmlWebpackPlugin({

@@ -198,7 +198,6 @@ class AIOpponent extends Opponent {
             const shot_options = [];
             const hit_pair = this._hit_stack[this._hit_stack.length - 1];
 
-            /* jshint ignore:start */
             grids.player.surrounding_coords_do(
                 /* what _sensible_offsets() will return is dependent on
                 * the difficulty class */
@@ -208,7 +207,6 @@ class AIOpponent extends Opponent {
                         shot_options.push(coord_pair);
                 }
             );
-            /* jshint ignore:end */
 
             if(shot_options.length > 0) {
                 return shot_options;
@@ -331,7 +329,6 @@ class AIOpponentNormal extends AIOpponent {
     _untouched_surrounding_coords(ship_coords) {
         const surrounding_coords = [];
         ship_coords.forEach(ship_pair => {
-            /* jshint ignore:start */
             grids.player.surrounding_coords_do(
                 ...ship_pair, this._offsets.all,
                 (adjacent_pair, $tile) => {
@@ -345,7 +342,6 @@ class AIOpponentNormal extends AIOpponent {
                     surrounding_coords.push(adjacent_pair);
                 }
             );
-            /* jshint ignore:end */
         });
 
         return surrounding_coords;

@@ -78,14 +78,12 @@ class ShipPlacement {
 
             for(const [ship_x, ship_y] of ship_coords) {
                 coords_map[ship_y][ship_x] = null;
-                /* jshint ignore:start */
                 grids.player.surrounding_coords_do(
                     ship_x, ship_y, surrounding_offsets,
                     (coord_pair, $tile) => {
                         coords_map[coord_pair[1]][coord_pair[0]] = null;
                     }
                 );
-                /* jshint ignore:end */
             }
 
             // let print_map = '';
@@ -328,7 +326,7 @@ class DnDShipPlacement extends ShipPlacement {
          * Event handler for mouse interaction with draggables.
          */
         function _draggable_mousedown_handler() {
-            const $draggable = $(this); // jshint ignore:line
+            const $draggable = $(this);
             const ship = $draggable.data('ship');
             self._draw_grid(ship);
             _set_dragging_cursor(true);
@@ -462,11 +460,9 @@ class DnDShipPlacement extends ShipPlacement {
      */
     _draw_ships(highlighted_ship) {
         for(const ship of this._ships) {
-            /* jshint ignore:start */
             const tiles = ship.coords.map(
                 coords => grids.player.coords_to_tile(coords)
             );
-            /* jshint ignore:end */
             for(const $tile of tiles) {
                 $tile.addClass($tile.hasClass('ship') ? 'overlap' : 'ship');
                 if(ship === highlighted_ship)
@@ -481,7 +477,6 @@ class DnDShipPlacement extends ShipPlacement {
     _mark_forbidden() {
         for(const ship of this._ships) {
             for(const [ship_x, ship_y] of ship.coords) {
-                /* jshint ignore:start */
                 grids.player.surrounding_coords_do(
                     ship_x, ship_y, surrounding_offsets,
                     (coord_pair, $tile) => {
@@ -491,7 +486,6 @@ class DnDShipPlacement extends ShipPlacement {
                             $tile.addClass('forbidden');
                     }
                 );
-                /* jshint ignore:end */
             }
         }
     }

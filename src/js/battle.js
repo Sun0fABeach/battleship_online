@@ -507,7 +507,6 @@ function animate_explosion($tile) {
     // total animation duration: num_sprites * delay = 800ms
 
     for(let i = 1; i < num_sprites; ++i) {
-        /* jshint ignore:start */
         setTimeout(() => {
             $sprite_container.css(
                 'background-position',
@@ -515,7 +514,6 @@ function animate_explosion($tile) {
                 -(Math.floor(i/spritesheet_row_length) * offset) + 'px'
             );
         }, i * delay);
-        /* jshint ignore:end */
     }
     setTimeout(() => $sprite_container.remove(), num_sprites * delay);
 
