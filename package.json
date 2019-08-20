@@ -19,7 +19,7 @@
   "author": "Markus Appel",
   "license": "UNLICENSED",
   "devDependencies": {
-    "jsdoc": "^3.6.2",
+    "jsdoc": "^3.6.3",
     "jshint": "^2.10.2",
     "jshint-loader": "^0.8.4",
     "mocha": "^6.1.4",
