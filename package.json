@@ -12,6 +12,7 @@
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "start": "node server.js",
+    "start_debug": "node server.js -d",
     "doc": "./node_modules/.bin/jsdoc -c jsdoc.json",
     "deploy": "git push --force-with-lease heroku master",
     "heroku-postbuild": "npm run build"
