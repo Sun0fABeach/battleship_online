@@ -12,7 +12,7 @@ const server = http.Server(app);
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
 
-app.get(/^\/(_?(help|imprint))$/, (req, res) => {
+app.get(/^\/(_?(help|imprint|privacy))$/, (req, res) => {
     res.render(req.params[0]);
 });
 
