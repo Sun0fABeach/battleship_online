@@ -62,4 +62,10 @@
       margin-bottom: 2em;
     }
   }
+
+  .overlay-close {
+    @include media-breakpoint-up(sm) {
+      display: inline-block; // to prevent full width stretch of button
+    }
+  }
 }

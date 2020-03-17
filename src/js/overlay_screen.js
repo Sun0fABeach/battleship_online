@@ -68,17 +68,17 @@ function setup_screen() {
 
     const $close_btn = $('<button>')
         .attr('type', 'button')
-        .addClass('btn btn-dark mt-4')
+        .addClass('btn btn-block btn-dark mt-4')
         .text('Close')
         .click(close_screen.bind(null, $screen));
 
     const $btn_container = $('<div>')
-        .addClass('text-center text-md-left')
+        .addClass('overlay-close text-center text-md-left')
         .append($close_btn);
 
     $content_container
-    .append('<div>') // for category content
-    .append($btn_container);
+        .append('<div>') // for category content
+        .append($btn_container);
 
     return $screen;
 }
