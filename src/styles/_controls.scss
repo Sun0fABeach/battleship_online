@@ -47,10 +47,10 @@
 
     @include media-breakpoint-down(xs) {
       > #vs-ai {
-        > button:first-of-type > div {
+        > .btn > div {
           margin-right: -55px; // re-center text b/c dropdown arrow screws with centering
         }
-        > button:last-of-type {
+        > .btn-group > .btn {
           padding: 0 24px; // widen dropdown arrow on mobile for more touch surface
         }
       }
