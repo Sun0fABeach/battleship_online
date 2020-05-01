@@ -39,6 +39,9 @@
         > button:first-of-type {
           flex-grow: 1;
         }
+        .dropdown-item {
+          cursor: pointer;
+        }
       }
     }
 
