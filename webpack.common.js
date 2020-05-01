@@ -91,7 +91,7 @@ module.exports = {
             Popper: ['popper.js', 'default'],
         }),
 
-        // see https://github.com/haydenbleasel/favicons#usage
+        // see https://github.com/jantimon/favicons-webpack-plugin#basic-usage
         new FaviconsWebpackPlugin({
             logo: './src/assets/crosshair1.jpg',
             // The prefix for all image files (might be a folder or a name)
