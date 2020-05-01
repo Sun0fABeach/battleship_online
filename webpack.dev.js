@@ -24,7 +24,7 @@ module.exports = merge(common, {
     plugins: [
         new Visualizer(),
         new HtmlWebpackPlugin({
-            template: './src/index.html'
+            template: './public/index.html'
         })
     ]
 });

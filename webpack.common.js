@@ -81,7 +81,7 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin([{from: 'robots.txt'}]),
+        new CopyWebpackPlugin([{from: 'public/robots.txt'}]),
 
         new webpack.ProvidePlugin({
             $: 'jquery',
