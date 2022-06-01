@@ -37,7 +37,7 @@
     "compression": "^1.7.4",
     "copy-webpack-plugin": "^5.1.2",
     "css-loader": "^3.6.0",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.7",
     "express": "^4.17.1",
     "favicons-webpack-plugin": "0.0.9",
     "file-loader": "^4.3.0",
