@@ -22,7 +22,7 @@
   "devDependencies": {
     "jsdoc": "^3.6.6",
     "mocha": "^10.2.0",
-    "webpack-dev-server": "^3.11.3",
+    "webpack-dev-server": "^5.0.4",
     "webpack-visualizer-plugin": "^0.1.11"
   },
   "dependencies": {
