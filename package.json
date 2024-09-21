@@ -38,7 +38,7 @@
     "copy-webpack-plugin": "^5.1.2",
     "css-loader": "^3.6.0",
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "favicons-webpack-plugin": "6.0.0",
     "file-loader": "^4.3.0",
     "font-awesome": "^4.7.0",
