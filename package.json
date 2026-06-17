@@ -20,7 +20,7 @@
   "author": "Markus Appel",
   "license": "UNLICENSED",
   "devDependencies": {
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^4.0.5",
     "mocha": "^10.2.0",
     "webpack-dev-server": "^5.2.4",
     "webpack-visualizer-plugin": "^0.1.11"
