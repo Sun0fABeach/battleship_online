@@ -21,7 +21,7 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "jsdoc": "^4.0.5",
-    "mocha": "^10.2.0",
+    "mocha": "^10.8.2",
     "webpack-dev-server": "^5.2.6",
     "webpack-visualizer-plugin": "^0.1.11"
   },
